@@ -14,8 +14,8 @@ import EventCard from '../components/EventCard';
 //    - Restrict the key to Google Calendar API (recommended)
 // 5. Replace these placeholder values:
 // ============================================================
-const GOOGLE_CALENDAR_ID = 'YOUR_CALENDAR_ID@group.calendar.google.com';
-const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY';
+const GOOGLE_CALENDAR_ID = 'ketteringarcherstest@gmail.com';
+const GOOGLE_API_KEY = 'AIzaSyCla7x5hStgKHGJspQwB82zKvwFfjqkTB4';
 
 const Events = () => {
     const [events, setEvents] = useState([]);
@@ -42,7 +42,13 @@ const Events = () => {
             const response = await fetch(url);
 
             if (!response.ok) {
-                throw new Error('Failed to fetch events');
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Google Calendar API Error:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: errorData
+                });
+                throw new Error(`API Error ${response.status}: ${errorData.error?.message || response.statusText}`);
             }
 
             const data = await response.json();
@@ -61,6 +67,12 @@ const Events = () => {
                     eventType = 'Open Day';
                 } else if (description.toLowerCase().includes('[social]')) {
                     eventType = 'Social';
+                } else if (description.toLowerCase().includes('[practice]')) {
+                    eventType = 'Practice';
+                } else if (description.toLowerCase().includes('[target]')) {
+                    eventType = 'Target';
+                } else if (description.toLowerCase().includes('[clout]')) {
+                    eventType = 'Clout';
                 }
 
                 // Get start date/time
@@ -85,7 +97,7 @@ const Events = () => {
 
                 // Clean description (remove type tags)
                 const cleanDescription = description
-                    .replace(/\[(competition|beginners|open day|social|club shoot)\]/gi, '')
+                    .replace(/\[(competition|beginners|open day|social|club shoot|practice|clout|indoors)\]/gi, '')
                     .trim();
 
                 return {
@@ -175,12 +187,12 @@ const Events = () => {
 
                 {/* Event Type Legend */}
                 <div className="flex flex-wrap justify-center gap-3 mb-10">
-                    {['Club Shoot', 'Competition', 'Beginners', 'Open Day', 'Social'].map((type) => (
+                    {['Practice', 'Target', 'Clout', 'Club Shoot', 'Competition', 'Beginners', 'Open Day'].map((type) => (
                         <span key={type} className={`px-3 py-1.5 rounded-full text-sm font-medium ${type === 'Club Shoot' ? 'bg-forest-600/20 text-forest-400' :
-                                type === 'Competition' ? 'bg-gold-600/20 text-gold-400' :
-                                    type === 'Beginners' ? 'bg-blue-600/20 text-blue-400' :
-                                        type === 'Open Day' ? 'bg-purple-600/20 text-purple-400' :
-                                            'bg-pink-600/20 text-pink-400'
+                            type === 'Competition' ? 'bg-gold-600/20 text-gold-400' :
+                                type === 'Beginners' ? 'bg-blue-600/20 text-blue-400' :
+                                    type === 'Open Day' ? 'bg-purple-600/20 text-purple-400' :
+                                        'bg-pink-600/20 text-pink-400'
                             }`}>
                             {type}
                         </span>
