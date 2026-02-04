@@ -177,10 +177,10 @@ const Events = () => {
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12 md:mb-16">
-                    <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
+                    <h1 className="text-3xl md:text-5xl font-bold text-forest-900 mb-4">
                         Upcoming <span className="gradient-text">Events</span>
                     </h1>
-                    <p className="text-charcoal-400 text-lg max-w-2xl mx-auto">
+                    <p className="text-charcoal-600 text-lg max-w-2xl mx-auto">
                         Stay up to date with all our club activities, competitions, and social events.
                     </p>
                 </div>
@@ -188,11 +188,14 @@ const Events = () => {
                 {/* Event Type Legend */}
                 <div className="flex flex-wrap justify-center gap-3 mb-10">
                     {['Practice', 'Target', 'Clout', 'Club Shoot', 'Competition', 'Beginners', 'Open Day'].map((type) => (
-                        <span key={type} className={`px-3 py-1.5 rounded-full text-sm font-medium ${type === 'Club Shoot' ? 'bg-forest-600/20 text-forest-400' :
-                            type === 'Competition' ? 'bg-gold-600/20 text-gold-400' :
-                                type === 'Beginners' ? 'bg-blue-600/20 text-blue-400' :
-                                    type === 'Open Day' ? 'bg-purple-600/20 text-purple-400' :
-                                        'bg-pink-600/20 text-pink-400'
+                        <span key={type} className={`px-3 py-1.5 rounded-full text-sm font-medium ${type === 'Club Shoot' ? 'bg-forest-100 text-forest-700 border border-forest-300' :
+                            type === 'Competition' ? 'bg-gold-100 text-gold-700 border border-gold-300' :
+                                type === 'Beginners' ? 'bg-blue-100 text-blue-700 border border-blue-300' :
+                                    type === 'Open Day' ? 'bg-purple-100 text-purple-700 border border-purple-300' :
+                                        type === 'Practice' ? 'bg-emerald-100 text-emerald-700 border border-emerald-300' :
+                                            type === 'Target' ? 'bg-teal-100 text-teal-700 border border-teal-300' :
+                                                type === 'Clout' ? 'bg-amber-100 text-amber-700 border border-amber-300' :
+                                                    'bg-pink-100 text-pink-700 border border-pink-300'
                             }`}>
                             {type}
                         </span>
@@ -203,13 +206,13 @@ const Events = () => {
                 {loading && (
                     <div className="text-center py-20">
                         <div className="w-12 h-12 mx-auto mb-4 rounded-full border-4 border-forest-600 border-t-transparent animate-spin"></div>
-                        <p className="text-charcoal-400">Loading events...</p>
+                        <p className="text-charcoal-600">Loading events...</p>
                     </div>
                 )}
 
                 {/* Error Message */}
                 {error && (
-                    <div className="mb-8 p-4 rounded-lg bg-gold-500/20 border border-gold-500/50 text-gold-400 text-center">
+                    <div className="mb-8 p-4 rounded-lg bg-gold-500/20 border border-gold-500/50 text-gold-600 text-center">
                         {error}
                     </div>
                 )}
@@ -220,7 +223,7 @@ const Events = () => {
                         <svg className="w-16 h-16 mx-auto mb-4 text-charcoal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <p className="text-charcoal-400">No upcoming events scheduled.</p>
+                        <p className="text-charcoal-600">No upcoming events scheduled.</p>
                     </div>
                 )}
 
@@ -229,7 +232,7 @@ const Events = () => {
                     <div className="space-y-12">
                         {Object.entries(groupedEvents).map(([monthYear, monthEvents]) => (
                             <div key={monthYear}>
-                                <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-3">
+                                <h2 className="text-xl font-semibold text-forest-900 mb-6 flex items-center gap-3">
                                     <span className="w-3 h-3 rounded-full bg-forest-500" />
                                     {monthYear}
                                 </h2>
@@ -252,14 +255,14 @@ const Events = () => {
                 {/* Info Box */}
                 <div className="mt-16 glass-card p-6 md:p-8 border-forest-500/30">
                     <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-forest-600/20 flex items-center justify-center shrink-0">
-                            <svg className="w-6 h-6 text-forest-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="w-12 h-12 rounded-xl bg-forest-100 flex items-center justify-center shrink-0">
+                            <svg className="w-6 h-6 text-forest-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-white mb-2">Event Information</h3>
-                            <p className="text-charcoal-400 text-sm leading-relaxed">
+                            <h3 className="font-semibold text-forest-900 mb-2">Event Information</h3>
+                            <p className="text-charcoal-600 text-sm leading-relaxed">
                                 Most club events are open to all members. Competitions may require pre-registration
                                 - please check with the club secretary. Beginners sessions must be booked in advance.
                                 For any queries, please contact us via email.

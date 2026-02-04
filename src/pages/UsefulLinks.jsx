@@ -144,11 +144,11 @@ const UsefulLinks = () => {
 
     const getColorClasses = (color) => {
         const colors = {
-            forest: 'bg-forest-600/20 text-forest-400 group-hover:bg-forest-600',
-            gold: 'bg-gold-600/20 text-gold-400 group-hover:bg-gold-600',
+            forest: 'bg-forest-100 text-forest-600 group-hover:bg-forest-600',
+            gold: 'bg-gold-100 text-gold-600 group-hover:bg-gold-600',
             purple: 'bg-purple-600/20 text-purple-400 group-hover:bg-purple-600',
             blue: 'bg-blue-600/20 text-blue-400 group-hover:bg-blue-600',
-            charcoal: 'bg-charcoal-600/20 text-charcoal-300 group-hover:bg-charcoal-600'
+            charcoal: 'bg-charcoal-600/20 text-charcoal-600 group-hover:bg-charcoal-600'
         };
         return colors[color] || colors.forest;
     };
@@ -158,10 +158,10 @@ const UsefulLinks = () => {
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12 md:mb-16">
-                    <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
+                    <h1 className="text-3xl md:text-5xl font-bold text-forest-900 mb-4">
                         Useful <span className="gradient-text">Links</span>
                     </h1>
-                    <p className="text-charcoal-400 text-lg max-w-2xl mx-auto">
+                    <p className="text-charcoal-600 text-lg max-w-2xl mx-auto">
                         A curated collection of archery resources, from governing bodies to equipment suppliers.
                     </p>
                 </div>
@@ -174,7 +174,7 @@ const UsefulLinks = () => {
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getColorClasses(category.color).split(' ').slice(0, 2).join(' ')}`}>
                                     {category.icon}
                                 </div>
-                                <h2 className="text-xl font-bold text-white">{category.title}</h2>
+                                <h2 className="text-xl font-bold text-forest-900">{category.title}</h2>
                             </div>
 
                             <div className="grid gap-4">
@@ -189,13 +189,13 @@ const UsefulLinks = () => {
                                     >
                                         <div className="flex items-center justify-between">
                                             <div className="flex-1 min-w-0">
-                                                <h3 className="text-lg font-medium text-white group-hover:text-forest-400 transition-colors mb-1">
+                                                <h3 className="text-lg font-medium text-forest-900 group-hover:text-forest-600 transition-colors mb-1">
                                                     {link.name}
                                                 </h3>
-                                                <p className="text-charcoal-400 text-sm">{link.description}</p>
+                                                <p className="text-charcoal-600 text-sm">{link.description}</p>
                                                 <p className="text-charcoal-500 text-xs mt-2 truncate">{link.url}</p>
                                             </div>
-                                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ml-4 shrink-0 transition-all duration-300 ${getColorClasses(category.color)} group-hover:text-white`}>
+                                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ml-4 shrink-0 transition-all duration-300 ${getColorClasses(category.color)} group-hover:text-forest-900`}>
                                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                                 </svg>
@@ -213,8 +213,8 @@ const UsefulLinks = () => {
                     <svg className="w-12 h-12 mx-auto mb-4 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <h3 className="text-xl font-semibold text-white mb-2">Know a useful link?</h3>
-                    <p className="text-charcoal-400 mb-4">
+                    <h3 className="text-xl font-semibold text-forest-900 mb-2">Know a useful link?</h3>
+                    <p className="text-charcoal-600 mb-4">
                         If you know of a useful archery resource that should be included here, let us know!
                     </p>
                     <a href="mailto:info@ketteringarchers.co.uk?subject=Link%20Suggestion" className="btn-secondary">

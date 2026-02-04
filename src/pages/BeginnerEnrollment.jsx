@@ -133,8 +133,8 @@ const BeginnerEnrollment = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
-                    <h1 className="text-3xl font-bold text-white mb-4">Thank You!</h1>
-                    <p className="text-charcoal-300 mb-8">
+                    <h1 className="text-3xl font-bold text-forest-900 mb-4">Thank You!</h1>
+                    <p className="text-charcoal-600 mb-8">
                         Your enrollment request has been received. We'll be in touch within 48 hours
                         to confirm your place on our next beginners course.
                     </p>
@@ -151,10 +151,10 @@ const BeginnerEnrollment = () => {
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
+                    <h1 className="text-3xl md:text-5xl font-bold text-forest-900 mb-4">
                         Beginners <span className="gradient-text">Enrollment</span>
                     </h1>
-                    <p className="text-charcoal-400 text-lg max-w-2xl mx-auto">
+                    <p className="text-charcoal-600 text-lg max-w-2xl mx-auto">
                         Register your interest in our beginners course. No experience necessary -
                         all equipment is provided.
                     </p>
@@ -162,7 +162,7 @@ const BeginnerEnrollment = () => {
 
                 {/* Course Info */}
                 <div className="glass-card p-6 md:p-8 mb-10 border-gold-500/30">
-                    <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-3">
+                    <h2 className="text-xl font-semibold text-forest-900 mb-4 flex items-center gap-3">
                         <svg className="w-6 h-6 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -173,49 +173,49 @@ const BeginnerEnrollment = () => {
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-charcoal-300">6-week structured course</span>
+                            <span className="text-charcoal-600">6-week structured course</span>
                         </div>
                         <div className="flex items-start gap-3">
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-charcoal-300">All equipment provided</span>
+                            <span className="text-charcoal-600">All equipment provided</span>
                         </div>
                         <div className="flex items-start gap-3">
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-charcoal-300">Qualified instructors</span>
+                            <span className="text-charcoal-600">Qualified instructors</span>
                         </div>
                         <div className="flex items-start gap-3">
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-charcoal-300">Small group sizes (max 8)</span>
+                            <span className="text-charcoal-600">Small group sizes (max 8)</span>
                         </div>
                         <div className="flex items-start gap-3">
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-charcoal-300">Ages 10+ welcome</span>
+                            <span className="text-charcoal-600">Ages 10+ welcome</span>
                         </div>
                         <div className="flex items-start gap-3">
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-charcoal-300">Course fee: £60 (includes temporary membership)</span>
+                            <span className="text-charcoal-600">Course fee: £60 (includes temporary membership)</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Enrollment Form */}
                 <form onSubmit={handleSubmit} className="glass-card p-6 md:p-8">
-                    <h2 className="text-xl font-semibold text-white mb-6">Enrollment Form</h2>
+                    <h2 className="text-xl font-semibold text-forest-900 mb-6">Enrollment Form</h2>
 
                     {/* Personal Details */}
                     <div className="grid md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label className="block text-sm font-medium text-charcoal-300 mb-2">
+                            <label className="block text-sm font-medium text-charcoal-600 mb-2">
                                 First Name *
                             </label>
                             <input
@@ -231,7 +231,7 @@ const BeginnerEnrollment = () => {
                             )}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-charcoal-300 mb-2">
+                            <label className="block text-sm font-medium text-charcoal-600 mb-2">
                                 Last Name *
                             </label>
                             <input
@@ -250,7 +250,7 @@ const BeginnerEnrollment = () => {
 
                     <div className="grid md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label className="block text-sm font-medium text-charcoal-300 mb-2">
+                            <label className="block text-sm font-medium text-charcoal-600 mb-2">
                                 Email *
                             </label>
                             <input
@@ -266,7 +266,7 @@ const BeginnerEnrollment = () => {
                             )}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-charcoal-300 mb-2">
+                            <label className="block text-sm font-medium text-charcoal-600 mb-2">
                                 Phone Number *
                             </label>
                             <input
@@ -285,7 +285,7 @@ const BeginnerEnrollment = () => {
 
                     <div className="grid md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label className="block text-sm font-medium text-charcoal-300 mb-2">
+                            <label className="block text-sm font-medium text-charcoal-600 mb-2">
                                 Age Group *
                             </label>
                             <select
@@ -307,7 +307,7 @@ const BeginnerEnrollment = () => {
                             )}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-charcoal-300 mb-2">
+                            <label className="block text-sm font-medium text-charcoal-600 mb-2">
                                 Previous Experience *
                             </label>
                             <select
@@ -330,7 +330,7 @@ const BeginnerEnrollment = () => {
 
                     {/* Preferred Sessions */}
                     <div className="mb-8">
-                        <label className="block text-sm font-medium text-charcoal-300 mb-3">
+                        <label className="block text-sm font-medium text-charcoal-600 mb-3">
                             Preferred Session Times * (select all that apply)
                         </label>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -339,7 +339,7 @@ const BeginnerEnrollment = () => {
                                     key={session}
                                     className={`flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-all ${formData.preferredSessions.includes(session)
                                         ? 'bg-forest-600/30 border border-forest-500'
-                                        : 'bg-charcoal-800/50 border border-charcoal-700 hover:border-charcoal-600'
+                                        : 'bg-white/50 border border-charcoal-200 hover:border-charcoal-600'
                                         }`}
                                 >
                                     <input
@@ -360,7 +360,7 @@ const BeginnerEnrollment = () => {
                                             </svg>
                                         )}
                                     </div>
-                                    <span className="text-sm text-charcoal-200">{session}</span>
+                                    <span className="text-sm text-charcoal-700">{session}</span>
                                 </label>
                             ))}
                         </div>
@@ -371,7 +371,7 @@ const BeginnerEnrollment = () => {
 
                     {/* How Heard */}
                     <div className="mb-8">
-                        <label className="block text-sm font-medium text-charcoal-300 mb-2">
+                        <label className="block text-sm font-medium text-charcoal-600 mb-2">
                             How did you hear about us?
                         </label>
                         <select
@@ -391,7 +391,7 @@ const BeginnerEnrollment = () => {
 
                     {/* Additional Message */}
                     <div className="mb-8">
-                        <label className="block text-sm font-medium text-charcoal-300 mb-2">
+                        <label className="block text-sm font-medium text-charcoal-600 mb-2">
                             Additional Message (optional)
                         </label>
                         <textarea

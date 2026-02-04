@@ -17,7 +17,7 @@ const Header = () => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-charcoal-900/80 backdrop-blur-lg border-b border-charcoal-700/50">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-b border-forest-200 shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16 md:h-20">
                     {/* Logo */}
@@ -25,11 +25,11 @@ const Header = () => {
                         <img
                             src="/logo.jpg"
                             alt="Kettering Archers Logo"
-                            className="w-10 h-10 md:w-12 md:h-12 rounded-lg shadow-lg group-hover:shadow-forest-500/30 transition-all duration-300"
+                            className="w-10 h-10 md:w-12 md:h-12 rounded-lg shadow-md group-hover:shadow-forest-500/30 transition-all duration-300"
                         />
                         <div className="hidden sm:block">
-                            <h1 className="text-lg md:text-xl font-bold text-white">Kettering Archers</h1>
-                            <p className="text-xs text-charcoal-400">Archery Club</p>
+                            <h1 className="text-lg md:text-xl font-bold text-forest-800">Kettering Archers</h1>
+                            <p className="text-xs text-forest-600">Archery Club</p>
                         </div>
                     </Link>
 
@@ -41,7 +41,7 @@ const Header = () => {
                                 to={link.path}
                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${isActive(link.path)
                                     ? 'bg-forest-600 text-white shadow-lg shadow-forest-500/30'
-                                    : 'text-charcoal-300 hover:text-white hover:bg-charcoal-800'
+                                    : 'text-forest-700 hover:text-forest-900 hover:bg-forest-100'
                                     }`}
                             >
                                 {link.label}
@@ -52,7 +52,7 @@ const Header = () => {
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="md:hidden p-2 text-charcoal-300 hover:text-white transition-colors"
+                        className="md:hidden p-2 text-forest-700 hover:text-forest-900 transition-colors"
                         aria-label="Toggle menu"
                     >
                         {isMobileMenuOpen ? (
@@ -69,7 +69,7 @@ const Header = () => {
 
                 {/* Mobile Navigation */}
                 {isMobileMenuOpen && (
-                    <nav className="md:hidden py-4 border-t border-charcoal-700/50">
+                    <nav className="md:hidden py-4 border-t border-forest-200">
                         <div className="flex flex-col gap-2">
                             {navLinks.map((link) => (
                                 <Link
@@ -78,7 +78,7 @@ const Header = () => {
                                     onClick={() => setIsMobileMenuOpen(false)}
                                     className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 ${isActive(link.path)
                                         ? 'bg-forest-600 text-white'
-                                        : 'text-charcoal-300 hover:text-white hover:bg-charcoal-800'
+                                        : 'text-forest-700 hover:text-forest-900 hover:bg-forest-100'
                                         }`}
                                 >
                                     {link.label}
