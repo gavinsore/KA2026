@@ -10,7 +10,7 @@ import UsefulLinks from './pages/UsefulLinks';
 
 function App() {
     return (
-        <Router>
+        <Router basename={import.meta.env.BASE_URL}>
             <div className="min-h-screen flex flex-col">
                 <Header />
                 <main className="flex-1 pt-16 md:pt-20">
