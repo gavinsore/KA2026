@@ -32,6 +32,14 @@ const Home = () => {
                             A friendly and welcoming archery club in Kettering, Northamptonshire.
                             Whether you're a complete beginner or an experienced archer, we have something for you.
                         </p>
+                        <p className="text-md sm:text-xl md:text-2xl text-charcoal-600 max-w-3xl mx-auto mb-10">
+                            Friday evenings from mid-April to mid-September (summer) we shoot on the field at Kettering Cricket Club.
+                        </p>
+                        <p className="text-md sm:text-xl md:text-2xl text-charcoal-600 max-w-3xl mx-auto mb-10">
+                            From mid-September to mid-April (winter) we shoot indoors on Friday evenings from 19.30 to 21.30 at Buccleuch Academy.</p>
+                        <p className="text-md sm:text-xl md:text-2xl text-charcoal-600 max-w-3xl mx-auto mb-10">
+                            Sunday mornings we host a different club competition each week, from clout to target to 3D animals.
+                        </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link to="/beginners" className="btn-primary text-lg">
                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,9 +95,9 @@ const Home = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-semibold text-forest-900 mb-3">Expert Coaching</h3>
+                            <h3 className="text-xl font-semibold text-forest-900 mb-3">Differing Styles</h3>
                             <p className="text-charcoal-600">
-                                Our qualified coaches provide excellent instruction and support to help you develop your skills.
+                                Kettering Archers is unique in Northamptonshire as the only club that runs target and clout shoots. We also have archers dedicated to Longbow archery who travel the UK on roves.
                             </p>
                         </div>
 
@@ -103,7 +111,8 @@ const Home = () => {
                             <h3 className="text-xl font-semibold text-forest-900 mb-3">Equipment Provided</h3>
                             <p className="text-charcoal-600">
                                 All equipment is provided for beginners. We have a range of bows suitable for different ages and abilities.
-                            </p>
+                            </p><br></br>
+                            <p className="text-charcoal-600">A small rental fee applies once you have completed your beginner course!</p>
                         </div>
                     </div>
                 </div>

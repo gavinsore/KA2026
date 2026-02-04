@@ -23,7 +23,7 @@ const Header = () => {
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 group">
                         <img
-                            src="/logo.jpg"
+                            src={`${import.meta.env.BASE_URL}logo.jpg`}
                             alt="Kettering Archers Logo"
                             className="w-10 h-10 md:w-12 md:h-12 rounded-lg shadow-md group-hover:shadow-forest-500/30 transition-all duration-300"
                         />

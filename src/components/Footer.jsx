@@ -11,7 +11,7 @@ const Footer = () => {
                     <div>
                         <div className="flex items-center gap-3 mb-4">
                             <img
-                                src="/logo.jpg"
+                                src={`${import.meta.env.BASE_URL}logo.jpg`}
                                 alt="Kettering Archers Logo"
                                 className="w-10 h-10 rounded-lg"
                             />
