@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import EventCard from '../components/EventCard';
+import { getOpenCompetitions } from '../data/competitions';
 
 // ============================================================
 // GOOGLE CALENDAR CONFIGURATION
@@ -21,6 +23,7 @@ const Events = () => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [activeFilter, setActiveFilter] = useState(null);
 
     useEffect(() => {
         fetchEvents();
@@ -55,24 +58,24 @@ const Events = () => {
 
             // Transform Google Calendar events to our format
             const transformedEvents = data.items.map((item, index) => {
-                // Parse event type from description or use default
-                let eventType = 'Club Shoot';
+                // Parse event types from description (supports multiple types)
                 const description = item.description || '';
+                const descLower = description.toLowerCase();
+                const eventTypes = [];
 
-                if (description.toLowerCase().includes('[competition]')) {
-                    eventType = 'Competition';
-                } else if (description.toLowerCase().includes('[beginners]')) {
-                    eventType = 'Beginners';
-                } else if (description.toLowerCase().includes('[open day]')) {
-                    eventType = 'Open Day';
-                } else if (description.toLowerCase().includes('[social]')) {
-                    eventType = 'Social';
-                } else if (description.toLowerCase().includes('[practice]')) {
-                    eventType = 'Practice';
-                } else if (description.toLowerCase().includes('[target]')) {
-                    eventType = 'Target';
-                } else if (description.toLowerCase().includes('[clout]')) {
-                    eventType = 'Clout';
+                // Check for each type tag
+                if (descLower.includes('[competition]')) eventTypes.push('Competition');
+                if (descLower.includes('[beginners]')) eventTypes.push('Beginners');
+                if (descLower.includes('[open day]')) eventTypes.push('Open Day');
+                if (descLower.includes('[social]')) eventTypes.push('Social');
+                if (descLower.includes('[practice]')) eventTypes.push('Practice');
+                if (descLower.includes('[target]')) eventTypes.push('Target');
+                if (descLower.includes('[clout]')) eventTypes.push('Clout');
+                if (descLower.includes('[club shoot]')) eventTypes.push('Club Shoot');
+
+                // Default to Club Shoot if no types found
+                if (eventTypes.length === 0) {
+                    eventTypes.push('Club Shoot');
                 }
 
                 // Get start date/time
@@ -97,7 +100,7 @@ const Events = () => {
 
                 // Clean description (remove type tags)
                 const cleanDescription = description
-                    .replace(/\[(competition|beginners|open day|social|club shoot|practice|clout|indoors)\]/gi, '')
+                    .replace(/\[(competition|beginners|open day|social|club shoot|practice|clout|target|indoors)\]/gi, '')
                     .trim();
 
                 return {
@@ -107,7 +110,7 @@ const Events = () => {
                     time: time,
                     location: item.location || '',
                     description: cleanDescription || item.summary,
-                    type: eventType
+                    types: eventTypes
                 };
             });
 
@@ -130,7 +133,7 @@ const Events = () => {
             time: "10:00 AM - 4:00 PM",
             location: "Kettering Sports Ground",
             description: "Monthly club target day. All members welcome. Various rounds available.",
-            type: "Club Shoot"
+            types: ["Club Shoot", "Target"]
         },
         {
             id: 2,
@@ -139,16 +142,16 @@ const Events = () => {
             time: "2:00 PM - 4:00 PM",
             location: "Indoor Range",
             description: "First session of our 6-week beginners course. All equipment provided.",
-            type: "Beginners"
+            types: ["Beginners"]
         },
         {
             id: 3,
-            title: "Portsmouth Indoor Competition",
+            title: "Clout Championship",
             date: "2026-03-01",
             time: "9:00 AM - 5:00 PM",
-            location: "Indoor Range",
-            description: "Indoor Portsmouth round competition. Open to all club members.",
-            type: "Competition"
+            location: "Kettering Sports Ground",
+            description: "Annual clout archery championship. Open to all club members.",
+            types: ["Competition", "Clout"]
         },
         {
             id: 4,
@@ -157,12 +160,17 @@ const Events = () => {
             time: "10:00 AM - 3:00 PM",
             location: "Kettering Sports Ground",
             description: "Outdoor season opening day! Join us for a relaxed shoot to kick off the outdoor season.",
-            type: "Club Shoot"
+            types: ["Club Shoot"]
         }
     ];
 
+    // Filter events based on active filter (check if event has the selected type)
+    const filteredEvents = activeFilter
+        ? events.filter(event => event.types?.includes(activeFilter))
+        : events;
+
     // Group events by month
-    const groupedEvents = events.reduce((groups, event) => {
+    const groupedEvents = filteredEvents.reduce((groups, event) => {
         const date = new Date(event.date);
         const monthYear = date.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
         if (!groups[monthYear]) {
@@ -185,22 +193,118 @@ const Events = () => {
                     </p>
                 </div>
 
+                {/* Open Competitions Section */}
+                {getOpenCompetitions().length > 0 && (
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold text-forest-900 mb-6 flex items-center gap-3">
+                            <svg className="w-7 h-7 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                            </svg>
+                            Open Competitions
+                        </h2>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            {getOpenCompetitions().map(competition => {
+                                const compDate = new Date(competition.date);
+                                const closingDate = new Date(competition.closingDate);
+                                const today = new Date();
+                                const daysUntilClose = Math.ceil((closingDate - today) / (1000 * 60 * 60 * 24));
+
+                                return (
+                                    <div key={competition.id} className="glass-card p-6 border-gold-500/30 hover:border-gold-500 transition-all duration-300">
+                                        <div className="flex items-start gap-4">
+                                            {/* Date Badge */}
+                                            <div className="shrink-0 w-16 h-16 rounded-lg bg-gradient-to-br from-gold-500 to-gold-600 flex flex-col items-center justify-center text-white shadow-md">
+                                                <span className="text-xl font-bold leading-none">{compDate.getDate()}</span>
+                                                <span className="text-xs uppercase tracking-wide">{compDate.toLocaleString('en-GB', { month: 'short' })}</span>
+                                            </div>
+
+                                            {/* Details */}
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="text-lg font-semibold text-forest-900 mb-1">{competition.name}</h3>
+                                                <div className="text-sm text-charcoal-600 mb-2">
+                                                    <span className="flex items-center gap-1.5">
+                                                        📍 {competition.location}
+                                                    </span>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2 mb-3">
+                                                    {competition.eligibleClasses.slice(0, 3).map(cls => (
+                                                        <span key={cls} className="px-2 py-0.5 rounded-full bg-forest-100 text-forest-700 text-xs font-medium">
+                                                            {cls}
+                                                        </span>
+                                                    ))}
+                                                    {competition.eligibleClasses.length > 3 && (
+                                                        <span className="px-2 py-0.5 rounded-full bg-charcoal-100 text-charcoal-600 text-xs">
+                                                            +{competition.eligibleClasses.length - 3} more
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center justify-between">
+                                                    <div className="text-sm">
+                                                        <span className="text-charcoal-500">Entry: </span>
+                                                        <span className="font-medium text-forest-700">£{competition.entryFee.adult}</span>
+                                                        <span className="text-charcoal-400"> / </span>
+                                                        <span className="font-medium text-forest-700">£{competition.entryFee.junior}</span>
+                                                        <span className="text-charcoal-500 text-xs ml-1">(junior)</span>
+                                                    </div>
+                                                    {daysUntilClose > 0 && daysUntilClose <= 7 && (
+                                                        <span className="text-xs text-amber-600 font-medium">
+                                                            {daysUntilClose} days left!
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <Link
+                                            to={`/competitions/${competition.id}`}
+                                            className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gold-500 text-white font-medium hover:bg-gold-600 transition-colors"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                            Enter Competition
+                                        </Link>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
                 {/* Event Type Legend */}
                 <div className="flex flex-wrap justify-center gap-3 mb-10">
                     {['Practice', 'Target', 'Clout', 'Club Shoot', 'Competition', 'Beginners', 'Open Day'].map((type) => (
-                        <span key={type} className={`px-3 py-1.5 rounded-full text-sm font-medium ${type === 'Club Shoot' ? 'bg-forest-100 text-forest-700 border border-forest-300' :
-                            type === 'Competition' ? 'bg-gold-100 text-gold-700 border border-gold-300' :
-                                type === 'Beginners' ? 'bg-blue-100 text-blue-700 border border-blue-300' :
-                                    type === 'Open Day' ? 'bg-purple-100 text-purple-700 border border-purple-300' :
-                                        type === 'Practice' ? 'bg-emerald-100 text-emerald-700 border border-emerald-300' :
-                                            type === 'Target' ? 'bg-teal-100 text-teal-700 border border-teal-300' :
-                                                type === 'Clout' ? 'bg-amber-100 text-amber-700 border border-amber-300' :
-                                                    'bg-pink-100 text-pink-700 border border-pink-300'
-                            }`}>
+                        <button
+                            key={type}
+                            onClick={() => setActiveFilter(activeFilter === type ? null : type)}
+                            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer hover:scale-105 ${type === 'Club Shoot' ? 'bg-forest-100 text-forest-700 border border-forest-300 hover:bg-forest-200' :
+                                type === 'Competition' ? 'bg-gold-100 text-gold-700 border border-gold-300 hover:bg-gold-200' :
+                                    type === 'Beginners' ? 'bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200' :
+                                        type === 'Open Day' ? 'bg-purple-100 text-purple-700 border border-purple-300 hover:bg-purple-200' :
+                                            type === 'Practice' ? 'bg-emerald-100 text-emerald-700 border border-emerald-300 hover:bg-emerald-200' :
+                                                type === 'Target' ? 'bg-teal-100 text-teal-700 border border-teal-300 hover:bg-teal-200' :
+                                                    type === 'Clout' ? 'bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-200' :
+                                                        'bg-pink-100 text-pink-700 border border-pink-300 hover:bg-pink-200'
+                                } ${activeFilter === type ? 'ring-2 ring-offset-2 ring-forest-500 scale-105' : 'opacity-90 hover:opacity-100'}`}
+                        >
                             {type}
-                        </span>
+                        </button>
                     ))}
                 </div>
+
+                {/* Active Filter Indicator */}
+                {activeFilter && (
+                    <div className="text-center mb-6">
+                        <button
+                            onClick={() => setActiveFilter(null)}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-charcoal-100 text-charcoal-700 hover:bg-charcoal-200 transition-colors text-sm"
+                        >
+                            <span>Showing: <strong>{activeFilter}</strong></span>
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                )}
 
                 {/* Loading State */}
                 {loading && (
@@ -218,17 +322,27 @@ const Events = () => {
                 )}
 
                 {/* No Events */}
-                {!loading && events.length === 0 && (
+                {!loading && filteredEvents.length === 0 && (
                     <div className="text-center py-20">
                         <svg className="w-16 h-16 mx-auto mb-4 text-charcoal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <p className="text-charcoal-600">No upcoming events scheduled.</p>
+                        <p className="text-charcoal-600">
+                            {activeFilter ? `No ${activeFilter} events found.` : 'No upcoming events scheduled.'}
+                        </p>
+                        {activeFilter && (
+                            <button
+                                onClick={() => setActiveFilter(null)}
+                                className="mt-4 text-forest-600 hover:text-forest-700 underline text-sm"
+                            >
+                                Clear filter
+                            </button>
+                        )}
                     </div>
                 )}
 
                 {/* Events by Month */}
-                {!loading && events.length > 0 && (
+                {!loading && filteredEvents.length > 0 && (
                     <div className="space-y-12">
                         {Object.entries(groupedEvents).map(([monthYear, monthEvents]) => (
                             <div key={monthYear}>

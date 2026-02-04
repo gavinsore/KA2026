@@ -1,4 +1,6 @@
-const EventCard = ({ event }) => {
+import { Link } from 'react-router-dom';
+
+const EventCard = ({ event, competitionId }) => {
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return {
@@ -31,6 +33,8 @@ const EventCard = ({ event }) => {
         }
     };
 
+    const isCompetition = event.types?.some(type => type.toLowerCase() === 'competition');
+
     return (
         <div className="glass-card p-6 hover:border-forest-400 hover:shadow-lg transition-all duration-300 group">
             <div className="flex gap-4">
@@ -48,7 +52,7 @@ const EventCard = ({ event }) => {
                     <p className="text-charcoal-600 text-sm mb-3 line-clamp-2">
                         {event.description}
                     </p>
-                    <div className="flex flex-wrap gap-3 text-xs">
+                    <div className="flex flex-wrap items-center gap-3 text-xs">
                         {event.time && (
                             <span className="flex items-center gap-1.5 text-charcoal-600">
                                 <svg className="w-4 h-4 text-gold-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -66,12 +70,27 @@ const EventCard = ({ event }) => {
                                 {event.location}
                             </span>
                         )}
-                        {event.type && (
-                            <span className={`px-2 py-1 rounded-full font-medium ${getTypeColor(event.type)}`}>
-                                {event.type}
+                        {event.types?.map((type) => (
+                            <span key={type} className={`px-2 py-1 rounded-full font-medium ${getTypeColor(type)}`}>
+                                {type}
                             </span>
-                        )}
+                        ))}
                     </div>
+
+                    {/* Enter Competition Button */}
+                    {isCompetition && competitionId && (
+                        <div className="mt-4">
+                            <Link
+                                to={`/competitions/${competitionId}`}
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gold-500 text-white font-medium text-sm hover:bg-gold-600 transition-colors"
+                            >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Enter Competition
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -79,3 +98,4 @@ const EventCard = ({ event }) => {
 };
 
 export default EventCard;
+

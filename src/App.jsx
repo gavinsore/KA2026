@@ -7,6 +7,7 @@ import BeginnerEnrollment from './pages/BeginnerEnrollment';
 import ArcheryRounds from './pages/ArcheryRounds';
 import Results from './pages/Results';
 import UsefulLinks from './pages/UsefulLinks';
+import CompetitionDetails from './pages/CompetitionDetails';
 
 function App() {
     return (
@@ -21,6 +22,7 @@ function App() {
                         <Route path="/rounds" element={<ArcheryRounds />} />
                         <Route path="/results" element={<Results />} />
                         <Route path="/links" element={<UsefulLinks />} />
+                        <Route path="/competitions/:competitionId" element={<CompetitionDetails />} />
                     </Routes>
                 </main>
                 <Footer />
@@ -30,3 +32,4 @@ function App() {
 }
 
 export default App;
+

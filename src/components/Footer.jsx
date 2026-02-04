@@ -108,7 +108,9 @@ const Footer = () => {
                         © {currentYear} Kettering Archers. All rights reserved.
                     </p>
                     <p className="text-forest-300 text-sm">
-                        Affiliated to <a href="https://archerygb.org" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">Archery GB</a>
+                        Affiliated to <a href="https://archerygb.org" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">Archery GB</a>,{' '}
+                        <a href="https://ncas-archery.org.uk" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">NCAS</a> &amp;{' '}
+                        <a href="https://www.emas-archery.org.uk" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">EMAS</a>
                     </p>
                 </div>
             </div>

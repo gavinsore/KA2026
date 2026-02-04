@@ -28,16 +28,17 @@ const Home = () => {
                             <br />
                             <span className="gradient-text">Kettering Archers</span>
                         </h1>
-                        <p className="text-lg sm:text-xl md:text-2xl text-charcoal-600 max-w-3xl mx-auto mb-10">
+                        <p className="text-base sm:text-lg text-charcoal-600 max-w-3xl mx-auto mb-6">
                             A friendly and welcoming archery club in Kettering, Northamptonshire.
                             Whether you're a complete beginner or an experienced archer, we have something for you.
                         </p>
-                        <p className="text-md sm:text-xl md:text-2xl text-charcoal-600 max-w-3xl mx-auto mb-10">
+                        <p className="text-base sm:text-lg text-charcoal-600 max-w-3xl mx-auto mb-4">
                             Friday evenings from mid-April to mid-September (summer) we shoot on the field at Kettering Cricket Club.
                         </p>
-                        <p className="text-md sm:text-xl md:text-2xl text-charcoal-600 max-w-3xl mx-auto mb-10">
-                            From mid-September to mid-April (winter) we shoot indoors on Friday evenings from 19.30 to 21.30 at Buccleuch Academy.</p>
-                        <p className="text-md sm:text-xl md:text-2xl text-charcoal-600 max-w-3xl mx-auto mb-10">
+                        <p className="text-base sm:text-lg text-charcoal-600 max-w-3xl mx-auto mb-4">
+                            From mid-September to mid-April (winter) we shoot indoors on Friday evenings from 19.30 to 21.30 at Buccleuch Academy.
+                        </p>
+                        <p className="text-base sm:text-lg text-charcoal-600 max-w-3xl mx-auto mb-8">
                             Sunday mornings we host a different club competition each week, from clout to target to 3D animals.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">

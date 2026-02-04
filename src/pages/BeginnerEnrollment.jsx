@@ -173,7 +173,7 @@ const BeginnerEnrollment = () => {
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-charcoal-600">6-week structured course</span>
+                            <span className="text-charcoal-600">2 x 3 hour structured sessions</span>
                         </div>
                         <div className="flex items-start gap-3">
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -185,7 +185,7 @@ const BeginnerEnrollment = () => {
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-charcoal-600">Qualified instructors</span>
+                            <span className="text-charcoal-600">Qualified instructors (DBS checked)</span>
                         </div>
                         <div className="flex items-start gap-3">
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -203,8 +203,38 @@ const BeginnerEnrollment = () => {
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-charcoal-600">Course fee: £60 (includes temporary membership)</span>
+                            <span className="text-charcoal-600">Course fee: £40 for adults, £30 for juniors</span>
                         </div>
+                    </div>
+
+                    {/* Course Topics */}
+                    <div className="mt-6 pt-6 border-t border-charcoal-200">
+                        <h3 className="text-lg font-medium text-forest-800 mb-3">The main topics of the course are:</h3>
+                        <ul className="space-y-2 text-sm text-charcoal-600">
+                            <li className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gold-500"></span>
+                                Safety
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gold-500"></span>
+                                Shooting Etiquette
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gold-500"></span>
+                                Draw, Aim and loose (release the arrow) the bow
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gold-500"></span>
+                                Scoring
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gold-500"></span>
+                                Bow Assembly
+                            </li>
+                        </ul>
+                        <p className="mt-4 text-sm text-forest-700 font-medium">
+                            Upon successful completion of the course you will receive a certificate.
+                        </p>
                     </div>
                 </div>
 
