@@ -11,6 +11,7 @@ const Header = () => {
         { path: '/beginners', label: 'Beginners' },
         { path: '/rounds', label: 'Rounds' },
         { path: '/results', label: 'Results' },
+        { path: '/gallery', label: 'Gallery' },
         { path: '/links', label: 'Links' },
     ];
 

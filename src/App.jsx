@@ -6,6 +6,7 @@ import Events from './pages/Events';
 import BeginnerEnrollment from './pages/BeginnerEnrollment';
 import ArcheryRounds from './pages/ArcheryRounds';
 import Results from './pages/Results';
+import Gallery from './pages/Gallery';
 import UsefulLinks from './pages/UsefulLinks';
 import CompetitionDetails from './pages/CompetitionDetails';
 
@@ -21,6 +22,7 @@ function App() {
                         <Route path="/beginners" element={<BeginnerEnrollment />} />
                         <Route path="/rounds" element={<ArcheryRounds />} />
                         <Route path="/results" element={<Results />} />
+                        <Route path="/gallery" element={<Gallery />} />
                         <Route path="/links" element={<UsefulLinks />} />
                         <Route path="/competitions/:competitionId" element={<CompetitionDetails />} />
                     </Routes>

@@ -1,0 +1,9 @@
+# CODEOWNERS - Protect code files, allow data updates
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default: You must approve all changes
+* @gavinsore
+
+# Data files: No owner required (anyone with write access can update)
+# Note: Empty owner means no required review for these paths
+/public/data/

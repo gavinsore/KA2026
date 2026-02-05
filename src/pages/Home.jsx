@@ -1,11 +1,33 @@
 import { Link } from 'react-router-dom';
 
+// Stock archery images from Unsplash
+const stockImages = {
+    hero: 'https://images.unsplash.com/photo-1510925758641-869d353cecc7?w=1920&q=80',
+    indoor: 'https://images.unsplash.com/photo-1565711561500-49678a10a63f?w=800&q=80',
+    outdoor: 'https://images.unsplash.com/photo-1514125669375-59ee3985d08b?w=800&q=80',
+    competition: 'https://images.unsplash.com/photo-1499744937866-d7e566a20a61?w=800&q=80',
+    gallery1: 'https://images.unsplash.com/photo-1547394765-185e1e68f34e?w=800&q=80',
+    gallery2: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&q=80',
+    gallery3: 'https://images.unsplash.com/photo-1579093571626-53d4e15f8479?w=800&q=80',
+    gallery4: 'https://images.unsplash.com/photo-1579093571626-53d4e15f8479?w=800&q=80',
+};
+
 const Home = () => {
     return (
         <div className="min-h-screen">
             {/* Hero Section */}
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-                {/* Background Pattern */}
+                {/* Hero Background Image */}
+                <div className="absolute inset-0">
+                    <img
+                        src={stockImages.hero}
+                        alt="Archery target on a field"
+                        className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/70 to-white/90" />
+                </div>
+
+                {/* Background Pattern Overlay */}
                 <div className="absolute inset-0 opacity-30">
                     <div className="absolute inset-0" style={{
                         backgroundImage: `radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.4) 0%, transparent 50%),
@@ -28,18 +50,9 @@ const Home = () => {
                             <br />
                             <span className="gradient-text">Kettering Archers</span>
                         </h1>
-                        <p className="text-base sm:text-lg text-charcoal-600 max-w-3xl mx-auto mb-6">
+                        <p className="text-base sm:text-lg text-charcoal-600 max-w-3xl mx-auto mb-8">
                             A friendly and welcoming archery club in Kettering, Northamptonshire.
                             Whether you're a complete beginner or an experienced archer, we have something for you.
-                        </p>
-                        <p className="text-base sm:text-lg text-charcoal-600 max-w-3xl mx-auto mb-4">
-                            Friday evenings from mid-April to mid-September (summer) we shoot on the field at Kettering Cricket Club.
-                        </p>
-                        <p className="text-base sm:text-lg text-charcoal-600 max-w-3xl mx-auto mb-4">
-                            From mid-September to mid-April (winter) we shoot indoors on Friday evenings from 19.30 to 21.30 at Buccleuch Academy.
-                        </p>
-                        <p className="text-base sm:text-lg text-charcoal-600 max-w-3xl mx-auto mb-8">
-                            Sunday mornings we host a different club competition each week, from clout to target to 3D animals.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link to="/beginners" className="btn-primary text-lg">
@@ -60,6 +73,94 @@ const Home = () => {
                     <svg className="w-6 h-6 text-forest-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
+                </div>
+            </section>
+
+            {/* Where We Shoot Section - With Images */}
+            <section className="py-20 md:py-32 bg-gradient-to-b from-white to-forest-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-bold text-forest-900 mb-4">
+                            Where We Shoot
+                        </h2>
+                        <p className="text-charcoal-600 text-lg max-w-2xl mx-auto">
+                            We shoot year-round, both outdoors in summer and indoors in winter
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {/* Outdoor Shooting */}
+                        <div className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                            <div className="aspect-[4/3] overflow-hidden">
+                                <img
+                                    src={stockImages.outdoor}
+                                    alt="Outdoor archery on a green field"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                            </div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707" />
+                                    </svg>
+                                    <span className="text-gold-400 font-medium text-sm uppercase tracking-wide">Summer</span>
+                                </div>
+                                <h3 className="text-xl font-bold mb-2">Outdoor Shooting</h3>
+                                <p className="text-white/90 text-sm">
+                                    Friday evenings from mid-April to mid-September at Kettering Cricket Club
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Indoor Shooting */}
+                        <div className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                            <div className="aspect-[4/3] overflow-hidden">
+                                <img
+                                    src={stockImages.indoor}
+                                    alt="Indoor archery range"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                            </div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                                    </svg>
+                                    <span className="text-blue-400 font-medium text-sm uppercase tracking-wide">Winter</span>
+                                </div>
+                                <h3 className="text-xl font-bold mb-2">Indoor Shooting</h3>
+                                <p className="text-white/90 text-sm">
+                                    Friday evenings 19:30-21:30 from mid-September to mid-April at Buccleuch Academy
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Sunday Competitions */}
+                        <div className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                            <div className="aspect-[4/3] overflow-hidden">
+                                <img
+                                    src={stockImages.competition}
+                                    alt="Archery competition"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                            </div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                    </svg>
+                                    <span className="text-gold-400 font-medium text-sm uppercase tracking-wide">Weekly</span>
+                                </div>
+                                <h3 className="text-xl font-bold mb-2">Sunday Competitions</h3>
+                                <p className="text-white/90 text-sm">
+                                    Different club competitions each week — clout, target, 3D animals, and more
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -133,6 +234,63 @@ const Home = () => {
                     <Link to="/beginners" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold-500 hover:bg-gold-400 text-forest-900 font-semibold rounded-lg transition-all duration-300 hover:shadow-lg text-lg">
                         Enroll in Beginners Course
                     </Link>
+                </div>
+            </section>
+
+            {/* Gallery Preview Section */}
+            <section className="py-20 md:py-32 bg-gradient-to-b from-forest-50 to-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl md:text-4xl font-bold text-forest-900 mb-4">
+                            Life at Kettering Archers
+                        </h2>
+                        <p className="text-charcoal-600 text-lg max-w-2xl mx-auto">
+                            A glimpse of what it's like to be part of our archery community
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                        <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
+                            <img
+                                src={stockImages.gallery1}
+                                alt="Archery at Kettering Archers"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                        </div>
+                        <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
+                            <img
+                                src={stockImages.gallery2}
+                                alt="Archery at Kettering Archers"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                        </div>
+                        <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
+                            <img
+                                src={stockImages.outdoor}
+                                alt="Outdoor archery"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                        </div>
+                        <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
+                            <img
+                                src={stockImages.indoor}
+                                alt="Indoor archery"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="text-center">
+                        <Link
+                            to="/gallery"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-forest-600 hover:bg-forest-700 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg"
+                        >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            View Full Gallery
+                        </Link>
+                    </div>
                 </div>
             </section>
 
