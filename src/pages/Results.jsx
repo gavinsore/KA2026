@@ -107,18 +107,52 @@ const Results = () => {
                     <h3 className="text-lg font-semibold text-forest-800">{event.eventName}</h3>
                     <span className="text-charcoal-500 text-sm">{formatDate(event.date)}</span>
                 </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm table-fixed">
+
+                {/* Mobile Card Layout */}
+                <div className="md:hidden space-y-3">
+                    {sortedResults.map((result, index) => {
+                        const { category, bowType } = parseBowType(result.bow_type);
+                        return (
+                            <div key={index} className="bg-white/60 rounded-lg p-4 border border-charcoal-100">
+                                <div className="flex items-start justify-between mb-2">
+                                    <div>
+                                        <p className="text-forest-900 font-semibold">{result.archer_name}</p>
+                                        <p className="text-charcoal-500 text-sm">{result.club}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-gold-600 font-bold text-lg">{result.score}</p>
+                                        <p className="text-charcoal-500 text-xs">Pos: {result.position}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryStyle(category)}`}>
+                                        {category}
+                                    </span>
+                                    <span className={`px-2 py-1 rounded text-xs font-medium ${getBowTypeStyle(bowType)}`}>
+                                        {bowType}
+                                    </span>
+                                    <span className="text-charcoal-500 text-xs ml-auto">
+                                        H: {result.hits} | G: {result.golds}
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Desktop Table Layout */}
+                <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full text-sm">
                         <thead>
                             <tr className="text-left border-b border-charcoal-100">
-                                <th className="pb-2 text-charcoal-600 font-medium w-[12%]">Category</th>
-                                <th className="pb-2 text-charcoal-600 font-medium w-[12%]">Bow</th>
-                                <th className="pb-2 text-charcoal-600 font-medium w-[8%]">Pos</th>
-                                <th className="pb-2 text-charcoal-600 font-medium w-[20%]">Archer</th>
-                                <th className="pb-2 text-charcoal-600 font-medium w-[10%]">Club</th>
-                                <th className="pb-2 text-charcoal-600 font-medium text-right w-[12%]">Score</th>
-                                <th className="pb-2 text-charcoal-600 font-medium text-right w-[12%]">Hits</th>
-                                <th className="pb-2 text-charcoal-600 font-medium text-right w-[14%]">Golds</th>
+                                <th className="pb-2 text-charcoal-600 font-medium">Category</th>
+                                <th className="pb-2 text-charcoal-600 font-medium">Bow</th>
+                                <th className="pb-2 text-charcoal-600 font-medium">Pos</th>
+                                <th className="pb-2 text-charcoal-600 font-medium">Archer</th>
+                                <th className="pb-2 text-charcoal-600 font-medium">Club</th>
+                                <th className="pb-2 text-charcoal-600 font-medium text-right">Score</th>
+                                <th className="pb-2 text-charcoal-600 font-medium text-right">Hits</th>
+                                <th className="pb-2 text-charcoal-600 font-medium text-right">Golds</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -249,7 +283,40 @@ const Results = () => {
                                     </svg>
                                     Club Records
                                 </h2>
-                                <div className="overflow-x-auto">
+
+                                {/* Mobile Card Layout */}
+                                <div className="md:hidden space-y-3">
+                                    {clubRecords
+                                        .filter(record => {
+                                            if (bowTypeFilter === 'all') return true;
+                                            return (record.bow_type || '').toLowerCase() === bowTypeFilter.toLowerCase();
+                                        })
+                                        .map((record, index) => (
+                                            <div key={index} className="bg-white/60 rounded-lg p-4 border border-charcoal-100">
+                                                <div className="flex items-start justify-between mb-2">
+                                                    <div>
+                                                        <p className="text-forest-800 font-semibold">{record.round}</p>
+                                                        <p className="text-forest-900 text-sm">{record.archer_name}</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-gold-600 font-bold text-lg">{record.score}</p>
+                                                        <p className="text-charcoal-500 text-xs">{formatDate(record.date)}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${getBowTypeStyle(record.bow_type)}`}>
+                                                        {record.bow_type}
+                                                    </span>
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryStyle(record.archer_category)}`}>
+                                                        {record.archer_category}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                </div>
+
+                                {/* Desktop Table Layout */}
+                                <div className="hidden md:block overflow-x-auto">
                                     <table className="w-full text-sm">
                                         <thead>
                                             <tr className="text-left border-b border-charcoal-200">
@@ -268,7 +335,7 @@ const Results = () => {
                                                     return (record.bow_type || '').toLowerCase() === bowTypeFilter.toLowerCase();
                                                 })
                                                 .map((record, index) => (
-                                                    <tr key={index} className="border-b border-charcoal-800 hover:bg-white/50 transition-colors">
+                                                    <tr key={index} className="border-b border-charcoal-100 hover:bg-white/50 transition-colors">
                                                         <td className="py-3 text-forest-800">{record.round}</td>
                                                         <td className="py-3">
                                                             <span className={`px-2 py-1 rounded text-xs font-medium ${getBowTypeStyle(record.bow_type)}`}>
@@ -287,15 +354,15 @@ const Results = () => {
                                                 ))}
                                         </tbody>
                                     </table>
-                                    {clubRecords.filter(record => {
-                                        if (bowTypeFilter === 'all') return true;
-                                        return (record.bow_type || '').toLowerCase() === bowTypeFilter.toLowerCase();
-                                    }).length === 0 && (
-                                            <p className="text-center text-charcoal-500 py-8">
-                                                {bowTypeFilter === 'all' ? 'No records available yet.' : `No ${bowTypeFilter} records available.`}
-                                            </p>
-                                        )}
                                 </div>
+                                {clubRecords.filter(record => {
+                                    if (bowTypeFilter === 'all') return true;
+                                    return (record.bow_type || '').toLowerCase() === bowTypeFilter.toLowerCase();
+                                }).length === 0 && (
+                                        <p className="text-center text-charcoal-500 py-8">
+                                            {bowTypeFilter === 'all' ? 'No records available yet.' : `No ${bowTypeFilter} records available.`}
+                                        </p>
+                                    )}
                             </div>
                         )}
 
@@ -325,16 +392,43 @@ const Results = () => {
                                                 </div>
                                                 <h3 className="text-lg font-semibold text-forest-800">{archerName}</h3>
                                             </div>
-                                            <div className="overflow-x-auto">
-                                                <table className="w-full text-sm table-fixed">
+
+                                            {/* Mobile Card Layout */}
+                                            <div className="md:hidden space-y-3">
+                                                {pbs.sort((a, b) => (a.round || '').localeCompare(b.round || '')).map((pb, index) => (
+                                                    <div key={index} className="bg-white/60 rounded-lg p-4 border border-charcoal-100">
+                                                        <div className="flex items-start justify-between mb-2">
+                                                            <div>
+                                                                <p className="text-forest-800 font-semibold">{pb.round}</p>
+                                                                <p className="text-charcoal-500 text-sm">{formatDate(pb.date)}</p>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <p className="text-gold-600 font-bold text-lg">{pb.score}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <span className={`px-2 py-1 rounded text-xs font-medium ${getBowTypeStyle(pb.bow_type)}`}>
+                                                                {pb.bow_type}
+                                                            </span>
+                                                            <span className="text-charcoal-500 text-xs ml-auto">
+                                                                H: {pb.hits} | G: {pb.golds}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Desktop Table Layout */}
+                                            <div className="hidden md:block overflow-x-auto">
+                                                <table className="w-full text-sm">
                                                     <thead>
                                                         <tr className="text-left border-b border-charcoal-100">
-                                                            <th className="pb-2 text-charcoal-600 font-medium w-[25%]">Round</th>
-                                                            <th className="pb-2 text-charcoal-600 font-medium w-[20%]">Bow Type</th>
-                                                            <th className="pb-2 text-charcoal-600 font-medium w-[20%]">Date</th>
-                                                            <th className="pb-2 text-charcoal-600 font-medium text-right w-[12%]">Score</th>
-                                                            <th className="pb-2 text-charcoal-600 font-medium text-right w-[11%]">Hits</th>
-                                                            <th className="pb-2 text-charcoal-600 font-medium text-right w-[12%]">Golds</th>
+                                                            <th className="pb-2 text-charcoal-600 font-medium">Round</th>
+                                                            <th className="pb-2 text-charcoal-600 font-medium">Bow Type</th>
+                                                            <th className="pb-2 text-charcoal-600 font-medium">Date</th>
+                                                            <th className="pb-2 text-charcoal-600 font-medium text-right">Score</th>
+                                                            <th className="pb-2 text-charcoal-600 font-medium text-right">Hits</th>
+                                                            <th className="pb-2 text-charcoal-600 font-medium text-right">Golds</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>

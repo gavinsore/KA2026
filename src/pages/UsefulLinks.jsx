@@ -21,8 +21,13 @@ const UsefulLinks = () => {
                 },
                 {
                     name: "NCAS (Northamptonshire CAS)",
-                    url: "https://ncas-archery.org.uk",
+                    url: "https://ncasarchery.org.uk",
                     description: "Northamptonshire County Archery Society"
+                },
+                {
+                    name: "EMAS (East Midlands Archery Society)",
+                    url: "https://emasarchery.org.uk",
+                    description: "East Midlands Archery Society"
                 }
             ]
         },
@@ -46,19 +51,19 @@ const UsefulLinks = () => {
                     description: "Wide range of archery equipment and accessories"
                 },
                 {
-                    name: "Aim4Sport",
-                    url: "https://www.aim4sport.com",
-                    description: "Archery specialists with expert advice"
-                },
-                {
-                    name: "Wales Archery",
-                    url: "https://www.walesarchery.com",
-                    description: "Quality equipment and fast delivery"
+                    name: "Hemlock Archery",
+                    url: "https://www.hemlockarchery.co.uk",
+                    description: "Handmade Arrows, Archery Accessories, Bespoke Products, Custom Orders & More"
                 },
                 {
                     name: "Bowsports",
                     url: "https://www.bowsports.com",
                     description: "Archery equipment and target sports"
+                },
+                {
+                    name: "Arrowsocks",
+                    url: "https://www.arrowsocks.co.uk/",
+                    description: "Arrow Wraps and Crestings"
                 }
             ]
         },
@@ -84,6 +89,11 @@ const UsefulLinks = () => {
                 {
                     name: "NuSensei (YouTube)",
                     url: "https://www.youtube.com/@NUSensei",
+                    description: "Popular archery education channel"
+                },
+                {
+                    name: "Jake Kaminski (YouTube)",
+                    url: "https://www.youtube.com/@JakeKaminskiArchery",
                     description: "Popular archery education channel"
                 }
             ]
@@ -132,11 +142,6 @@ const UsefulLinks = () => {
                     name: "Handicap Tables",
                     url: "https://archerygb.org/handicap",
                     description: "Official handicap and classification tables"
-                },
-                {
-                    name: "Field Captain's Guide",
-                    url: "https://archerygb.org/field-captains",
-                    description: "Guide for running archery events"
                 }
             ]
         }

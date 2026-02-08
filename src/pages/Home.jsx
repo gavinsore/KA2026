@@ -1,16 +1,6 @@
 import { Link } from 'react-router-dom';
 
-// Stock archery images from Unsplash
-const stockImages = {
-    hero: 'https://images.unsplash.com/photo-1510925758641-869d353cecc7?w=1920&q=80',
-    indoor: 'https://images.unsplash.com/photo-1565711561500-49678a10a63f?w=800&q=80',
-    outdoor: 'https://images.unsplash.com/photo-1514125669375-59ee3985d08b?w=800&q=80',
-    competition: 'https://images.unsplash.com/photo-1499744937866-d7e566a20a61?w=800&q=80',
-    gallery1: 'https://images.unsplash.com/photo-1547394765-185e1e68f34e?w=800&q=80',
-    gallery2: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&q=80',
-    gallery3: 'https://images.unsplash.com/photo-1579093571626-53d4e15f8479?w=800&q=80',
-    gallery4: 'https://images.unsplash.com/photo-1579093571626-53d4e15f8479?w=800&q=80',
-};
+
 
 const Home = () => {
     return (
@@ -20,8 +10,8 @@ const Home = () => {
                 {/* Hero Background Image */}
                 <div className="absolute inset-0">
                     <img
-                        src={stockImages.hero}
-                        alt="Archery target on a field"
+                        src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540677.jpg`}
+                        alt="Archery at Kettering Archers"
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/70 to-white/90" />
@@ -93,8 +83,8 @@ const Home = () => {
                         <div className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
                             <div className="aspect-[4/3] overflow-hidden">
                                 <img
-                                    src={stockImages.outdoor}
-                                    alt="Outdoor archery on a green field"
+                                    src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540679.jpg`}
+                                    alt="Outdoor archery"
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                             </div>
@@ -117,8 +107,8 @@ const Home = () => {
                         <div className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
                             <div className="aspect-[4/3] overflow-hidden">
                                 <img
-                                    src={stockImages.indoor}
-                                    alt="Indoor archery range"
+                                    src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540712.jpg`}
+                                    alt="Indoor archery"
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                             </div>
@@ -141,7 +131,7 @@ const Home = () => {
                         <div className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
                             <div className="aspect-[4/3] overflow-hidden">
                                 <img
-                                    src={stockImages.competition}
+                                    src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540714.jpg`}
                                     alt="Archery competition"
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
@@ -220,20 +210,81 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="py-20 md:py-32 relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-forest-600 to-forest-800" />
-                <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold text-forest-900 mb-6">
-                        Ready to Try Archery?
-                    </h2>
-                    <p className="text-lg text-forest-100 mb-10">
-                        Join our next beginners course and discover the ancient art of archery.
-                        No experience necessary – just bring your enthusiasm!
-                    </p>
-                    <Link to="/beginners" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold-500 hover:bg-gold-400 text-forest-900 font-semibold rounded-lg transition-all duration-300 hover:shadow-lg text-lg">
-                        Enroll in Beginners Course
-                    </Link>
+            {/* CTA Section - Enhanced */}
+            <section className="py-12 md:py-16 relative overflow-hidden">
+                {/* Background gradient */}
+                <div className="absolute inset-0 bg-gradient-to-br from-forest-600 via-forest-700 to-forest-800" />
+
+                {/* Animated Target Rings Pattern */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                    <div className="absolute w-[600px] h-[600px] rounded-full border-2 border-white/30 animate-pulse" />
+                    <div className="absolute w-[450px] h-[450px] rounded-full border-2 border-white/25" style={{ animationDelay: '0.5s' }} />
+                    <div className="absolute w-[300px] h-[300px] rounded-full border-2 border-gold-400/40" />
+                    <div className="absolute w-[150px] h-[150px] rounded-full border-2 border-gold-400/50" />
+                    <div className="absolute w-[50px] h-[50px] rounded-full bg-gold-400/30" />
+                </div>
+
+                {/* Decorative arrows */}
+                <div className="absolute top-10 left-10 opacity-10 rotate-45">
+                    <svg className="w-32 h-32 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div className="absolute bottom-10 right-10 opacity-10 -rotate-45">
+                    <svg className="w-24 h-24 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+
+                <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Glass card container */}
+                    <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/20 shadow-2xl">
+                        <div className="text-center mb-6">
+                            {/* Icon */}
+                            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gold-500/20 border-2 border-gold-400/50 mb-4 animate-float">
+                                <svg className="w-7 h-7 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+
+                            <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
+                                Ready to Try Archery?
+                            </h2>
+                            <p className="text-base md:text-lg text-forest-100 max-w-2xl mx-auto">
+                                Join our next beginners course and discover the ancient art of archery.
+                                No experience necessary – just bring your enthusiasm!
+                            </p>
+                        </div>
+
+                        {/* Stats row */}
+                        <div className="grid grid-cols-3 gap-3 md:gap-6 mb-6">
+                            <div className="text-center p-3 rounded-lg bg-white/5 border border-white/10">
+                                <div className="text-xl md:text-3xl font-bold text-gold-400 mb-1">75+</div>
+                                <div className="text-xs md:text-sm text-forest-100 uppercase tracking-wide">Members</div>
+                            </div>
+                            <div className="text-center p-3 rounded-lg bg-white/5 border border-white/10">
+                                <div className="text-xl md:text-3xl font-bold text-gold-400 mb-1">1977</div>
+                                <div className="text-xs md:text-sm text-forest-100 uppercase tracking-wide">Established</div>
+                            </div>
+                            <div className="text-center p-3 rounded-lg bg-white/5 border border-white/10">
+                                <div className="text-xl md:text-3xl font-bold text-gold-400 mb-1">Age 7+</div>
+                                <div className="text-xs md:text-sm text-forest-100 uppercase tracking-wide">Welcome</div>
+                            </div>
+                        </div>
+
+                        {/* CTA Button */}
+                        <div className="text-center">
+                            <Link
+                                to="/beginners"
+                                className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-gold-500 hover:bg-gold-400 text-forest-900 font-bold rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-gold-500/30 text-lg group"
+                            >
+                                <span>Enroll in Beginners Course</span>
+                                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -252,29 +303,29 @@ const Home = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
                         <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
                             <img
-                                src={stockImages.gallery1}
+                                src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540677.jpg`}
                                 alt="Archery at Kettering Archers"
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                         </div>
                         <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
                             <img
-                                src={stockImages.gallery2}
+                                src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540679.jpg`}
                                 alt="Archery at Kettering Archers"
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                         </div>
                         <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
                             <img
-                                src={stockImages.outdoor}
-                                alt="Outdoor archery"
+                                src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540712.jpg`}
+                                alt="Archery at Kettering Archers"
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                         </div>
                         <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
                             <img
-                                src={stockImages.indoor}
-                                alt="Indoor archery"
+                                src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540714.jpg`}
+                                alt="Archery at Kettering Archers"
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                         </div>
