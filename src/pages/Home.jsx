@@ -78,8 +78,9 @@ const Home = () => {
                         <h2 className="text-3xl md:text-4xl font-bold text-forest-900 mb-4">
                             Where We Shoot
                         </h2>
-                        <p className="text-charcoal-600 text-lg max-w-2xl mx-auto">
-                            We shoot year-round, both outdoors in summer and indoors in winter
+                        <p className="text-charcoal-600 text-lg max-w-3xl mx-auto">
+                            We shoot year-round in all weathers — rain or shine, our dedicated archers are out on the field.
+                            From target archery to clout shooting and field courses, there's always something to aim at.
                         </p>
                     </div>
 
@@ -159,57 +160,97 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Features Section */}
+            {/* About Us Section */}
             <section className="py-20 md:py-32">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold text-forest-900 mb-4">
-                            Why Choose Kettering Archers?
+                            About Kettering Archers
                         </h2>
-                        <p className="text-charcoal-600 text-lg max-w-2xl mx-auto">
-                            Join our thriving community and discover the joy of archery
+                        <p className="text-charcoal-600 text-lg max-w-3xl mx-auto">
+                            A unique archery club with a rich mix of traditional and modern archery
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {/* Feature 1 */}
-                        <div className="glass-card p-8 text-center group hover:border-forest-400 hover:shadow-lg transition-all duration-300">
-                            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-forest-500 to-forest-600 flex items-center justify-center shadow-lg group-hover:shadow-forest-500/30 transition-shadow animate-float" style={{ animationDelay: '0s' }}>
-                                <svg className="w-8 h-8 text-forest-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
+                    <div className="grid md:grid-cols-2 gap-8 mb-12">
+                        {/* Longbow Archers */}
+                        <div className="glass-card overflow-hidden group hover:border-gold-400 hover:shadow-lg transition-all duration-300">
+                            <div className="aspect-[16/9] overflow-hidden">
+                                <img
+                                    src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540679.jpg`}
+                                    alt="Traditional longbow archery"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
                             </div>
-                            <h3 className="text-xl font-semibold text-forest-900 mb-3">All Welcome</h3>
-                            <p className="text-charcoal-600">
-                                From complete beginners to experienced competition archers, we welcome everyone regardless of age or ability.
-                            </p>
+                            <div className="p-6">
+                                <h3 className="text-xl font-semibold text-forest-900 mb-3">The Longbow Lot</h3>
+                                <p className="text-charcoal-600">
+                                    Our merry band of English Longbow archers are known across the UK for their enthusiasm
+                                    for lobbing arrows skyward (occasionally in the direction of a flag), enjoying a good
+                                    natter, and embarking on "roves" — essentially walking through woods shooting at things.
+                                    What's not to love?
+                                </p>
+                            </div>
                         </div>
 
-                        {/* Feature 2 */}
+                        {/* Target & Clout Archers */}
+                        <div className="glass-card overflow-hidden group hover:border-forest-400 hover:shadow-lg transition-all duration-300">
+                            <div className="aspect-[16/9] overflow-hidden">
+                                <img
+                                    src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540714.jpg`}
+                                    alt="Target archery"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                            </div>
+                            <div className="p-6">
+                                <h3 className="text-xl font-semibold text-forest-900 mb-3">Target & Clout Crew</h3>
+                                <p className="text-charcoal-600">
+                                    Then there's the rest of us — happily switching between aiming at proper target faces
+                                    and launching arrows into the distance at clout. Recurve, compound, barebow... we've got
+                                    the lot. Some even compete at county and national level (show-offs).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {/* Unique in Northamptonshire */}
                         <div className="glass-card p-8 text-center group hover:border-gold-400 hover:shadow-lg transition-all duration-300">
-                            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg group-hover:shadow-gold-500/30 transition-shadow animate-float" style={{ animationDelay: '0.2s' }}>
+                            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg group-hover:shadow-gold-500/30 transition-shadow animate-float" style={{ animationDelay: '0s' }}>
                                 <svg className="w-8 h-8 text-forest-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-semibold text-forest-900 mb-3">Differing Styles</h3>
+                            <h3 className="text-xl font-semibold text-forest-900 mb-3">Unique in Northamptonshire</h3>
                             <p className="text-charcoal-600">
-                                Kettering Archers is unique in Northamptonshire as the only club that runs target and clout shoots. We also have archers dedicated to Longbow archery who travel the UK on roves.
+                                We're the only club in the county offering both target and clout shooting — plus our own licensed clubhouse for after the action!
                             </p>
                         </div>
 
-                        {/* Feature 3 */}
+                        {/* All Welcome */}
                         <div className="glass-card p-8 text-center group hover:border-forest-400 hover:shadow-lg transition-all duration-300">
-                            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-forest-500 to-forest-600 flex items-center justify-center shadow-lg group-hover:shadow-forest-500/30 transition-shadow animate-float" style={{ animationDelay: '0.4s' }}>
+                            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-forest-500 to-forest-600 flex items-center justify-center shadow-lg group-hover:shadow-forest-500/30 transition-shadow animate-float" style={{ animationDelay: '0.2s' }}>
                                 <svg className="w-8 h-8 text-forest-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-semibold text-forest-900 mb-3">Equipment Provided</h3>
+                            <h3 className="text-xl font-semibold text-forest-900 mb-3">All Ages & Abilities</h3>
                             <p className="text-charcoal-600">
-                                All equipment is provided for beginners. We have a range of bows suitable for different ages and abilities.
-                            </p><br></br>
-                            <p className="text-charcoal-600">A small rental fee applies once you have completed your beginner course!</p>
+                                We welcome everyone from age 7 upwards, complete beginners to seasoned competition archers. There's always someone on hand to help.
+                            </p>
+                        </div>
+
+                        {/* Friendly Advice */}
+                        <div className="glass-card p-8 text-center group hover:border-gold-400 hover:shadow-lg transition-all duration-300">
+                            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg group-hover:shadow-gold-500/30 transition-shadow animate-float" style={{ animationDelay: '0.4s' }}>
+                                <svg className="w-8 h-8 text-forest-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-semibold text-forest-900 mb-3">Friendly Advice</h3>
+                            <p className="text-charcoal-600">
+                                With lots of experienced archers on hand, you'll always find people happy to offer advice on technique, equipment, and getting the most from your shooting.
+                            </p>
                         </div>
                     </div>
                 </div>

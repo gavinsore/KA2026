@@ -6,7 +6,7 @@ const Footer = () => {
     return (
         <footer className="bg-forest-900 border-t border-forest-800 mt-auto">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {/* Club Info */}
                     <div>
                         <div className="flex items-center gap-3 mb-4">
@@ -53,6 +53,32 @@ const Footer = () => {
                         </ul>
                     </div>
 
+                    {/* Archers Welfare */}
+                    <div>
+                        <h4 className="font-semibold text-white mb-4 flex items-center gap-2">
+                            <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            Archers Welfare
+                        </h4>
+                        <p className="text-forest-200 text-sm leading-relaxed mb-3">
+                            We have a confidential email for anyone with concerns about a fellow archer —
+                            whether it's mental health, bullying, harassment, child welfare, or anything else.
+                        </p>
+                        <p className="text-forest-300 text-xs mb-3 italic">
+                            All correspondence is dealt with in the strictest confidence.
+                        </p>
+                        <a
+                            href="mailto:cpo@ketteringarchers.co.uk"
+                            className="inline-flex items-center gap-2 text-gold-400 hover:text-gold-300 transition-colors text-sm font-medium"
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            cpo@ketteringarchers.co.uk
+                        </a>
+                    </div>
+
                     {/* Contact */}
                     <div>
                         <h4 className="font-semibold text-white mb-4">Contact Us</h4>
@@ -79,7 +105,7 @@ const Footer = () => {
                         {/* Social Links */}
                         <div className="flex gap-4 mt-6">
                             <a
-                                href="https://www.facebook.com/"
+                                href="https://www.facebook.com/groups/307111027663784/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-10 h-10 rounded-full bg-forest-800 flex items-center justify-center text-forest-300 hover:bg-gold-500 hover:text-forest-900 transition-all duration-300"
@@ -89,7 +115,7 @@ const Footer = () => {
                                 </svg>
                             </a>
                             <a
-                                href="https://www.instagram.com/"
+                                href="https://www.instagram.com/kettering_archers/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-10 h-10 rounded-full bg-forest-800 flex items-center justify-center text-forest-300 hover:bg-gold-500 hover:text-forest-900 transition-all duration-300"

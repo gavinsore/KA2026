@@ -1,0 +1,31 @@
+{
+    "active": true,
+    "type": "urgent",
+    "title": "Session Cancelled",
+    "message": "Tonight's shooting session has been cancelled due to severe weather. Stay safe and we'll see you next week.",
+    "lastUpdated": "8th February 2026",
+    "_examples": {
+        "info_example": {
+            "active": true,
+            "type": "info",
+            "title": "New Beginners Course",
+            "message": "Our next beginners course starts on Friday 15th March. Places are filling up fast - contact us to book your spot!",
+            "lastUpdated": "1st March 2026"
+        },
+        "warning_example": {
+            "active": true,
+            "type": "warning",
+            "title": "Venue Change This Friday",
+            "message": "Due to maintenance at Buccleuch Academy, this Friday's indoor session will be held at an alternative venue. Check Facebook for details.",
+            "lastUpdated": "8th February 2026"
+        },
+        "urgent_example": {
+            "active": true,
+            "type": "urgent",
+            "title": "Session Cancelled",
+            "message": "Tonight's shooting session has been cancelled due to severe weather. Stay safe and we'll see you next week.",
+            "lastUpdated": "8th February 2026"
+        }
+    },
+    "_instructions": "To show an announcement: 1) Set 'active' to true, 2) Choose type: info (blue), warning (amber), or urgent (red), 3) Fill in title, message, and lastUpdated. The _examples and _instructions fields are ignored by the website."
+}
