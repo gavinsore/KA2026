@@ -1,10 +1,15 @@
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 
 
 const Home = () => {
     return (
         <div className="min-h-screen">
+            <SEO
+                title="Kettering Archers - Archery Club in Kettering, Northamptonshire"
+                description="A friendly archery club in Kettering. Join us for beginners courses, competitions, and social shooting. Established 1977, all ages welcome from age 7+."
+            />
             {/* Hero Section */}
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
                 {/* Hero Background Image */}

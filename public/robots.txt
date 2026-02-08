@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Privacy protection - do not index results with personal names
+Disallow: /results
+
+# Sitemap location
+Sitemap: https://ketteringarchers.co.uk/sitemap.xml

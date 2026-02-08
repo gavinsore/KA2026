@@ -1,3 +1,5 @@
+import SEO from '../components/SEO';
+
 const UsefulLinks = () => {
     const linkCategories = [
         {
@@ -15,19 +17,19 @@ const UsefulLinks = () => {
                     description: "The national governing body for archery in Great Britain"
                 },
                 {
-                    name: "World Archery",
-                    url: "https://worldarchery.sport",
-                    description: "International Federation for the sport of archery"
-                },
-                {
-                    name: "NCAS (Northamptonshire CAS)",
+                    name: "NCAS",
                     url: "https://ncasarchery.org.uk",
                     description: "Northamptonshire County Archery Society"
                 },
                 {
-                    name: "EMAS (East Midlands Archery Society)",
+                    name: "EMAS",
                     url: "https://emasarchery.org.uk",
                     description: "East Midlands Archery Society"
+                },
+                {
+                    name: "World Archery",
+                    url: "https://worldarchery.sport",
+                    description: "International Federation for the sport of archery"
                 }
             ]
         },
@@ -160,6 +162,10 @@ const UsefulLinks = () => {
 
     return (
         <div className="min-h-screen py-12 md:py-20">
+            <SEO
+                title="Useful Links | Kettering Archers"
+                description="Archery resources including governing bodies, equipment suppliers, coaching resources, neighboring clubs, and rules for archers in Northamptonshire."
+            />
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12 md:mb-16">

@@ -49,8 +49,13 @@ const EventCard = ({ event, competitionId }) => {
                     <h3 className="text-lg md:text-xl font-semibold text-forest-900 mb-1 truncate">
                         {event.title}
                     </h3>
-                    <p className="text-charcoal-600 text-sm mb-3 line-clamp-2">
-                        {event.description}
+                    <p className="text-charcoal-600 text-sm mb-3 ">
+                        {event.description?.split('|').map((line, index, arr) => (
+                            <span key={index}>
+                                {line.trim()}
+                                {index < arr.length - 1 && <br />}
+                            </span>
+                        ))}
                     </p>
                     <div className="flex flex-wrap items-center gap-3 text-xs">
                         {event.time && (

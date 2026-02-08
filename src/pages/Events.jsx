@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import EventCard from '../components/EventCard';
 import { getOpenCompetitions } from '../data/competitions';
+import SEO from '../components/SEO';
 
 // ============================================================
 // GOOGLE CALENDAR CONFIGURATION
@@ -182,6 +183,10 @@ const Events = () => {
 
     return (
         <div className="min-h-screen py-12 md:py-20">
+            <SEO
+                title="Events & Calendar | Kettering Archers"
+                description="Upcoming archery events, competitions, beginners courses, and club activities at Kettering Archers. Join us for target shooting, clout, and social events."
+            />
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12 md:mb-16">

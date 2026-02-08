@@ -5,16 +5,63 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="./arrow.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary Meta Tags -->
+  <title>Kettering Archers - Archery Club in Kettering, Northamptonshire</title>
+  <meta name="title" content="Kettering Archers - Archery Club in Kettering, Northamptonshire" />
   <meta name="description"
-    content="Kettering Archers - A friendly archery club in Kettering. Join us for beginners courses, competitions, and social shooting." />
-  <title>Kettering Archers</title>
+    content="Kettering Archers - A friendly archery club in Kettering, Northamptonshire. Join us for beginners courses, competitions, and social shooting. All ages welcome, age 7+." />
+  <meta name="keywords"
+    content="archery, Kettering, archery club, beginners archery, Northamptonshire, archery lessons, target archery, field archery, clout, longbow" />
+  <meta name="author" content="Kettering Archers" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ketteringarchers.co.uk/" />
+  <meta property="og:title" content="Kettering Archers - Archery Club in Kettering, Northamptonshire" />
+  <meta property="og:description"
+    content="A friendly archery club in Kettering, Northamptonshire. Join us for beginners courses, competitions, and social shooting. All ages welcome, age 7+." />
+  <meta property="og:site_name" content="Kettering Archers" />
+  <meta property="og:locale" content="en_GB" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:url" content="https://ketteringarchers.co.uk/" />
+  <meta name="twitter:title" content="Kettering Archers - Archery Club in Kettering, Northamptonshire" />
+  <meta name="twitter:description"
+    content="A friendly archery club in Kettering, Northamptonshire. Join us for beginners courses, competitions, and social shooting. All ages welcome, age 7+." />
+
+  <!-- Geo Meta Tags for Local SEO -->
+  <meta name="geo.region" content="GB-NTH" />
+  <meta name="geo.placename" content="Kettering" />
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://ketteringarchers.co.uk/" />
 </head>
 
 <body>
+  <!-- GitHub Pages SPA redirect handling -->
+  <script type="text/javascript">
+    // Single Page Apps for GitHub Pages
+    // This script checks for a redirect from the 404.html page and
+    // restores the correct URL in the browser history
+    (function (l) {
+      if (l.search[1] === '/') {
+        var decoded = l.search.slice(1).split('&').map(function (s) {
+          return s.replace(/~and~/g, '&')
+        }).join('?');
+        window.history.replaceState(null, null,
+          l.pathname.slice(0, -1) + decoded + l.hash
+        );
+      }
+    }(window.location))
+  </script>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

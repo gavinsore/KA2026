@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import SEO from '../components/SEO';
 
 const Gallery = () => {
     const [galleryImages, setGalleryImages] = useState([]);
@@ -61,6 +62,10 @@ const Gallery = () => {
 
     return (
         <div className="min-h-screen" onKeyDown={handleKeyDown} tabIndex={0}>
+            <SEO
+                title="Photo Gallery | Kettering Archers"
+                description="Explore photos from Kettering Archers archery sessions, competitions, and club events. See our facilities and community in action."
+            />
             {/* Hero Section */}
             <section className="relative py-20 md:py-32 overflow-hidden">
                 {/* Background */}

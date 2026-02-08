@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { loadAllEventResults, loadClubRecords, loadPersonalBests } from '../utils/csvLoader';
+import SEO from '../components/SEO';
 
 const Results = () => {
     const [activeTab, setActiveTab] = useState('outdoor');
@@ -11,7 +12,7 @@ const Results = () => {
     const [bowTypeFilter, setBowTypeFilter] = useState('all');
 
     // Available bow types for filtering
-    const bowTypes = ['all', 'Recurve', 'Compound', 'Longbow', 'Barebow'];
+    const bowTypes = ['all', 'Recurve', 'Compound', 'Longbow', 'Barebow', 'Traditional', 'Horsebow'];
 
     // Parse combined bow_type field (e.g., "Mens Barebow") into category and bowType
     const parseBowType = (bowTypeField) => {
@@ -32,11 +33,11 @@ const Results = () => {
     ];
 
     const archiveSeasons = [
-        { season: '2024-2025 Indoor', description: 'Portsmouth League, WA 18 Championship' },
-        { season: '2024 Outdoor', description: 'Club Championship, County Records' },
-        { season: '2023-2024 Indoor', description: 'Portsmouth League, Indoor Championship' },
-        { season: '2023 Outdoor', description: 'Outdoor Season Results' },
-        { season: '2022-2023 Indoor', description: 'Indoor Season Archive' },
+        { season: '2024-2025 Indoor', description: '24/25 Indoor Results' },
+        { season: '2024 Outdoor', description: '2024 Outdoor Results' },
+        { season: '2023-2024 Indoor', description: '23/24 Indoor Results' },
+        { season: '2023 Outdoor', description: '2023 Outdoor Results' },
+        { season: '2022-2023 Indoor', description: '22/23 Indoor Results' },
     ];
 
     useEffect(() => {
@@ -193,6 +194,11 @@ const Results = () => {
 
     return (
         <div className="min-h-screen py-12 md:py-20">
+            <SEO
+                title="Results & Records | Kettering Archers"
+                description="Club results, records, personal bests and historical archives for Kettering Archers members."
+                noindex={true}
+            />
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12 md:mb-16">

@@ -1,139 +1,467 @@
+import { useState } from 'react';
 import RoundCard from '../components/RoundCard';
+import SEO from '../components/SEO';
 
 const ArcheryRounds = () => {
-    const rounds = {
-        target: [
-            {
-                name: "Portsmouth",
-                type: "Target",
-                description: "Indoor round shot at 20 yards on a 60cm face. Popular competition round.",
-                distances: "20 yards",
-                arrows: "60 arrows",
-                maxScore: "600"
-            },
-            {
-                name: "WA 18",
-                type: "Target",
-                description: "World Archery indoor round. Shot on a 40cm triple vertical face.",
-                distances: "18 metres",
-                arrows: "60 arrows",
-                maxScore: "600"
-            },
-            {
-                name: "National",
-                type: "Target",
-                description: "Traditional British outdoor round. Popular for club competitions.",
-                distances: "60, 50 yards",
-                arrows: "48 arrows per distance",
-                maxScore: "864"
-            },
-            {
-                name: "York / Hereford / Bristol",
-                type: "Target",
-                description: "Traditional British imperial rounds at various distances for different categories.",
-                distances: "100-40 yards (varies by round)",
-                arrows: "72 arrows at longest, 48 at others",
-                maxScore: "1296"
-            },
-            {
-                name: "WA 1440 (FITA)",
-                type: "Target",
-                description: "World Archery outdoor round. Shot at 4 distances on 122cm and 80cm faces.",
-                distances: "90, 70, 50, 30m (men) / 70, 60, 50, 30m (women)",
-                arrows: "36 arrows per distance",
-                maxScore: "1440"
-            },
-            {
-                name: "WA 720",
-                type: "Target",
-                description: "Half of a WA 1440, shot at two distances. Common competition format.",
-                distances: "70, 60m or 50, 30m",
-                arrows: "36 arrows per distance",
-                maxScore: "720"
-            },
-            {
-                name: "Western",
-                type: "Target",
-                description: "Shorter outdoor round suitable for all abilities.",
-                distances: "60, 50 yards",
-                arrows: "48 arrows per distance",
-                maxScore: "864"
-            },
-            {
-                name: "Windsor",
-                type: "Target",
-                description: "Traditional outdoor round at medium distances.",
-                distances: "60, 50, 40 yards",
-                arrows: "36 arrows per distance",
-                maxScore: "972"
-            }
-        ],
-        field: [
-            {
-                name: "WA Field",
-                type: "Field",
-                description: "Shot over a course with marked distances. 24 targets at various distances.",
-                distances: "5-60m (marked)",
-                arrows: "3 arrows per target",
-                maxScore: "432"
-            },
-            {
-                name: "WA Unmarked",
-                type: "Field",
-                description: "Similar to WA Field but distances are unmarked - requires distance judging skills.",
-                distances: "5-60m (unmarked)",
-                arrows: "3 arrows per target",
-                maxScore: "432"
-            },
-            {
-                name: "NFAS Big Game",
-                type: "Field",
-                description: "Shot at 3D animal targets in woodland. Popular with traditional archers.",
-                distances: "Various (unmarked)",
-                arrows: "Varies",
-                maxScore: "Varies"
-            }
-        ],
-        clout: [
-            {
-                name: "Clout",
-                type: "Clout",
-                description: "Long distance shooting at a flag (clout) on the ground. Arrows scored by proximity to flag.",
-                distances: "180/165/140/125/110 yards (by gender/age)",
-                arrows: "36 arrows (varies)",
-                maxScore: "180"
-            },
-            {
-                name: "WA Clout",
-                type: "Clout",
-                description: "World Archery clout format using metric distances.",
-                distances: "185/165/125m (by gender/age)",
-                arrows: "36 arrows",
-                maxScore: "180"
-            }
-        ],
-        other: [
-            {
-                name: "Flight",
-                type: "Flight",
-                description: "Distance shooting - aim is to shoot as far as possible. Specialist equipment used.",
-                distances: "Maximum distance",
-                arrows: "6 arrows",
-                maxScore: "N/A (distance measured)"
-            },
-            {
-                name: "Popinjay",
-                type: "Other",
-                description: "Traditional shooting at 'birds' on a tall mast. Shot vertically upwards.",
-                distances: "Vertical (90 feet mast)",
-                arrows: "Varies",
-                maxScore: "Varies"
-            }
-        ]
+    const [activeFilter, setActiveFilter] = useState('all');
+
+    // Categories for filtering
+    const categories = [
+        { id: 'all', label: 'All Rounds', color: 'bg-charcoal-100 text-charcoal-700 border-charcoal-300' },
+        { id: 'indoor-imperial', label: 'Indoor Imperial', color: 'bg-blue-100 text-blue-700 border-blue-300' },
+        { id: 'indoor-metric', label: 'Indoor Metric', color: 'bg-sky-100 text-sky-700 border-sky-300' },
+        { id: 'outdoor-imperial', label: 'Outdoor Imperial', color: 'bg-forest-100 text-forest-700 border-forest-300' },
+        { id: 'outdoor-metric', label: 'Outdoor Metric', color: 'bg-emerald-100 text-emerald-700 border-emerald-300' },
+        { id: 'clout-imperial', label: 'Clout Imperial', color: 'bg-purple-100 text-purple-700 border-purple-300' },
+        { id: 'clout-metric', label: 'Clout Metric', color: 'bg-violet-100 text-violet-700 border-violet-300' },
+    ];
+
+    // All rounds with category and official/custom flag
+    const rounds = [
+        // Indoor Imperial
+        {
+            name: "Portsmouth",
+            category: "indoor-imperial",
+            isOfficial: true,
+            description: "Indoor round shot at 20 yards on a 60cm face. Popular competition round.",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 60 }
+            ],
+            maxScore: "600"
+        },
+        {
+            name: "Worcester",
+            category: "indoor-imperial",
+            isOfficial: true,
+            description: "Indoor round shot at 20 yards on a 16-inch black and white face.",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 60 }
+            ],
+            maxScore: "300"
+        },
+        {
+            name: "Vegas",
+            category: "indoor-imperial",
+            isOfficial: true,
+            description: "Popular American indoor format, shot on a 40cm triple face.",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 30 }
+            ],
+            maxScore: "300"
+        },
+
+        // Indoor Metric
+        {
+            name: "WA 18",
+            category: "indoor-metric",
+            isOfficial: true,
+            description: "World Archery indoor round. Shot on a 40cm triple vertical face.",
+            distanceBreakdown: [
+                { distance: "18 metres", arrows: 60 }
+            ],
+            maxScore: "600"
+        },
+        {
+            name: "WA 25",
+            category: "indoor-metric",
+            isOfficial: true,
+            description: "World Archery indoor round at longer distance. Shot on a 60cm face.",
+            distanceBreakdown: [
+                { distance: "25 metres", arrows: 60 }
+            ],
+            maxScore: "600"
+        },
+        {
+            name: "Bray I",
+            category: "indoor-metric",
+            isOfficial: true,
+            description: "Short indoor metric round, often used for practice or junior competitions.",
+            distanceBreakdown: [
+                { distance: "20 metres", arrows: 30 }
+            ],
+            maxScore: "300"
+        },
+        {
+            name: "Bray II",
+            category: "indoor-metric",
+            isOfficial: true,
+            description: "Slightly shorter version of the Bray round.",
+            distanceBreakdown: [
+                { distance: "25 metres", arrows: 30 }
+            ],
+            maxScore: "300"
+        },
+
+        // Outdoor Imperial
+        {
+            name: "York",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "The longest and most prestigious imperial round for men.",
+            distanceBreakdown: [
+                { distance: "100 yards", arrows: 72 },
+                { distance: "80 yards", arrows: 48 },
+                { distance: "60 yards", arrows: 24 }
+            ],
+            maxScore: "1296"
+        },
+        {
+            name: "Hereford",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Standard long-distance round for women, equivalent distances to Bristol I.",
+            distanceBreakdown: [
+                { distance: "80 yards", arrows: 72 },
+                { distance: "60 yards", arrows: 48 },
+                { distance: "50 yards", arrows: 24 }
+            ],
+            maxScore: "1296"
+        },
+        {
+            name: "Bristol I",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Long-distance round primarily for U18 boys.",
+            distanceBreakdown: [
+                { distance: "80 yards", arrows: 72 },
+                { distance: "60 yards", arrows: 48 },
+                { distance: "50 yards", arrows: 24 }
+            ],
+            maxScore: "1296"
+        },
+        {
+            name: "Bristol II",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Medium-distance round for U16 boys and U18 girls.",
+            distanceBreakdown: [
+                { distance: "60 yards", arrows: 72 },
+                { distance: "50 yards", arrows: 48 },
+                { distance: "40 yards", arrows: 24 }
+            ],
+            maxScore: "1296"
+        },
+        {
+            name: "Bristol III",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Shorter round for U14 boys and U16 girls.",
+            distanceBreakdown: [
+                { distance: "50 yards", arrows: 72 },
+                { distance: "40 yards", arrows: 48 },
+                { distance: "30 yards", arrows: 24 }
+            ],
+            maxScore: "1296"
+        },
+        {
+            name: "Bristol IV",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Junior round for U12 boys and U14 girls.",
+            distanceBreakdown: [
+                { distance: "40 yards", arrows: 72 },
+                { distance: "30 yards", arrows: 48 },
+                { distance: "20 yards", arrows: 24 }
+            ],
+            maxScore: "1296"
+        },
+        {
+            name: "Bristol V",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Shortest Bristol round for youngest juniors.",
+            distanceBreakdown: [
+                { distance: "30 yards", arrows: 72 },
+                { distance: "20 yards", arrows: 48 },
+                { distance: "10 yards", arrows: 24 }
+            ],
+            maxScore: "1296"
+        },
+        {
+            name: "National",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Traditional British outdoor round. Popular for club competitions.",
+            distanceBreakdown: [
+                { distance: "60 yards", arrows: 48 },
+                { distance: "50 yards", arrows: 24 }
+            ],
+            maxScore: "864"
+        },
+        {
+            name: "Western",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Shorter outdoor round suitable for all abilities.",
+            distanceBreakdown: [
+                { distance: "60 yards", arrows: 48 },
+                { distance: "50 yards", arrows: 48 }
+            ],
+            maxScore: "864"
+        },
+        {
+            name: "Windsor",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Traditional outdoor round at medium distances.",
+            distanceBreakdown: [
+                { distance: "60 yards", arrows: 36 },
+                { distance: "50 yards", arrows: 36 },
+                { distance: "40 yards", arrows: 36 }
+            ],
+            maxScore: "972"
+        },
+        {
+            name: "American",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Popular outdoor round shot at medium-long distances.",
+            distanceBreakdown: [
+                { distance: "60 yards", arrows: 30 },
+                { distance: "50 yards", arrows: 30 },
+                { distance: "40 yards", arrows: 30 }
+            ],
+            maxScore: "810"
+        },
+        {
+            name: "St George",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Prestigious long-distance imperial round.",
+            distanceBreakdown: [
+                { distance: "100 yards", arrows: 36 },
+                { distance: "80 yards", arrows: 36 },
+                { distance: "60 yards", arrows: 36 }
+            ],
+            maxScore: "972"
+        },
+        {
+            name: "Albion",
+            category: "outdoor-imperial",
+            isOfficial: true,
+            description: "Medium-distance imperial round suitable for most archers.",
+            distanceBreakdown: [
+                { distance: "80 yards", arrows: 36 },
+                { distance: "60 yards", arrows: 36 },
+                { distance: "50 yards", arrows: 36 }
+            ],
+            maxScore: "972"
+        },
+
+        // Outdoor Metric
+        {
+            name: "WA 1440 (Gents)",
+            category: "outdoor-metric",
+            isOfficial: true,
+            description: "World Archery outdoor round for men. Shot at 4 distances on 122cm and 80cm faces.",
+            distanceBreakdown: [
+                { distance: "90 metres", arrows: 36 },
+                { distance: "70 metres", arrows: 36 },
+                { distance: "50 metres", arrows: 36 },
+                { distance: "30 metres", arrows: 36 }
+            ],
+            maxScore: "1440"
+        },
+        {
+            name: "WA 1440 (Ladies)",
+            category: "outdoor-metric",
+            isOfficial: true,
+            description: "World Archery outdoor round for women. Shot at 4 distances on 122cm and 80cm faces.",
+            distanceBreakdown: [
+                { distance: "70 metres", arrows: 36 },
+                { distance: "60 metres", arrows: 36 },
+                { distance: "50 metres", arrows: 36 },
+                { distance: "30 metres", arrows: 36 }
+            ],
+            maxScore: "1440"
+        },
+        {
+            name: "WA 720",
+            category: "outdoor-metric",
+            isOfficial: true,
+            description: "Half of a WA 1440, shot at single distance. Common competition format.",
+            distanceBreakdown: [
+                { distance: "70m or 50m", arrows: 72 }
+            ],
+            maxScore: "720"
+        },
+        {
+            name: "WA 70",
+            category: "outdoor-metric",
+            isOfficial: true,
+            description: "Standard Olympic distance round. Shot on a 122cm face.",
+            distanceBreakdown: [
+                { distance: "70 metres", arrows: 72 }
+            ],
+            maxScore: "720"
+        },
+        {
+            name: "WA 60",
+            category: "outdoor-metric",
+            isOfficial: true,
+            description: "Intermediate distance metric round.",
+            distanceBreakdown: [
+                { distance: "60 metres", arrows: 72 }
+            ],
+            maxScore: "720"
+        },
+        {
+            name: "WA 50",
+            category: "outdoor-metric",
+            isOfficial: true,
+            description: "Compound bow standard distance. Shot on an 80cm face.",
+            distanceBreakdown: [
+                { distance: "50 metres", arrows: 72 }
+            ],
+            maxScore: "720"
+        },
+        {
+            name: "Metric 122-50",
+            category: "outdoor-metric",
+            isOfficial: true,
+            description: "Junior/beginner metric round at shorter distances.",
+            distanceBreakdown: [
+                { distance: "50 metres", arrows: 36 },
+                { distance: "40 metres", arrows: 36 },
+                { distance: "30 metres", arrows: 36 }
+            ],
+            maxScore: "1080"
+        },
+        {
+            name: "Short Metric",
+            category: "outdoor-metric",
+            isOfficial: true,
+            description: "Compact metric round for beginners or shorter sessions.",
+            distanceBreakdown: [
+                { distance: "50 metres", arrows: 36 },
+                { distance: "30 metres", arrows: 36 }
+            ],
+            maxScore: "720"
+        },
+        {
+            name: "Long Metric (Gents)",
+            category: "outdoor-metric",
+            isOfficial: true,
+            description: "Two-distance metric round for men.",
+            distanceBreakdown: [
+                { distance: "90 metres", arrows: 36 },
+                { distance: "70 metres", arrows: 36 }
+            ],
+            maxScore: "720"
+        },
+        {
+            name: "Long Metric (Ladies)",
+            category: "outdoor-metric",
+            isOfficial: true,
+            description: "Two-distance metric round for women.",
+            distanceBreakdown: [
+                { distance: "70 metres", arrows: 36 },
+                { distance: "60 metres", arrows: 36 }
+            ],
+            maxScore: "720"
+        },
+
+        // Clout Imperial
+        {
+            name: "Clout Imperial (Gents)",
+            category: "clout-imperial",
+            isOfficial: true,
+            description: "Long distance shooting at a flag (clout) on the ground. Arrows scored by proximity to flag.",
+            distanceBreakdown: [
+                { distance: "180 yards", arrows: 36 }
+            ],
+            maxScore: "180"
+        },
+        {
+            name: "Clout Imperial (Ladies)",
+            category: "clout-imperial",
+            isOfficial: true,
+            description: "Long distance shooting at a flag (clout) on the ground for women.",
+            distanceBreakdown: [
+                { distance: "140 yards", arrows: 36 }
+            ],
+            maxScore: "180"
+        },
+        {
+            name: "Double Clout Imperial (Gents)",
+            category: "clout-imperial",
+            isOfficial: true,
+            description: "Two rounds of clout shooting for a longer competition.",
+            distanceBreakdown: [
+                { distance: "180 yards", arrows: 72 }
+            ],
+            maxScore: "360"
+        },
+        {
+            name: "Double Clout Imperial (Ladies)",
+            category: "clout-imperial",
+            isOfficial: true,
+            description: "Two rounds of clout shooting for a longer competition for women.",
+            distanceBreakdown: [
+                { distance: "140 yards", arrows: 72 }
+            ],
+            maxScore: "360"
+        },
+
+        // Clout Metric
+        {
+            name: "WA Clout (Gents)",
+            category: "clout-metric",
+            isOfficial: true,
+            description: "World Archery clout format using metric distances for men.",
+            distanceBreakdown: [
+                { distance: "165 metres", arrows: 36 }
+            ],
+            maxScore: "180"
+        },
+        {
+            name: "WA Clout (Ladies)",
+            category: "clout-metric",
+            isOfficial: true,
+            description: "World Archery clout format using metric distances for women.",
+            distanceBreakdown: [
+                { distance: "125 metres", arrows: 36 }
+            ],
+            maxScore: "180"
+        },
+        {
+            name: "Double WA Clout (Gents)",
+            category: "clout-metric",
+            isOfficial: true,
+            description: "Two rounds of WA clout for longer competitions for men.",
+            distanceBreakdown: [
+                { distance: "165 metres", arrows: 72 }
+            ],
+            maxScore: "360"
+        },
+        {
+            name: "Double WA Clout (Ladies)",
+            category: "clout-metric",
+            isOfficial: true,
+            description: "Two rounds of WA clout for longer competitions for women.",
+            distanceBreakdown: [
+                { distance: "125 metres", arrows: 72 }
+            ],
+            maxScore: "360"
+        },
+    ];
+
+    // Filter rounds based on active filter
+    const filteredRounds = activeFilter === 'all'
+        ? rounds
+        : rounds.filter(round => round.category === activeFilter);
+
+    // Get category info for display
+    const getCategoryInfo = (categoryId) => {
+        return categories.find(c => c.id === categoryId) || categories[0];
     };
 
     return (
         <div className="min-h-screen py-12 md:py-20">
+            <SEO
+                title="Archery Rounds | Kettering Archers"
+                description="Learn about archery rounds shot in the UK: indoor, outdoor, imperial, metric, and clout. Guide to Portsmouth, WA 1440, York, and other archery formats."
+            />
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12 md:mb-16">
@@ -142,89 +470,90 @@ const ArcheryRounds = () => {
                     </h1>
                     <p className="text-charcoal-600 text-lg max-w-2xl mx-auto">
                         Learn about the different types of archery rounds shot in the UK.
-                        From indoor to outdoor, target to field - there's a round for everyone.
+                        From indoor to outdoor, imperial to metric - there's a round for everyone.
                     </p>
                 </div>
 
-                {/* Target Rounds */}
-                <section className="mb-16">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-forest-100 flex items-center justify-center">
-                            <svg className="w-5 h-5 text-forest-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <h2 className="text-2xl font-bold text-forest-900">Target Rounds</h2>
-                    </div>
-                    <p className="text-charcoal-600 mb-6">
-                        Shot at fixed distances on standard target faces. The most common form of archery competition.
-                    </p>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {rounds.target.map((round) => (
-                            <RoundCard key={round.name} round={round} />
-                        ))}
-                    </div>
-                </section>
+                {/* Filter Buttons */}
+                <div className="flex flex-wrap justify-center gap-2 mb-10">
+                    {categories.map((category) => (
+                        <button
+                            key={category.id}
+                            onClick={() => setActiveFilter(category.id)}
+                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border ${activeFilter === category.id
+                                    ? `${category.color} ring-2 ring-offset-2 ring-forest-500 scale-105`
+                                    : 'bg-white/50 text-charcoal-600 border-charcoal-200 hover:bg-white hover:border-charcoal-300'
+                                }`}
+                        >
+                            {category.label}
+                        </button>
+                    ))}
+                </div>
 
-                {/* Field Rounds */}
-                <section className="mb-16">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-gold-100 flex items-center justify-center">
-                            <svg className="w-5 h-5 text-gold-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                {/* Active Filter Indicator */}
+                {activeFilter !== 'all' && (
+                    <div className="text-center mb-8">
+                        <button
+                            onClick={() => setActiveFilter('all')}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-charcoal-100 text-charcoal-700 hover:bg-charcoal-200 transition-colors text-sm"
+                        >
+                            <span>Showing: <strong>{getCategoryInfo(activeFilter).label}</strong></span>
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
-                        </div>
-                        <h2 className="text-2xl font-bold text-forest-900">Field Rounds</h2>
+                        </button>
                     </div>
-                    <p className="text-charcoal-600 mb-6">
-                        Shot over a woodland or parkland course at varying distances and terrain. Tests distance judging and shooting skills.
-                    </p>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {rounds.field.map((round) => (
-                            <RoundCard key={round.name} round={round} />
-                        ))}
-                    </div>
-                </section>
+                )}
 
-                {/* Clout */}
-                <section className="mb-16">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-purple-600/20 flex items-center justify-center">
-                            <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                            </svg>
-                        </div>
-                        <h2 className="text-2xl font-bold text-forest-900">Clout</h2>
-                    </div>
-                    <p className="text-charcoal-600 mb-6">
-                        Long-distance shooting at a flag on the ground. Arrows arc high and land near the clout. A unique and exciting discipline.
-                    </p>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {rounds.clout.map((round) => (
-                            <RoundCard key={round.name} round={round} />
-                        ))}
-                    </div>
-                </section>
+                {/* Results Count */}
+                <p className="text-center text-charcoal-500 text-sm mb-8">
+                    Showing {filteredRounds.length} round{filteredRounds.length !== 1 ? 's' : ''}
+                </p>
 
-                {/* Other */}
-                <section className="mb-16">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-charcoal-600/20 flex items-center justify-center">
-                            <svg className="w-5 h-5 text-charcoal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                            </svg>
+                {/* Rounds Grid */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+                    {filteredRounds.map((round, index) => (
+                        <RoundCard
+                            key={round.name}
+                            round={round}
+                            categoryInfo={getCategoryInfo(round.category)}
+                        />
+                    ))}
+                </div>
+
+                {/* Legend */}
+                <div className="glass-card p-6 md:p-8 mb-8">
+                    <h3 className="font-semibold text-forest-900 mb-4 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Round Categories
+                    </h3>
+                    <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <span className="font-medium text-forest-800">Imperial</span>
+                            <p className="text-charcoal-600">Distances in yards/feet (traditional British)</p>
                         </div>
-                        <h2 className="text-2xl font-bold text-forest-900">Other Disciplines</h2>
+                        <div>
+                            <span className="font-medium text-forest-800">Metric</span>
+                            <p className="text-charcoal-600">Distances in metres (World Archery standard)</p>
+                        </div>
+                        <div>
+                            <span className="font-medium text-forest-800">Clout</span>
+                            <p className="text-charcoal-600">Long-distance shooting at a ground target</p>
+                        </div>
                     </div>
-                    <p className="text-charcoal-600 mb-6">
-                        Specialist archery disciplines including flight (distance) and traditional formats.
-                    </p>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {rounds.other.map((round) => (
-                            <RoundCard key={round.name} round={round} />
-                        ))}
+                    <div className="mt-4 pt-4 border-t border-charcoal-200 flex flex-wrap gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                            <span className="px-2 py-1 rounded bg-forest-100 text-forest-700 text-xs font-medium border border-forest-300">Official</span>
+                            <span className="text-charcoal-600">Archery GB / World Archery recognised</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="px-2 py-1 rounded bg-gold-100 text-gold-700 text-xs font-medium border border-gold-300">KA Custom</span>
+                            <span className="text-charcoal-600">Kettering Archers club rounds</span>
+                        </div>
                     </div>
-                </section>
+                </div>
 
                 {/* Info Box */}
                 <div className="glass-card p-6 md:p-8 border-forest-500/30">

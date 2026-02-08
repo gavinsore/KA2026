@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { getCompetitionById } from '../data/competitions';
 import CompetitionEntryForm from '../components/CompetitionEntryForm';
+import SEO from '../components/SEO';
 
 const CompetitionDetails = () => {
     const { competitionId } = useParams();
@@ -44,6 +45,10 @@ const CompetitionDetails = () => {
 
     return (
         <div className="min-h-screen py-12 md:py-20">
+            <SEO
+                title={`${competition.name} | Kettering Archers`}
+                description={`Enter ${competition.name} archery competition hosted by Kettering Archers on ${formatDate(competition.date)} at ${competition.location}.`}
+            />
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Back Link */}
                 <Link

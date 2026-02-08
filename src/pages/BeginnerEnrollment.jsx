@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import emailjs from '@emailjs/browser';
+import SEO from '../components/SEO';
 
 // ============================================================
 // EMAILJS CONFIGURATION
@@ -148,6 +149,10 @@ const BeginnerEnrollment = () => {
 
     return (
         <div className="min-h-screen py-12 md:py-20">
+            <SEO
+                title="Beginners Course Enrollment | Kettering Archers"
+                description="Sign up for archery beginners courses at Kettering Archers. 6-week structured sessions with qualified instructors. All equipment provided. Ages 10+ welcome."
+            />
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12">
