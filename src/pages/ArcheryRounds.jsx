@@ -8,12 +8,11 @@ const ArcheryRounds = () => {
     // Categories for filtering
     const categories = [
         { id: 'all', label: 'All Rounds', color: 'bg-charcoal-100 text-charcoal-700 border-charcoal-300' },
-        { id: 'indoor-imperial', label: 'Indoor Imperial', color: 'bg-blue-100 text-blue-700 border-blue-300' },
-        { id: 'indoor-metric', label: 'Indoor Metric', color: 'bg-sky-100 text-sky-700 border-sky-300' },
-        { id: 'outdoor-imperial', label: 'Outdoor Imperial', color: 'bg-forest-100 text-forest-700 border-forest-300' },
-        { id: 'outdoor-metric', label: 'Outdoor Metric', color: 'bg-emerald-100 text-emerald-700 border-emerald-300' },
-        { id: 'clout-imperial', label: 'Clout Imperial', color: 'bg-purple-100 text-purple-700 border-purple-300' },
-        { id: 'clout-metric', label: 'Clout Metric', color: 'bg-violet-100 text-violet-700 border-violet-300' },
+        { id: 'indoor', label: 'Indoor', color: 'bg-blue-100 text-blue-700 border-blue-300' },
+        { id: 'outdoor', label: 'Outdoor', color: 'bg-forest-100 text-forest-700 border-forest-300' },
+        { id: 'clout', label: 'Clout', color: 'bg-purple-100 text-purple-700 border-purple-300' },
+        { id: 'field', label: 'Field', color: 'bg-amber-100 text-amber-700 border-amber-300' },
+        { id: 'fun', label: 'Fun / Novelty', color: 'bg-pink-100 text-pink-700 border-pink-300' },
     ];
 
     // All rounds with category and official/custom flag
@@ -21,7 +20,7 @@ const ArcheryRounds = () => {
         // Indoor Imperial
         {
             name: "Portsmouth",
-            category: "indoor-imperial",
+            category: "indoor", measurement: "imperial",
             isOfficial: true,
             description: "Indoor round shot at 20 yards on a 60cm face. Popular competition round.",
             distanceBreakdown: [
@@ -31,7 +30,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Worcester",
-            category: "indoor-imperial",
+            category: "indoor", measurement: "imperial",
             isOfficial: true,
             description: "Indoor round shot at 20 yards on a 16-inch black and white face.",
             distanceBreakdown: [
@@ -41,7 +40,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Vegas",
-            category: "indoor-imperial",
+            category: "indoor", measurement: "imperial",
             isOfficial: true,
             description: "Popular American indoor format, shot on a 40cm triple face.",
             distanceBreakdown: [
@@ -53,7 +52,7 @@ const ArcheryRounds = () => {
         // Indoor Metric
         {
             name: "WA 18",
-            category: "indoor-metric",
+            category: "indoor", measurement: "metric",
             isOfficial: true,
             description: "World Archery indoor round. Shot on a 40cm triple vertical face.",
             distanceBreakdown: [
@@ -63,7 +62,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "WA 25",
-            category: "indoor-metric",
+            category: "indoor", measurement: "metric",
             isOfficial: true,
             description: "World Archery indoor round at longer distance. Shot on a 60cm face.",
             distanceBreakdown: [
@@ -73,7 +72,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Bray I",
-            category: "indoor-metric",
+            category: "indoor", measurement: "metric",
             isOfficial: true,
             description: "Short indoor metric round, often used for practice or junior competitions.",
             distanceBreakdown: [
@@ -83,7 +82,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Bray II",
-            category: "indoor-metric",
+            category: "indoor", measurement: "metric",
             isOfficial: true,
             description: "Slightly shorter version of the Bray round.",
             distanceBreakdown: [
@@ -95,7 +94,7 @@ const ArcheryRounds = () => {
         // Outdoor Imperial
         {
             name: "York",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "The longest and most prestigious imperial round for men.",
             distanceBreakdown: [
@@ -107,7 +106,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Hereford",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Standard long-distance round for women, equivalent distances to Bristol I.",
             distanceBreakdown: [
@@ -119,7 +118,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Bristol I",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Long-distance round primarily for U18 boys.",
             distanceBreakdown: [
@@ -131,7 +130,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Bristol II",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Medium-distance round for U16 boys and U18 girls.",
             distanceBreakdown: [
@@ -143,7 +142,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Bristol III",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Shorter round for U14 boys and U16 girls.",
             distanceBreakdown: [
@@ -155,7 +154,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Bristol IV",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Junior round for U12 boys and U14 girls.",
             distanceBreakdown: [
@@ -167,7 +166,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Bristol V",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Shortest Bristol round for youngest juniors.",
             distanceBreakdown: [
@@ -179,7 +178,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "National",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Traditional British outdoor round. Popular for club competitions.",
             distanceBreakdown: [
@@ -190,7 +189,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Western",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Shorter outdoor round suitable for all abilities.",
             distanceBreakdown: [
@@ -201,7 +200,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Windsor",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Traditional outdoor round at medium distances.",
             distanceBreakdown: [
@@ -213,7 +212,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "American",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Popular outdoor round shot at medium-long distances.",
             distanceBreakdown: [
@@ -225,7 +224,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "St George",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Prestigious long-distance imperial round.",
             distanceBreakdown: [
@@ -237,7 +236,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Albion",
-            category: "outdoor-imperial",
+            category: "outdoor", measurement: "imperial",
             isOfficial: true,
             description: "Medium-distance imperial round suitable for most archers.",
             distanceBreakdown: [
@@ -251,7 +250,7 @@ const ArcheryRounds = () => {
         // Outdoor Metric
         {
             name: "WA 1440 (Gents)",
-            category: "outdoor-metric",
+            category: "outdoor", measurement: "metric",
             isOfficial: true,
             description: "World Archery outdoor round for men. Shot at 4 distances on 122cm and 80cm faces.",
             distanceBreakdown: [
@@ -264,7 +263,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "WA 1440 (Ladies)",
-            category: "outdoor-metric",
+            category: "outdoor", measurement: "metric",
             isOfficial: true,
             description: "World Archery outdoor round for women. Shot at 4 distances on 122cm and 80cm faces.",
             distanceBreakdown: [
@@ -277,7 +276,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "WA 720",
-            category: "outdoor-metric",
+            category: "outdoor", measurement: "metric",
             isOfficial: true,
             description: "Half of a WA 1440, shot at single distance. Common competition format.",
             distanceBreakdown: [
@@ -287,7 +286,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "WA 70",
-            category: "outdoor-metric",
+            category: "outdoor", measurement: "metric",
             isOfficial: true,
             description: "Standard Olympic distance round. Shot on a 122cm face.",
             distanceBreakdown: [
@@ -297,7 +296,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "WA 60",
-            category: "outdoor-metric",
+            category: "outdoor", measurement: "metric",
             isOfficial: true,
             description: "Intermediate distance metric round.",
             distanceBreakdown: [
@@ -307,7 +306,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "WA 50",
-            category: "outdoor-metric",
+            category: "outdoor", measurement: "metric",
             isOfficial: true,
             description: "Compound bow standard distance. Shot on an 80cm face.",
             distanceBreakdown: [
@@ -317,7 +316,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Metric 122-50",
-            category: "outdoor-metric",
+            category: "outdoor", measurement: "metric",
             isOfficial: true,
             description: "Junior/beginner metric round at shorter distances.",
             distanceBreakdown: [
@@ -329,7 +328,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Short Metric",
-            category: "outdoor-metric",
+            category: "outdoor", measurement: "metric",
             isOfficial: true,
             description: "Compact metric round for beginners or shorter sessions.",
             distanceBreakdown: [
@@ -340,7 +339,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Long Metric (Gents)",
-            category: "outdoor-metric",
+            category: "outdoor", measurement: "metric",
             isOfficial: true,
             description: "Two-distance metric round for men.",
             distanceBreakdown: [
@@ -351,7 +350,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Long Metric (Ladies)",
-            category: "outdoor-metric",
+            category: "outdoor", measurement: "metric",
             isOfficial: true,
             description: "Two-distance metric round for women.",
             distanceBreakdown: [
@@ -364,7 +363,7 @@ const ArcheryRounds = () => {
         // Clout Imperial
         {
             name: "Clout Imperial (Gents)",
-            category: "clout-imperial",
+            category: "clout", measurement: "imperial",
             isOfficial: true,
             description: "Long distance shooting at a flag (clout) on the ground. Arrows scored by proximity to flag.",
             distanceBreakdown: [
@@ -374,7 +373,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Clout Imperial (Ladies)",
-            category: "clout-imperial",
+            category: "clout", measurement: "imperial",
             isOfficial: true,
             description: "Long distance shooting at a flag (clout) on the ground for women.",
             distanceBreakdown: [
@@ -384,7 +383,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Double Clout Imperial (Gents)",
-            category: "clout-imperial",
+            category: "clout", measurement: "imperial",
             isOfficial: true,
             description: "Two rounds of clout shooting for a longer competition.",
             distanceBreakdown: [
@@ -394,7 +393,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Double Clout Imperial (Ladies)",
-            category: "clout-imperial",
+            category: "clout", measurement: "imperial",
             isOfficial: true,
             description: "Two rounds of clout shooting for a longer competition for women.",
             distanceBreakdown: [
@@ -406,7 +405,7 @@ const ArcheryRounds = () => {
         // Clout Metric
         {
             name: "WA Clout (Gents)",
-            category: "clout-metric",
+            category: "clout", measurement: "metric",
             isOfficial: true,
             description: "World Archery clout format using metric distances for men.",
             distanceBreakdown: [
@@ -416,7 +415,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "WA Clout (Ladies)",
-            category: "clout-metric",
+            category: "clout", measurement: "metric",
             isOfficial: true,
             description: "World Archery clout format using metric distances for women.",
             distanceBreakdown: [
@@ -426,7 +425,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Double WA Clout (Gents)",
-            category: "clout-metric",
+            category: "clout", measurement: "metric",
             isOfficial: true,
             description: "Two rounds of WA clout for longer competitions for men.",
             distanceBreakdown: [
@@ -436,7 +435,7 @@ const ArcheryRounds = () => {
         },
         {
             name: "Double WA Clout (Ladies)",
-            category: "clout-metric",
+            category: "clout", measurement: "metric",
             isOfficial: true,
             description: "Two rounds of WA clout for longer competitions for women.",
             distanceBreakdown: [
@@ -444,12 +443,385 @@ const ArcheryRounds = () => {
             ],
             maxScore: "360"
         },
+
+        // Official Indoor Rounds from KA shoots
+        {
+            name: "Frostbite",
+            category: "outdoor", measurement: "metric",
+            isOfficial: true,
+            description: "Popular winter league round. Shot on an 80cm face with metric scoring.",
+            distanceBreakdown: [
+                { distance: "30 metres", arrows: 36 }
+            ],
+            maxScore: "360"
+        },
+        {
+            name: "Stafford",
+            category: "indoor", measurement: "imperial",
+            isOfficial: true,
+            description: "Indoor round shot on an 80cm face. Popular club competition round.",
+            distanceBreakdown: [
+                { distance: "30 yards", arrows: 72 }
+            ],
+            maxScore: "720"
+        },
+        {
+            name: "Oxford",
+            category: "indoor", measurement: "imperial",
+            isOfficial: true,
+            description: "Indoor round shot at 20 yards on a 60cm standard face.",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 36 }
+            ],
+            maxScore: "360"
+        },
+        {
+            name: "London",
+            category: "indoor", measurement: "imperial",
+            isOfficial: true,
+            description: "Indoor round shot at 25 yards on an 80cm standard face.",
+            distanceBreakdown: [
+                { distance: "25 yards", arrows: 36 }
+            ],
+            maxScore: "360"
+        },
+        {
+            name: "Cambridge",
+            category: "indoor", measurement: "imperial",
+            isOfficial: true,
+            description: "Indoor round shot at 20 yards on a 60cm half face.",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 36 }
+            ],
+            maxScore: "360"
+        },
+        {
+            name: "Coventry",
+            category: "indoor", measurement: "imperial",
+            isOfficial: true,
+            description: "Indoor round shot at 20 yards on a 40cm 3-spot vertical face. 5-zone scoring.",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 36 }
+            ],
+            maxScore: "180"
+        },
+        {
+            name: "Stratford",
+            category: "indoor", measurement: "imperial",
+            isOfficial: true,
+            description: "Indoor round shot at 20 yards on two Worcester faces arranged vertically.",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 48 }
+            ],
+            maxScore: "240"
+        },
+
+        // Field Archery Rounds
+        {
+            name: "Field",
+            category: "field",
+            isOfficial: false,
+            description: "KA field round with 8 different distances from 10-80 yards in various directions.",
+            distanceBreakdown: [
+                { distance: "10-80 yards", arrows: 48 }
+            ],
+            maxScore: "480"
+        },
+        {
+            name: "Pope-Young",
+            category: "field",
+            isOfficial: false,
+            description: "Speed shoot at various target faces from 15-25 paces. 2 x 3 dozen arrows.",
+            distanceBreakdown: [
+                { distance: "15-25 paces", arrows: 72 }
+            ],
+            maxScore: "720"
+        },
+        {
+            name: "Royal Game",
+            category: "field",
+            isOfficial: false,
+            description: "Shot at 9 different 3D animals plus a King/Knight target from 10-70 paces.",
+            distanceBreakdown: [
+                { distance: "10-70 paces", arrows: 60 }
+            ],
+            maxScore: "600"
+        },
+        {
+            name: "Safari",
+            category: "field",
+            isOfficial: false,
+            description: "Shot at 10 different animal face targets from 10-40 paces.",
+            distanceBreakdown: [
+                { distance: "10-40 paces", arrows: 60 }
+            ],
+            maxScore: "300"
+        },
+
+        // KA Custom Clout Rounds
+        {
+            name: "3-Way Clout",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "KA custom clout with 3 flags at different distances in metric clout circles.",
+            distanceBreakdown: [
+                { distance: "180 paces", arrows: 12 },
+                { distance: "120 paces", arrows: 12 },
+                { distance: "60 paces", arrows: 12 }
+            ],
+            maxScore: "180"
+        },
+        {
+            name: "Black Bear",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "3D bear target placed in a metric clout circle at long distance.",
+            distanceBreakdown: [
+                { distance: "180 paces", arrows: 12 },
+                { distance: "140 paces", arrows: 12 },
+                { distance: "100 paces", arrows: 12 }
+            ],
+            maxScore: "216"
+        },
+        {
+            name: "Easter Bunny",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "3D bunny target placed in a metric clout circle. Popular Easter event.",
+            distanceBreakdown: [
+                { distance: "180 paces", arrows: 12 },
+                { distance: "140 paces", arrows: 12 },
+                { distance: "100 paces", arrows: 12 }
+            ],
+            maxScore: "216"
+        },
+        {
+            name: "Stag",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "3D stag target placed in a metric clout circle at long distance.",
+            distanceBreakdown: [
+                { distance: "180 paces", arrows: 24 },
+                { distance: "140 paces", arrows: 24 }
+            ],
+            maxScore: "288"
+        },
+        {
+            name: "Wolf",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "3D wolf target placed in a metric clout circle.",
+            distanceBreakdown: [
+                { distance: "160 paces", arrows: 24 },
+                { distance: "120 paces", arrows: 24 }
+            ],
+            maxScore: "288"
+        },
+        {
+            name: "Coyote",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "3D coyote target placed in a metric clout circle.",
+            distanceBreakdown: [
+                { distance: "120 paces", arrows: 24 },
+                { distance: "80 paces", arrows: 24 }
+            ],
+            maxScore: "288"
+        },
+        {
+            name: "Hog",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "3D hog target placed in a metric clout circle.",
+            distanceBreakdown: [
+                { distance: "140 paces", arrows: 24 },
+                { distance: "100 paces", arrows: 24 }
+            ],
+            maxScore: "288"
+        },
+        {
+            name: "Valentine 120",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "Heart-faced boss placed in an imperial clout circle. Valentine's Day special.",
+            distanceBreakdown: [
+                { distance: "120 paces", arrows: 24 },
+                { distance: "80 paces", arrows: 24 }
+            ],
+            maxScore: "240"
+        },
+        {
+            name: "Boxing Day Clout",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "Snowman cut-out placed in a metric clout circle. Festive fun round.",
+            distanceBreakdown: [
+                { distance: "160 paces", arrows: 12 },
+                { distance: "120 paces", arrows: 12 },
+                { distance: "100 paces", arrows: 12 }
+            ],
+            maxScore: "180"
+        },
+        {
+            name: "Halloween Clout",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "Night-time clout shoot with pumpkin target worth 10 points.",
+            distanceBreakdown: [
+                { distance: "160 paces", arrows: 12 },
+                { distance: "120 paces", arrows: 12 },
+                { distance: "100 paces", arrows: 12 }
+            ],
+            maxScore: "180"
+        },
+        {
+            name: "New Year Rove",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "Multiple clout flags at various distances in metric clout circles.",
+            distanceBreakdown: [
+                { distance: "Various", arrows: 48 }
+            ],
+            maxScore: "240"
+        },
+        {
+            name: "Cloth Of Gold",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "Gold-faced boss placed in a square target area at 150 paces. 2-zone scoring.",
+            distanceBreakdown: [
+                { distance: "150 paces", arrows: 48 }
+            ],
+            maxScore: "96"
+        },
+        {
+            name: "West Lodge Square",
+            category: "clout", measurement: "imperial",
+            isOfficial: false,
+            description: "Flag in a square at 60 yards. High ping shot format.",
+            distanceBreakdown: [
+                { distance: "60 yards", arrows: 24 }
+            ],
+            maxScore: "24"
+        },
+        {
+            name: "Shield Wall",
+            category: "outdoor", measurement: "imperial",
+            isOfficial: false,
+            description: "10 low touching targets in a wall formation. Unique KA format.",
+            distanceBreakdown: [
+                { distance: "120 paces", arrows: 36 },
+                { distance: "100 paces", arrows: 24 },
+                { distance: "80 paces", arrows: 12 }
+            ],
+            maxScore: "720"
+        },
+
+        // KA Custom Outdoor Rounds
+        {
+            name: "Kettering",
+            category: "outdoor", measurement: "imperial",
+            isOfficial: false,
+            description: "KA signature round shot at increasing distances on 122cm faces.",
+            distanceBreakdown: [
+                { distance: "80 yards", arrows: 24 },
+                { distance: "100 yards", arrows: 24 },
+                { distance: "120 yards", arrows: 24 }
+            ],
+            maxScore: "360"
+        },
+        {
+            name: "Midsummer",
+            category: "outdoor", measurement: "imperial",
+            isOfficial: false,
+            description: "Shot at low targets from decreasing distances on 122cm faces.",
+            distanceBreakdown: [
+                { distance: "60 yards", arrows: 15 },
+                { distance: "50 yards", arrows: 15 },
+                { distance: "40 yards", arrows: 15 },
+                { distance: "30 yards", arrows: 15 }
+            ],
+            maxScore: "300"
+        },
+        {
+            name: "Flight",
+            category: "outdoor", measurement: "imperial",
+            isOfficial: true,
+            description: "Distance shooting competition - aim is to shoot as far as possible.",
+            distanceBreakdown: [
+                { distance: "Maximum", arrows: 24 }
+            ],
+            maxScore: "N/A"
+        },
+
+        // KA Custom Fun / Novelty Rounds
+        {
+            name: "Christmas Turkey",
+            category: "fun",
+            isOfficial: false,
+            description: "Indoor novelty round shot at a turkey face target. Festive fun!",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 48 }
+            ],
+            maxScore: "240"
+        },
+        {
+            name: "Darts",
+            category: "fun",
+            isOfficial: false,
+            description: "Shot at a darts-style face at 30 yards. Scored like pub darts!",
+            distanceBreakdown: [
+                { distance: "30 yards", arrows: 36 }
+            ],
+            maxScore: "Varies"
+        },
+        {
+            name: "Ghost",
+            category: "fun",
+            isOfficial: false,
+            description: "Halloween indoor round shot at a ghost face target.",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 36 }
+            ],
+            maxScore: "180"
+        },
+        {
+            name: "Snowman",
+            category: "fun",
+            isOfficial: false,
+            description: "Indoor round shot at a cut-out snowman face. Reverse scoring.",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 36 }
+            ],
+            maxScore: "360"
+        },
+        {
+            name: "Star",
+            category: "fun",
+            isOfficial: false,
+            description: "Indoor round shot at a cut-out star face on 80cm boss. Reverse scoring.",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 36 }
+            ],
+            maxScore: "360"
+        },
+        {
+            name: "Valentine",
+            category: "fun",
+            isOfficial: false,
+            description: "Indoor round shot at a heart face target. Perfect for Valentine's Day!",
+            distanceBreakdown: [
+                { distance: "20 yards", arrows: 48 }
+            ],
+            maxScore: "240"
+        },
     ];
 
-    // Filter rounds based on active filter
-    const filteredRounds = activeFilter === 'all'
+    // Filter rounds based on active filter and sort alphabetically
+    const filteredRounds = (activeFilter === 'all'
         ? rounds
-        : rounds.filter(round => round.category === activeFilter);
+        : rounds.filter(round => round.category === activeFilter)
+    ).sort((a, b) => a.name.localeCompare(b.name));
 
     // Get category info for display
     const getCategoryInfo = (categoryId) => {
@@ -481,8 +853,8 @@ const ArcheryRounds = () => {
                             key={category.id}
                             onClick={() => setActiveFilter(category.id)}
                             className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border ${activeFilter === category.id
-                                    ? `${category.color} ring-2 ring-offset-2 ring-forest-500 scale-105`
-                                    : 'bg-white/50 text-charcoal-600 border-charcoal-200 hover:bg-white hover:border-charcoal-300'
+                                ? `${category.color} ring-2 ring-offset-2 ring-forest-500 scale-105`
+                                : 'bg-white/50 text-charcoal-600 border-charcoal-200 hover:bg-white hover:border-charcoal-300'
                                 }`}
                         >
                             {category.label}
