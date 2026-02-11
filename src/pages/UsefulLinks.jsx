@@ -23,7 +23,7 @@ const UsefulLinks = () => {
                 },
                 {
                     name: "EMAS",
-                    url: "https://emasarchery.org.uk",
+                    url: "https://emasarchery.co.uk",
                     description: "East Midlands Archery Society"
                 },
                 {
@@ -80,7 +80,7 @@ const UsefulLinks = () => {
             links: [
                 {
                     name: "Archery GB Coaching",
-                    url: "https://archerygb.org/coaches",
+                    url: "https://archerygb.org/coaching",
                     description: "Coaching qualifications and resources"
                 },
                 {

@@ -1,0 +1,12 @@
+[
+    {
+        "id": "2025_outdoor",
+        "name": "2025 Outdoor Season",
+        "path": "archive/2025_outdoor"
+    },
+    {
+        "id": "2024_2025_indoor",
+        "name": "2024/2025 Indoor Season",
+        "path": "archive/2024_2025_indoor"
+    }
+]

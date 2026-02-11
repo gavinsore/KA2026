@@ -1,21 +1,37 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { format } from 'date-fns';
 
 const Announcement = () => {
     const [announcement, setAnnouncement] = useState(null);
     const [dismissed, setDismissed] = useState(false);
 
     useEffect(() => {
-        fetch(`${import.meta.env.BASE_URL}data/announcement.json`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.active && data.message) {
-                    setAnnouncement(data);
-                }
-            })
-            .catch(() => {
-                // Silently fail if no announcement file
-            });
+        fetchAnnouncement();
     }, []);
+
+    const fetchAnnouncement = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('announcements')
+                .select('*')
+                .eq('is_active', true)
+                .order('date', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+                console.error('Error fetching announcement:', error);
+                return;
+            }
+
+            if (data) {
+                setAnnouncement(data);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
     if (!announcement || dismissed) return null;
 
@@ -54,8 +70,8 @@ const Announcement = () => {
         ),
         warning: (
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M6 18L18 6M6 6l12 12" />
+            </svg> // Warning icon was a bit complex, sticking to simple alert or using the one from before
         ),
         urgent: (
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -63,6 +79,13 @@ const Announcement = () => {
             </svg>
         )
     };
+    // Proper Warning Icon
+    icons.warning = (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+    );
+
 
     return (
         <div className={`${style.bg} border-b-2 py-4 px-4`}>
@@ -77,11 +100,11 @@ const Announcement = () => {
                         </h3>
                     )}
                     <p className={`${style.text} text-sm leading-relaxed`}>
-                        {announcement.message}
+                        {announcement.content}
                     </p>
-                    {announcement.lastUpdated && (
+                    {announcement.date && (
                         <p className={`${style.text} text-xs mt-2 opacity-70`}>
-                            Last updated: {announcement.lastUpdated}
+                            Last updated: {format(new Date(announcement.date), 'do MMMM yyyy')}
                         </p>
                     )}
                 </div>

@@ -199,7 +199,7 @@ const CompetitionEntryForm = ({ competition }) => {
                         className={`input-field ${errors.bowtype ? 'border-red-500' : ''}`}
                     >
                         <option value="">Select bowtype</option>
-                        {competition.eligibleClasses.map(cls => (
+                        {competition.eligible_classes?.map(cls => (
                             <option key={cls} value={cls}>{cls}</option>
                         ))}
                     </select>
@@ -216,7 +216,7 @@ const CompetitionEntryForm = ({ competition }) => {
                         className={`input-field ${errors.distance ? 'border-red-500' : ''}`}
                     >
                         <option value="">Select distance</option>
-                        {competition.eligibleDistances.map(dist => (
+                        {competition.eligible_distances?.map(dist => (
                             <option key={dist} value={dist}>{dist}</option>
                         ))}
                     </select>
@@ -365,7 +365,7 @@ const CompetitionEntryForm = ({ competition }) => {
                         )}
                     </div>
                     <span className="text-sm text-charcoal-600">
-                        I have read and agree to the data processing terms. {competition.gdprNotice}
+                        I have read and agree to the data processing terms. {competition.gdpr_notice}
                     </span>
                 </label>
                 {errors.gdprConsent && <p className="text-red-400 text-sm mt-2">{errors.gdprConsent}</p>}

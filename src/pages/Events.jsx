@@ -1,24 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import EventCard from '../components/EventCard';
-import { getOpenCompetitions } from '../data/competitions';
-import SEO from '../components/SEO';
 
-// ============================================================
-// GOOGLE CALENDAR CONFIGURATION
-// To use Google Calendar for events:
-// 1. Create a Google Calendar for your club events
-// 2. Make the calendar public (Settings > Access permissions > Make available to public)
-// 3. Get the Calendar ID (Settings > Integrate calendar > Calendar ID)
-// 4. Get a Google API key from https://console.cloud.google.com/
-//    - Create a new project
-//    - Enable the Google Calendar API
-//    - Create credentials (API key)
-//    - Restrict the key to Google Calendar API (recommended)
-// 5. Replace these placeholder values:
-// ============================================================
-const GOOGLE_CALENDAR_ID = 'ketteringarcherstest@gmail.com';
-const GOOGLE_API_KEY = 'AIzaSyCla7x5hStgKHGJspQwB82zKvwFfjqkTB4';
+import SEO from '../components/SEO';
+import { supabase } from '../lib/supabase';
 
 const Events = () => {
     const [events, setEvents] = useState([]);
@@ -26,92 +11,61 @@ const Events = () => {
     const [error, setError] = useState('');
     const [activeFilter, setActiveFilter] = useState(null);
 
+    const [competitions, setCompetitions] = useState([]);
+
     useEffect(() => {
         fetchEvents();
+        fetchCompetitions();
     }, []);
 
-    const fetchEvents = async () => {
-        // If not configured, use sample events
-        if (GOOGLE_CALENDAR_ID === 'YOUR_CALENDAR_ID@group.calendar.google.com') {
-            console.log('Google Calendar not configured. Using sample events.');
-            setEvents(getSampleEvents());
-            setLoading(false);
-            return;
-        }
-
+    const fetchCompetitions = async () => {
         try {
-            const now = new Date().toISOString();
-            const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(GOOGLE_CALENDAR_ID)}/events?key=${GOOGLE_API_KEY}&timeMin=${now}&maxResults=50&singleEvents=true&orderBy=startTime`;
+            const today = new Date().toISOString().split('T')[0];
+            const { data, error } = await supabase
+                .from('competitions')
+                .select('*')
+                .eq('is_open', true)
+                .gte('date', today)
+                .order('date', { ascending: true });
 
-            const response = await fetch(url);
+            if (error) throw error;
+            setCompetitions(data);
+        } catch (err) {
+            console.error('Error fetching competitions:', err);
+        }
+    };
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error('Google Calendar API Error:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    error: errorData
-                });
-                throw new Error(`API Error ${response.status}: ${errorData.error?.message || response.statusText}`);
-            }
+    const fetchEvents = async () => {
+        try {
+            const today = new Date().toISOString().split('T')[0];
 
-            const data = await response.json();
+            const { data, error } = await supabase
+                .from('events')
+                .select('*')
+                .gte('date', today)
+                .order('date', { ascending: true });
 
-            // Transform Google Calendar events to our format
-            const transformedEvents = data.items.map((item, index) => {
-                // Parse event types from description (supports multiple types)
-                const description = item.description || '';
-                const descLower = description.toLowerCase();
-                const eventTypes = [];
+            if (error) throw error;
 
-                // Check for each type tag
-                if (descLower.includes('[competition]')) eventTypes.push('Competition');
-                if (descLower.includes('[beginners]')) eventTypes.push('Beginners');
-                if (descLower.includes('[open day]')) eventTypes.push('Open Day');
-                if (descLower.includes('[social]')) eventTypes.push('Social');
-                if (descLower.includes('[practice]')) eventTypes.push('Practice');
-                if (descLower.includes('[target]')) eventTypes.push('Target');
-                if (descLower.includes('[clout]')) eventTypes.push('Clout');
-                if (descLower.includes('[club shoot]')) eventTypes.push('Club Shoot');
-
-                // Default to Club Shoot if no types found
-                if (eventTypes.length === 0) {
-                    eventTypes.push('Club Shoot');
+            // Transform Supabase events to our internal format if needed
+            // Currently they are almost identical match, but we handle time formatting
+            const transformedEvents = data.map((item) => {
+                let timeStr = '';
+                if (item.start_time) {
+                    timeStr = item.start_time.slice(0, 5);
+                    if (item.end_time) {
+                        timeStr += ` - ${item.end_time.slice(0, 5)}`;
+                    }
                 }
-
-                // Get start date/time
-                const startDate = item.start.dateTime || item.start.date;
-                const endDate = item.end.dateTime || item.end.date;
-
-                // Format time if available
-                let time = '';
-                if (item.start.dateTime) {
-                    const startTime = new Date(item.start.dateTime).toLocaleTimeString('en-GB', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                    });
-                    const endTime = new Date(item.end.dateTime).toLocaleTimeString('en-GB', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                    });
-                    time = `${startTime} - ${endTime}`;
-                }
-
-                // Clean description (remove type tags)
-                const cleanDescription = description
-                    .replace(/\[(competition|beginners|open day|social|club shoot|practice|clout|target|indoors)\]/gi, '')
-                    .trim();
 
                 return {
-                    id: item.id || index,
-                    title: item.summary || 'Untitled Event',
-                    date: startDate.split('T')[0],
-                    time: time,
+                    id: item.id,
+                    title: item.title,
+                    date: item.date,
+                    time: timeStr,
                     location: item.location || '',
-                    description: cleanDescription || item.summary,
-                    types: eventTypes
+                    description: item.description || '',
+                    types: [item.type] // Convert single type to array for compatibility
                 };
             });
 
@@ -119,51 +73,10 @@ const Events = () => {
         } catch (err) {
             console.error('Error fetching events:', err);
             setError('Unable to load events. Please try again later.');
-            // Fall back to sample events on error
-            setEvents(getSampleEvents());
         } finally {
             setLoading(false);
         }
     };
-
-    const getSampleEvents = () => [
-        {
-            id: 1,
-            title: "Club Target Day",
-            date: "2026-02-15",
-            time: "10:00 AM - 4:00 PM",
-            location: "Kettering Sports Ground",
-            description: "Monthly club target day. All members welcome. Various rounds available.",
-            types: ["Club Shoot", "Target"]
-        },
-        {
-            id: 2,
-            title: "Beginners Course - Session 1",
-            date: "2026-02-22",
-            time: "2:00 PM - 4:00 PM",
-            location: "Indoor Range",
-            description: "First session of our 6-week beginners course. All equipment provided.",
-            types: ["Beginners"]
-        },
-        {
-            id: 3,
-            title: "Clout Championship",
-            date: "2026-03-01",
-            time: "9:00 AM - 5:00 PM",
-            location: "Kettering Sports Ground",
-            description: "Annual clout archery championship. Open to all club members.",
-            types: ["Competition", "Clout"]
-        },
-        {
-            id: 4,
-            title: "Spring Outdoor Opening",
-            date: "2026-03-15",
-            time: "10:00 AM - 3:00 PM",
-            location: "Kettering Sports Ground",
-            description: "Outdoor season opening day! Join us for a relaxed shoot to kick off the outdoor season.",
-            types: ["Club Shoot"]
-        }
-    ];
 
     // Filter events based on active filter (check if event has the selected type)
     const filteredEvents = activeFilter
@@ -198,8 +111,8 @@ const Events = () => {
                     </p>
                 </div>
 
-                {/* Open Competitions Section */}
-                {getOpenCompetitions().length > 0 && (
+                {/* Open Competitions Section - Fetched from Supabase */}
+                {competitions.length > 0 && (
                     <div className="mb-12">
                         <h2 className="text-2xl font-bold text-forest-900 mb-6 flex items-center gap-3">
                             <svg className="w-7 h-7 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -208,9 +121,9 @@ const Events = () => {
                             Open Competitions
                         </h2>
                         <div className="grid md:grid-cols-2 gap-4">
-                            {getOpenCompetitions().map(competition => {
+                            {competitions.map(competition => {
                                 const compDate = new Date(competition.date);
-                                const closingDate = new Date(competition.closingDate);
+                                const closingDate = new Date(competition.closing_date);
                                 const today = new Date();
                                 const daysUntilClose = Math.ceil((closingDate - today) / (1000 * 60 * 60 * 24));
 
@@ -232,23 +145,23 @@ const Events = () => {
                                                     </span>
                                                 </div>
                                                 <div className="flex flex-wrap gap-2 mb-3">
-                                                    {competition.eligibleClasses.slice(0, 3).map(cls => (
+                                                    {competition.eligible_classes && competition.eligible_classes.slice(0, 3).map(cls => (
                                                         <span key={cls} className="px-2 py-0.5 rounded-full bg-forest-100 text-forest-700 text-xs font-medium">
                                                             {cls}
                                                         </span>
                                                     ))}
-                                                    {competition.eligibleClasses.length > 3 && (
+                                                    {competition.eligible_classes && competition.eligible_classes.length > 3 && (
                                                         <span className="px-2 py-0.5 rounded-full bg-charcoal-100 text-charcoal-600 text-xs">
-                                                            +{competition.eligibleClasses.length - 3} more
+                                                            +{competition.eligible_classes.length - 3} more
                                                         </span>
                                                     )}
                                                 </div>
                                                 <div className="flex items-center justify-between">
                                                     <div className="text-sm">
                                                         <span className="text-charcoal-500">Entry: </span>
-                                                        <span className="font-medium text-forest-700">£{competition.entryFee.adult}</span>
+                                                        <span className="font-medium text-forest-700">£{competition.entry_fee_adult}</span>
                                                         <span className="text-charcoal-400"> / </span>
-                                                        <span className="font-medium text-forest-700">£{competition.entryFee.junior}</span>
+                                                        <span className="font-medium text-forest-700">£{competition.entry_fee_junior}</span>
                                                         <span className="text-charcoal-500 text-xs ml-1">(junior)</span>
                                                     </div>
                                                     {daysUntilClose > 0 && daysUntilClose <= 7 && (
@@ -260,7 +173,7 @@ const Events = () => {
                                             </div>
                                         </div>
                                         <Link
-                                            to={`/competitions/${competition.id}`}
+                                            to={`/competitions/${competition.slug}`}
                                             className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gold-500 text-white font-medium hover:bg-gold-600 transition-colors"
                                         >
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

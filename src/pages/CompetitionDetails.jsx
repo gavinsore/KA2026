@@ -1,11 +1,43 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getCompetitionById } from '../data/competitions';
+import { supabase } from '../lib/supabase';
 import CompetitionEntryForm from '../components/CompetitionEntryForm';
 import SEO from '../components/SEO';
 
 const CompetitionDetails = () => {
     const { competitionId } = useParams();
-    const competition = getCompetitionById(competitionId);
+    const [competition, setCompetition] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchCompetition();
+    }, [competitionId]);
+
+    const fetchCompetition = async () => {
+        try {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('competitions')
+                .select('*')
+                .eq('slug', competitionId)
+                .single();
+
+            if (error) throw error;
+            setCompetition(data);
+        } catch (error) {
+            console.error('Error fetching competition:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen py-20 flex justify-center">
+                <div className="w-12 h-12 rounded-full border-4 border-forest-600 border-t-transparent animate-spin"></div>
+            </div>
+        );
+    }
 
     // Competition not found
     if (!competition) {
@@ -31,6 +63,7 @@ const CompetitionDetails = () => {
 
     // Format date
     const formatDate = (dateString) => {
+        if (!dateString) return 'TBA';
         const date = new Date(dateString);
         return date.toLocaleDateString('en-GB', {
             weekday: 'long',
@@ -41,7 +74,7 @@ const CompetitionDetails = () => {
     };
 
     // Check if entries are closed
-    const entriesClosed = new Date(competition.closingDate) < new Date();
+    const entriesClosed = new Date(competition.closing_date) < new Date();
 
     return (
         <div className="min-h-screen py-12 md:py-20">
@@ -91,8 +124,8 @@ const CompetitionDetails = () => {
                             Entry Fee
                         </h3>
                         <div className="space-y-2 text-charcoal-600">
-                            <p><span className="font-medium">Adults:</span> £{competition.entryFee.adult}</p>
-                            <p><span className="font-medium">Juniors:</span> £{competition.entryFee.junior}</p>
+                            <p><span className="font-medium">Adults:</span> £{competition.entry_fee_adult}</p>
+                            <p><span className="font-medium">Juniors:</span> £{competition.entry_fee_junior}</p>
                         </div>
                     </div>
 
@@ -105,10 +138,10 @@ const CompetitionDetails = () => {
                             Entry Deadline
                         </h3>
                         <p className={`font-medium ${entriesClosed ? 'text-red-500' : 'text-forest-600'}`}>
-                            {entriesClosed ? 'Entries Closed' : formatDate(competition.closingDate)}
+                            {entriesClosed ? 'Entries Closed' : formatDate(competition.closing_date)}
                         </p>
-                        {competition.maxEntries && (
-                            <p className="text-sm text-charcoal-500 mt-1">Maximum {competition.maxEntries} entries</p>
+                        {competition.max_entries && (
+                            <p className="text-sm text-charcoal-500 mt-1">Maximum {competition.max_entries} entries</p>
                         )}
                     </div>
                 </div>
@@ -122,7 +155,7 @@ const CompetitionDetails = () => {
                         Payment Details
                     </h3>
                     <pre className="text-charcoal-600 text-sm whitespace-pre-wrap font-sans">
-                        {competition.paymentDetails}
+                        {competition.payment_details}
                     </pre>
                 </div>
 
@@ -136,7 +169,7 @@ const CompetitionDetails = () => {
                             Judges
                         </h3>
                         <ul className="space-y-1 text-charcoal-600 text-sm">
-                            {competition.judges.map((judge, index) => (
+                            {competition.judges && competition.judges.map((judge, index) => (
                                 <li key={index} className="flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-forest-500"></span>
                                     {judge}
@@ -163,7 +196,7 @@ const CompetitionDetails = () => {
                         <div>
                             <h4 className="font-medium text-charcoal-700 mb-2">Bow Classes</h4>
                             <div className="flex flex-wrap gap-2">
-                                {competition.eligibleClasses.map(cls => (
+                                {competition.eligible_classes && competition.eligible_classes.map(cls => (
                                     <span key={cls} className="px-3 py-1 rounded-full bg-forest-100 text-forest-700 text-sm font-medium">
                                         {cls}
                                     </span>
@@ -173,7 +206,7 @@ const CompetitionDetails = () => {
                         <div>
                             <h4 className="font-medium text-charcoal-700 mb-2">Distances</h4>
                             <div className="flex flex-wrap gap-2">
-                                {competition.eligibleDistances.map(dist => (
+                                {competition.eligible_distances && competition.eligible_distances.map(dist => (
                                     <span key={dist} className="px-3 py-1 rounded-full bg-gold-100 text-gold-700 text-sm font-medium">
                                         {dist}
                                     </span>
@@ -191,11 +224,11 @@ const CompetitionDetails = () => {
                         </svg>
                         Dress Code (Archery GB Regulations)
                     </h3>
-                    <p className="text-charcoal-600 text-sm">{competition.dressCode}</p>
+                    <p className="text-charcoal-600 text-sm">{competition.dress_code}</p>
                 </div>
 
                 {/* Additional Info */}
-                {competition.additionalInfo && (
+                {competition.additional_info && (
                     <div className="glass-card p-6 md:p-8 mb-10 border-gold-500/30">
                         <h3 className="text-lg font-semibold text-forest-900 mb-3 flex items-center gap-2">
                             <svg className="w-5 h-5 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -203,7 +236,7 @@ const CompetitionDetails = () => {
                             </svg>
                             Additional Information
                         </h3>
-                        <p className="text-charcoal-600 text-sm">{competition.additionalInfo}</p>
+                        <p className="text-charcoal-600 text-sm">{competition.additional_info}</p>
                     </div>
                 )}
 
@@ -218,7 +251,7 @@ const CompetitionDetails = () => {
                             Unfortunately, entries for this competition have now closed.
                         </p>
                     </div>
-                ) : competition.isOpen ? (
+                ) : competition.is_open ? (
                     <CompetitionEntryForm competition={competition} />
                 ) : (
                     <div className="glass-card p-8 text-center border-charcoal-500/30">

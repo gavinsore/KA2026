@@ -1,7 +1,0 @@
-id,date,event_name,venue,file
-2026-01-26-portsmouth,2026-01-26,Portsmouth,Indoor,events/2026-01-26-portsmouth-indoor.csv
-2026-01-19-western,2026-01-19,Western,Outdoor,events/2026-01-19-western-outdoor.csv
-2026-01-19-wa18,2026-01-19,WA 18,Indoor,events/2026-01-19-wa18-indoor.csv
-2026-01-12-national,2026-01-12,National,Outdoor,events/2026-01-12-national-outdoor.csv
-2026-01-12-portsmouth,2026-01-12,Portsmouth,Indoor,events/2026-01-12-portsmouth-indoor.csv
-2026-01-05-short-metric,2026-01-05,Short Metric,Outdoor,events/2026-01-05-short-metric-outdoor.csv
