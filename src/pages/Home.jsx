@@ -1,9 +1,46 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 import SEO from '../components/SEO';
 
 
 
 const Home = () => {
+    const [recentImages, setRecentImages] = useState([]);
+    const [loadingGallery, setLoadingGallery] = useState(true);
+
+    useEffect(() => {
+        const fetchRecentImages = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('gallery_images')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(4);
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    const images = data.map((item) => {
+                        const { data: urlData } = supabase.storage.from('gallery').getPublicUrl(item.filename);
+                        return {
+                            id: item.id,
+                            src: urlData.publicUrl,
+                            alt: item.description || 'Archery at Kettering Archers',
+                        };
+                    });
+                    setRecentImages(images);
+                }
+            } catch (error) {
+                console.error('Error fetching recent gallery images:', error);
+            } finally {
+                setLoadingGallery(false);
+            }
+        };
+
+        fetchRecentImages();
+    }, []);
+
     return (
         <div className="min-h-screen">
             <SEO
@@ -347,34 +384,53 @@ const Home = () => {
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-                        <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
-                            <img
-                                src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540677.jpg`}
-                                alt="Archery at Kettering Archers"
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                        </div>
-                        <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
-                            <img
-                                src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540679.jpg`}
-                                alt="Archery at Kettering Archers"
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                        </div>
-                        <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
-                            <img
-                                src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540712.jpg`}
-                                alt="Archery at Kettering Archers"
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                        </div>
-                        <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
-                            <img
-                                src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540714.jpg`}
-                                alt="Archery at Kettering Archers"
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                        </div>
+                        {loadingGallery ? (
+                            <div className="col-span-full py-12 flex justify-center">
+                                <div className="animate-spin rounded-full h-8 w-8 border-4 border-forest-200 border-t-forest-600"></div>
+                            </div>
+                        ) : recentImages.length > 0 ? (
+                            recentImages.map((img) => (
+                                <div key={img.id} className="aspect-square overflow-hidden rounded-xl shadow-lg group">
+                                    <img
+                                        src={img.src}
+                                        alt={img.alt}
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                </div>
+                            ))
+                        ) : (
+                            // Fallback static images if no dynamic ones found
+                            <>
+                                <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
+                                    <img
+                                        src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540677.jpg`}
+                                        alt="Archery at Kettering Archers"
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                </div>
+                                <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
+                                    <img
+                                        src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540679.jpg`}
+                                        alt="Archery at Kettering Archers"
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                </div>
+                                <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
+                                    <img
+                                        src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540712.jpg`}
+                                        alt="Archery at Kettering Archers"
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                </div>
+                                <div className="aspect-square overflow-hidden rounded-xl shadow-lg group">
+                                    <img
+                                        src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540714.jpg`}
+                                        alt="Archery at Kettering Archers"
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     <div className="text-center">
