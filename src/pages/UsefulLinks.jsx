@@ -1,153 +1,104 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import SEO from '../components/SEO';
 
 const UsefulLinks = () => {
-    const linkCategories = [
-        {
-            title: "Governing Bodies",
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const categoryConfig = {
+        "Governing Bodies": {
             icon: (
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
             ),
-            color: "forest",
-            links: [
-                {
-                    name: "Archery GB",
-                    url: "https://archerygb.org",
-                    description: "The national governing body for archery in Great Britain"
-                },
-                {
-                    name: "NCAS",
-                    url: "https://ncasarchery.org.uk",
-                    description: "Northamptonshire County Archery Society"
-                },
-                {
-                    name: "EMAS",
-                    url: "https://emasarchery.co.uk",
-                    description: "East Midlands Archery Society"
-                },
-                {
-                    name: "World Archery",
-                    url: "https://worldarchery.sport",
-                    description: "International Federation for the sport of archery"
-                }
-            ]
+            color: "forest"
         },
-        {
-            title: "Equipment Suppliers",
+        "Equipment Suppliers": {
             icon: (
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
             ),
-            color: "gold",
-            links: [
-                {
-                    name: "Merlin Archery",
-                    url: "https://www.merlinarchery.co.uk",
-                    description: "One of the UK's largest archery retailers"
-                },
-                {
-                    name: "The Archery Shop",
-                    url: "https://www.thearcheryshop.co.uk",
-                    description: "Wide range of archery equipment and accessories"
-                },
-                {
-                    name: "Hemlock Archery",
-                    url: "https://www.hemlockarchery.co.uk",
-                    description: "Handmade Arrows, Archery Accessories, Bespoke Products, Custom Orders & More"
-                },
-                {
-                    name: "Bowsports",
-                    url: "https://www.bowsports.com",
-                    description: "Archery equipment and target sports"
-                },
-                {
-                    name: "Arrowsocks",
-                    url: "https://www.arrowsocks.co.uk/",
-                    description: "Arrow Wraps and Crestings"
-                }
-            ]
+            color: "gold"
         },
-        {
-            title: "Training & Coaching",
+        "Training & Coaching": {
             icon: (
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
             ),
-            color: "purple",
-            links: [
-                {
-                    name: "Archery GB Coaching",
-                    url: "https://archerygb.org/coaching",
-                    description: "Coaching qualifications and resources"
-                },
-                {
-                    name: "Online Archery Academy",
-                    url: "https://www.onlinearcheryacademy.com",
-                    description: "Video lessons from top coaches"
-                },
-                {
-                    name: "NuSensei (YouTube)",
-                    url: "https://www.youtube.com/@NUSensei",
-                    description: "Popular archery education channel"
-                },
-                {
-                    name: "Jake Kaminski (YouTube)",
-                    url: "https://www.youtube.com/@JakeKaminskiArchery",
-                    description: "Popular archery education channel"
-                }
-            ]
+            color: "purple"
         },
-        {
-            title: "Neighbouring Clubs",
+        "Neighbouring Clubs": {
             icon: (
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
             ),
-            color: "blue",
-            links: [
-                {
-                    name: "Wellingborough Archery Club",
-                    url: "https://www.wellingborough-archery.org.uk",
-                    description: "Friendly club in neighbouring Wellingborough"
-                },
-                {
-                    name: "Corby Bowmen",
-                    url: "https://www.corbybowmen.co.uk",
-                    description: "Active club in Corby"
-                },
-                {
-                    name: "Northampton Archery Club",
-                    url: "https://www.northamptonarcheryclub.co.uk",
-                    description: "One of the largest clubs in the county"
-                }
-            ]
+            color: "blue"
         },
-        {
-            title: "Rules & Resources",
+        "Rules & Resources": {
             icon: (
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
             ),
-            color: "charcoal",
-            links: [
-                {
-                    name: "Rules of Shooting",
-                    url: "https://archerygb.org/rules",
-                    description: "Official Archery GB rules and procedures"
-                },
-                {
-                    name: "Handicap Tables",
-                    url: "https://archerygb.org/handicap",
-                    description: "Official handicap and classification tables"
-                }
-            ]
+            color: "charcoal"
         }
-    ];
+    };
+
+    useEffect(() => {
+        fetchLinks();
+    }, []);
+
+    const fetchLinks = async () => {
+        try {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('useful_links')
+                .select('*')
+                .order('display_order', { ascending: true });
+
+            if (error) throw error;
+
+            // Group by category
+            const grouped = data.reduce((acc, link) => {
+                const cat = link.category || 'Other';
+                if (!acc[cat]) {
+                    acc[cat] = {
+                        title: cat,
+                        ...categoryConfig[cat], // spread icon and color
+                        links: []
+                    };
+                }
+                acc[cat].links.push({
+                    name: link.title,
+                    url: link.url,
+                    description: link.description
+                });
+                return acc;
+            }, {});
+
+            // Convert map to array and sort according to specific order if needed
+            // For now, we'll iterate through our predefined categories order
+            const orderedCategories = Object.keys(categoryConfig).map(key => grouped[key]).filter(Boolean);
+
+            // Add any others that weren't in our config
+            Object.keys(grouped).forEach(key => {
+                if (!categoryConfig[key]) {
+                    orderedCategories.push(grouped[key]);
+                }
+            });
+
+            setCategories(orderedCategories);
+        } catch (error) {
+            console.error('Error fetching links:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const getColorClasses = (color) => {
         const colors = {
@@ -177,47 +128,50 @@ const UsefulLinks = () => {
                     </p>
                 </div>
 
-                {/* Link Categories */}
-                <div className="space-y-10">
-                    {linkCategories.map((category, categoryIndex) => (
-                        <section key={category.title} className="animate-fade-in-up" style={{ animationDelay: `${categoryIndex * 0.1}s`, opacity: 0 }}>
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getColorClasses(category.color).split(' ').slice(0, 2).join(' ')}`}>
-                                    {category.icon}
+                {loading ? (
+                    <div className="text-center py-12">Loading...</div>
+                ) : (
+                    <div className="space-y-10">
+                        {categories.map((category, categoryIndex) => (
+                            <section key={category.title} className="animate-fade-in-up" style={{ animationDelay: `${categoryIndex * 0.1}s`, opacity: 0 }}>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getColorClasses(category.color).split(' ').slice(0, 2).join(' ')}`}>
+                                        {category.icon}
+                                    </div>
+                                    <h2 className="text-xl font-bold text-forest-900">{category.title}</h2>
                                 </div>
-                                <h2 className="text-xl font-bold text-forest-900">{category.title}</h2>
-                            </div>
 
-                            <div className="grid gap-4">
-                                {category.links.map((link) => (
-                                    <a
-                                        key={link.name}
-                                        href={link.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="glass-card p-5 group hover:border-opacity-50 transition-all duration-300"
-                                        style={{ borderColor: `var(--color-${category.color}-500)`, borderOpacity: 0.1 }}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="text-lg font-medium text-forest-900 group-hover:text-forest-600 transition-colors mb-1">
-                                                    {link.name}
-                                                </h3>
-                                                <p className="text-charcoal-600 text-sm">{link.description}</p>
-                                                <p className="text-charcoal-500 text-xs mt-2 truncate">{link.url}</p>
+                                <div className="grid gap-4">
+                                    {category.links.map((link) => (
+                                        <a
+                                            key={link.name}
+                                            href={link.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="glass-card p-5 group hover:border-opacity-50 transition-all duration-300"
+                                            style={{ borderColor: `var(--color-${category.color}-500)`, borderOpacity: 0.1 }}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="text-lg font-medium text-forest-900 group-hover:text-forest-600 transition-colors mb-1">
+                                                        {link.name}
+                                                    </h3>
+                                                    <p className="text-charcoal-600 text-sm">{link.description}</p>
+                                                    <p className="text-charcoal-500 text-xs mt-2 truncate">{link.url}</p>
+                                                </div>
+                                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ml-4 shrink-0 transition-all duration-300 ${getColorClasses(category.color)} group-hover:text-forest-900`}>
+                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                </div>
                                             </div>
-                                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ml-4 shrink-0 transition-all duration-300 ${getColorClasses(category.color)} group-hover:text-forest-900`}>
-                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </a>
-                                ))}
-                            </div>
-                        </section>
-                    ))}
-                </div>
+                                        </a>
+                                    ))}
+                                </div>
+                            </section>
+                        ))}
+                    </div>
+                )}
 
                 {/* Suggestion Box */}
                 <div className="mt-16 glass-card p-6 md:p-8 border-gold-500/30 text-center">

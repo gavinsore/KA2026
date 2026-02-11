@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
+import AdminBreadcrumbs from '../../components/admin/AdminBreadcrumbs';
 
 const ResultsManager = () => {
     const [files, setFiles] = useState([]);
@@ -71,7 +72,6 @@ const ResultsManager = () => {
                 filePath = `${formData.venue.toLowerCase()}/${fileName}`;
             } else {
                 // Special Record File Upload (Overwrite)
-                // We format the filename drastically to ensure it matches what the loader expects
                 if (dataMode === 'records') {
                     filePath = 'special/club-records.csv';
                 } else if (dataMode === 'pbs') {
@@ -135,7 +135,6 @@ const ResultsManager = () => {
 
             if (storageError) {
                 console.warn('Storage delete warning:', storageError);
-                // Continue anyway to delete from DB if file is missing
             }
 
             // Delete from DB
@@ -159,6 +158,7 @@ const ResultsManager = () => {
     return (
         <div className="min-h-screen py-10 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <AdminBreadcrumbs />
                 <div className="space-y-6">
                     <div className="flex items-center justify-between">
                         <h1 className="text-3xl font-bold text-forest-900">Results Manager</h1>

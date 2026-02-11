@@ -18,6 +18,9 @@ import EventsManager from './pages/admin/EventsManager';
 import CompetitionsManager from './pages/admin/CompetitionsManager';
 import ResultsManager from './pages/admin/ResultsManager';
 import AnnouncementsManager from './pages/admin/AnnouncementsManager';
+import LinksManager from './pages/admin/LinksManager';
+import RoundsManager from './pages/admin/RoundsManager';
+import GalleryManager from './pages/admin/GalleryManager';
 
 function App() {
     return (
@@ -86,6 +89,30 @@ function App() {
                                     element={
                                         <ProtectedRoute requireAdmin={true}>
                                             <AnnouncementsManager />
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/admin/links"
+                                    element={
+                                        <ProtectedRoute requireAdmin={true}>
+                                            <LinksManager />
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/admin/rounds"
+                                    element={
+                                        <ProtectedRoute requireAdmin={true}>
+                                            <RoundsManager />
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/admin/gallery"
+                                    element={
+                                        <ProtectedRoute requireAdmin={true}>
+                                            <GalleryManager />
                                         </ProtectedRoute>
                                     }
                                 />

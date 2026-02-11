@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import emailjs from '@emailjs/browser';
+import { supabase } from '../lib/supabase';
 
 // ============================================================
 // EMAILJS CONFIGURATION
@@ -102,6 +103,29 @@ const CompetitionEntryForm = ({ competition }) => {
             };
 
             try {
+                // Save to Supabase
+                const { error: dbError } = await supabase
+                    .from('competition_entries')
+                    .insert([{
+                        competition_id: competition.id,
+                        full_name: formData.fullName,
+                        email: formData.email,
+                        bowtype: formData.bowtype,
+                        distance: formData.distance,
+                        category: formData.category,
+                        age_category: formData.ageCategory,
+                        dob: formData.ageCategory === 'Junior' ? formData.dob : null,
+                        agb_number: formData.agbNumber,
+                        seated: formData.seated,
+                        club: formData.club,
+                        emergency_contact: formData.emergencyContact,
+                        gdpr_consent: formData.gdprConsent,
+                        is_paid: false
+                    }]);
+
+                if (dbError) throw dbError;
+
+                // Send Email Notification
                 await emailjs.send(
                     EMAILJS_SERVICE_ID,
                     EMAILJS_TEMPLATE_ID,
@@ -110,13 +134,19 @@ const CompetitionEntryForm = ({ competition }) => {
                 );
                 setSubmitted(true);
             } catch (error) {
-                console.error('Email send failed:', error);
-                // For development, still show success if template not configured
-                if (EMAILJS_TEMPLATE_ID === 'template_competition') {
+                console.error('Submission failed:', error);
+                // For development, still show success if template not configured but DB worked? 
+                // Better to show error if DB failed.
+                if (error.code) { // Supabase error
+                    setSubmitError('Failed to save entry. Please try again.');
+                } else if (EMAILJS_TEMPLATE_ID === 'template_competition') {
                     console.log('EmailJS template not configured. Form data:', templateParams);
                     setSubmitted(true);
                 } else {
-                    setSubmitError('Failed to submit entry. Please try again or contact us directly.');
+                    setSubmitError('Entry saved but failed to send email confirmation. Please contact us.');
+                    // If DB succeeded but email failed, we might still want to show success or at least warn.
+                    // For now, let's assume if DB works we are good, but warn about email.
+                    setSubmitted(true);
                 }
             } finally {
                 setIsSubmitting(false);

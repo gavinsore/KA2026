@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import SEO from '../components/SEO';
 
 const Gallery = () => {
@@ -6,19 +7,27 @@ const Gallery = () => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Load gallery images from JSON file
+    // Load gallery images from Supabase
     useEffect(() => {
         const loadGalleryImages = async () => {
             try {
-                const response = await fetch(`${import.meta.env.BASE_URL}data/gallery.json`);
-                const data = await response.json();
+                const { data, error } = await supabase
+                    .from('gallery_images')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
                 // Transform data to include full paths
-                const images = data.map((item, index) => ({
-                    id: index + 1,
-                    src: `${import.meta.env.BASE_URL}gallery/${item.filename}`,
-                    alt: item.description || 'Archery at Kettering Archers',
-                    description: item.description || ''
-                }));
+                const images = data.map((item) => {
+                    const { data: urlData } = supabase.storage.from('gallery').getPublicUrl(item.filename);
+                    return {
+                        id: item.id,
+                        src: urlData.publicUrl,
+                        alt: item.description || 'Archery at Kettering Archers',
+                        description: item.description || ''
+                    };
+                });
                 setGalleryImages(images);
             } catch (error) {
                 console.error('Error loading gallery images:', error);

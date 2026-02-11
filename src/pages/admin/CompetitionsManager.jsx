@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
+import CompetitionEntriesViewer from '../../components/admin/CompetitionEntriesViewer';
+import AdminBreadcrumbs from '../../components/admin/AdminBreadcrumbs';
 
 const CompetitionsManager = () => {
     const [competitions, setCompetitions] = useState([]);
@@ -33,9 +35,38 @@ const CompetitionsManager = () => {
         };
     }
 
+    const [entryStats, setEntryStats] = useState({});
+
     useEffect(() => {
         fetchCompetitions();
+        fetchEntryStats();
     }, []);
+
+    const fetchEntryStats = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('competition_entries')
+                .select('competition_id, is_paid');
+
+            if (error) throw error;
+
+            const stats = {};
+            data.forEach(entry => {
+                if (!stats[entry.competition_id]) {
+                    stats[entry.competition_id] = { paid: 0, unpaid: 0, total: 0 };
+                }
+                stats[entry.competition_id].total++;
+                if (entry.is_paid) {
+                    stats[entry.competition_id].paid++;
+                } else {
+                    stats[entry.competition_id].unpaid++;
+                }
+            });
+            setEntryStats(stats);
+        } catch (error) {
+            console.error('Error fetching entry stats:', error);
+        }
+    };
 
     const fetchCompetitions = async () => {
         try {
@@ -54,6 +85,8 @@ const CompetitionsManager = () => {
             setLoading(false);
         }
     };
+
+
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -151,39 +184,27 @@ const CompetitionsManager = () => {
         }
     };
 
+    const [viewingEntriesFor, setViewingEntriesFor] = useState(null);
+
+    // ... existing functions ...
+
     return (
         <div className="min-h-screen py-10 bg-gray-50">
+            {/* ... existing JSX ... */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Competitions Manager</h1>
-                    <button
-                        onClick={() => openModal()}
-                        className="bg-forest-600 text-white px-4 py-2 rounded-lg hover:bg-forest-700 transition-colors flex items-center gap-2 shadow-md"
-                    >
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        New Competition
-                    </button>
-                </div>
+                <AdminBreadcrumbs />
+                {/* ... existing header ... */}
 
                 {loading ? (
                     <div className="text-center py-12">Loading...</div>
                 ) : (
                     <div className="bg-white shadow overflow-hidden rounded-lg">
                         <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entries</th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
+                            {/* ... existing table header ... */}
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {competitions.map((comp) => (
                                     <tr key={comp.id} className="hover:bg-gray-50">
+                                        {/* ... existing cells ... */}
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {format(new Date(comp.date), 'dd MMM yyyy')}
                                         </td>
@@ -198,9 +219,24 @@ const CompetitionsManager = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            Max: {comp.max_entries || 'Unlimited'}
+                                            <div>Max: {comp.max_entries || 'Unlimited'}</div>
+                                            {entryStats[comp.id] && (
+                                                <div className="text-xs mt-1 space-y-0.5">
+                                                    <div className="flex gap-2">
+                                                        <span className="text-green-600 font-medium bg-green-50 px-1.5 rounded">{entryStats[comp.id].paid} Paid</span>
+                                                        <span className="text-red-600 font-medium bg-red-50 px-1.5 rounded">{entryStats[comp.id].unpaid} Unpaid</span>
+                                                    </div>
+                                                    <div className="text-gray-400 font-medium pl-0.5">Total: {entryStats[comp.id].total}</div>
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button
+                                                onClick={() => setViewingEntriesFor(comp)}
+                                                className="text-forest-600 hover:text-forest-900 mr-4"
+                                            >
+                                                Entries
+                                            </button>
                                             <button
                                                 onClick={() => openModal(comp)}
                                                 className="text-indigo-600 hover:text-indigo-900 mr-4"
@@ -227,6 +263,7 @@ const CompetitionsManager = () => {
 
             {/* Modal */}
             {isModalOpen && (
+                // ... existing modal code ...
                 <div className="fixed inset-0 z-50 overflow-y-auto">
                     <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         <div className="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -369,6 +406,17 @@ const CompetitionsManager = () => {
                                         </div>
 
                                         <div className="col-span-2">
+                                            <label className="block text-sm font-medium text-gray-700">Medals / Awards</label>
+                                            <textarea
+                                                name="medals"
+                                                rows="2"
+                                                value={formData.medals}
+                                                onChange={handleInputChange}
+                                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-forest-500 focus:border-forest-500 sm:text-sm"
+                                            />
+                                        </div>
+
+                                        <div className="col-span-2">
                                             <label className="block text-sm font-medium text-gray-700">Eligible Classes (comma separated)</label>
                                             <input
                                                 type="text"
@@ -447,6 +495,14 @@ const CompetitionsManager = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Entries Viewer Modal */}
+            {viewingEntriesFor && (
+                <CompetitionEntriesViewer
+                    competition={viewingEntriesFor}
+                    onClose={() => setViewingEntriesFor(null)}
+                />
             )}
         </div>
     );
