@@ -190,70 +190,90 @@ const CompetitionsManager = () => {
 
     return (
         <div className="min-h-screen py-10 bg-gray-50">
-            {/* ... existing JSX ... */}
+
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <AdminBreadcrumbs />
-                {/* ... existing header ... */}
+                <div className="flex justify-between items-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">Competitions Manager</h1>
+                    <button
+                        onClick={() => openModal()}
+                        className="bg-forest-600 text-white px-4 py-2 rounded-lg hover:bg-forest-700 transition-colors flex items-center gap-2 shadow-md"
+                    >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        New Competition
+                    </button>
+                </div>
 
                 {loading ? (
                     <div className="text-center py-12">Loading...</div>
                 ) : (
                     <div className="bg-white shadow overflow-hidden rounded-lg">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            {/* ... existing table header ... */}
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {competitions.map((comp) => (
-                                    <tr key={comp.id} className="hover:bg-gray-50">
-                                        {/* ... existing cells ... */}
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {format(new Date(comp.date), 'dd MMM yyyy')}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {comp.name}
-                                            <span className="block text-xs text-gray-500">{comp.slug}</span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                ${comp.is_open ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                {comp.is_open ? 'Open' : 'Closed'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <div>Max: {comp.max_entries || 'Unlimited'}</div>
-                                            {entryStats[comp.id] && (
-                                                <div className="text-xs mt-1 space-y-0.5">
-                                                    <div className="flex gap-2">
-                                                        <span className="text-green-600 font-medium bg-green-50 px-1.5 rounded">{entryStats[comp.id].paid} Paid</span>
-                                                        <span className="text-red-600 font-medium bg-red-50 px-1.5 rounded">{entryStats[comp.id].unpaid} Unpaid</span>
-                                                    </div>
-                                                    <div className="text-gray-400 font-medium pl-0.5">Total: {entryStats[comp.id].total}</div>
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button
-                                                onClick={() => setViewingEntriesFor(comp)}
-                                                className="text-forest-600 hover:text-forest-900 mr-4"
-                                            >
-                                                Entries
-                                            </button>
-                                            <button
-                                                onClick={() => openModal(comp)}
-                                                className="text-indigo-600 hover:text-indigo-900 mr-4"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(comp.id)}
-                                                className="text-red-600 hover:text-red-900"
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entries</th>
+                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {competitions.map((comp) => (
+                                        <tr key={comp.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {format(new Date(comp.date), 'dd MMM yyyy')}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                {comp.name}
+                                                <span className="block text-xs text-gray-500">{comp.slug}</span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                    ${comp.is_open ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                    {comp.is_open ? 'Open' : 'Closed'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <div>Max: {comp.max_entries || 'Unlimited'}</div>
+                                                {entryStats[comp.id] && (
+                                                    <div className="text-xs mt-1 space-y-0.5">
+                                                        <div className="flex gap-2">
+                                                            <span className="text-green-600 font-medium bg-green-50 px-1.5 rounded">{entryStats[comp.id].paid} Paid</span>
+                                                            <span className="text-red-600 font-medium bg-red-50 px-1.5 rounded">{entryStats[comp.id].unpaid} Unpaid</span>
+                                                        </div>
+                                                        <div className="text-gray-400 font-medium pl-0.5">Total: {entryStats[comp.id].total}</div>
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button
+                                                    onClick={() => setViewingEntriesFor(comp)}
+                                                    className="text-forest-600 hover:text-forest-900 mr-4"
+                                                >
+                                                    Entries
+                                                </button>
+                                                <button
+                                                    onClick={() => openModal(comp)}
+                                                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(comp.id)}
+                                                    className="text-red-600 hover:text-red-900"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                         {competitions.length === 0 && (
                             <div className="text-center py-8 text-gray-500">No competitions found.</div>
                         )}
@@ -279,7 +299,7 @@ const CompetitionsManager = () => {
                                         {currentComp ? 'Edit Competition' : 'New Competition'}
                                     </h3>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                         <div className="col-span-2">
                                             <label className="block text-sm font-medium text-gray-700">Name</label>
                                             <input
@@ -292,7 +312,7 @@ const CompetitionsManager = () => {
                                             />
                                         </div>
 
-                                        <div>
+                                        <div className="col-span-2">
                                             <label className="block text-sm font-medium text-gray-700">Slug (URL friendly ID)</label>
                                             <input
                                                 type="text"
@@ -304,7 +324,7 @@ const CompetitionsManager = () => {
                                             />
                                         </div>
 
-                                        <div>
+                                        <div className="col-span-2">
                                             <label className="block text-sm font-medium text-gray-700">Date</label>
                                             <input
                                                 type="date"
@@ -316,7 +336,7 @@ const CompetitionsManager = () => {
                                             />
                                         </div>
 
-                                        <div>
+                                        <div className="col-span-2">
                                             <label className="block text-sm font-medium text-gray-700">Time</label>
                                             <input
                                                 type="time"
@@ -327,7 +347,7 @@ const CompetitionsManager = () => {
                                             />
                                         </div>
 
-                                        <div>
+                                        <div className="col-span-2">
                                             <label className="block text-sm font-medium text-gray-700">Location</label>
                                             <input
                                                 type="text"
@@ -338,7 +358,7 @@ const CompetitionsManager = () => {
                                             />
                                         </div>
 
-                                        <div>
+                                        <div className="col-span-2">
                                             <label className="block text-sm font-medium text-gray-700">Adult Fee (£)</label>
                                             <input
                                                 type="number"
@@ -349,7 +369,7 @@ const CompetitionsManager = () => {
                                             />
                                         </div>
 
-                                        <div>
+                                        <div className="col-span-2">
                                             <label className="block text-sm font-medium text-gray-700">Junior Fee (£)</label>
                                             <input
                                                 type="number"
@@ -360,7 +380,7 @@ const CompetitionsManager = () => {
                                             />
                                         </div>
 
-                                        <div>
+                                        <div className="col-span-2">
                                             <label className="block text-sm font-medium text-gray-700">Closing Date</label>
                                             <input
                                                 type="date"
@@ -371,7 +391,7 @@ const CompetitionsManager = () => {
                                             />
                                         </div>
 
-                                        <div>
+                                        <div className="col-span-2">
                                             <label className="block text-sm font-medium text-gray-700">Max Entries</label>
                                             <input
                                                 type="number"
