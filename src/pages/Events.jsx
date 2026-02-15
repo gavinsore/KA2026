@@ -14,42 +14,41 @@ const Events = () => {
     const [competitions, setCompetitions] = useState([]);
 
     useEffect(() => {
-        fetchEvents();
-        fetchCompetitions();
+        fetchAllData();
     }, []);
 
-    const fetchCompetitions = async () => {
+    const fetchAllData = async () => {
         try {
-            const today = new Date().toISOString().split('T')[0];
-            const { data, error } = await supabase
-                .from('competitions')
-                .select('*')
-                .eq('is_open', true)
-                .gte('date', today)
-                .order('date', { ascending: true });
-
-            if (error) throw error;
-            setCompetitions(data);
-        } catch (err) {
-            console.error('Error fetching competitions:', err);
-        }
-    };
-
-    const fetchEvents = async () => {
-        try {
+            setLoading(true);
             const today = new Date().toISOString().split('T')[0];
 
-            const { data, error } = await supabase
+            // 1. Fetch Events
+            const eventsPromise = supabase
                 .from('events')
                 .select('*')
                 .gte('date', today)
                 .order('date', { ascending: true });
 
-            if (error) throw error;
+            // 2. Fetch Competitions (All future, to show in calendar)
+            const competitionsPromise = supabase
+                .from('competitions')
+                .select('*')
+                .gte('date', today)
+                .order('date', { ascending: true });
 
-            // Transform Supabase events to our internal format if needed
-            // Currently they are almost identical match, but we handle time formatting
-            const transformedEvents = data.map((item) => {
+            const [
+                { data: eventsData, error: eventsError },
+                { data: competitionsData, error: competitionsError }
+            ] = await Promise.all([eventsPromise, competitionsPromise]);
+
+            if (eventsError) throw eventsError;
+            if (competitionsError) throw competitionsError;
+
+            // Set Open Competitions for the top section
+            setCompetitions(competitionsData.filter(c => c.is_open));
+
+            // Transform Supabase events
+            const transformedEvents = eventsData.map((item) => {
                 let timeStr = '';
                 if (item.start_time) {
                     timeStr = item.start_time.slice(0, 5);
@@ -65,13 +64,34 @@ const Events = () => {
                     time: timeStr,
                     location: item.location || '',
                     description: item.description || '',
-                    types: [item.type] // Convert single type to array for compatibility
+                    types: [item.type]
                 };
             });
 
-            setEvents(transformedEvents);
+            // Transform Competitions into Events
+            const transformedCompetitions = competitionsData.map((comp) => ({
+                id: `comp_${comp.id}`,
+                title: comp.name,
+                date: comp.date,
+                time: comp.time ? comp.time.slice(0, 5) : '',
+                location: comp.location,
+                description: comp.additional_info || 'Competition',
+                types: ['Competition'],
+                competitionSlug: comp.slug,
+                is_competition: true
+            }));
+
+            // Merge and Sort
+            const combinedEvents = [...transformedEvents, ...transformedCompetitions].sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                return dateA - dateB;
+            });
+
+            setEvents(combinedEvents);
+
         } catch (err) {
-            console.error('Error fetching events:', err);
+            console.error('Error fetching data:', err);
             setError('Unable to load events. Please try again later.');
         } finally {
             setLoading(false);
@@ -275,7 +295,7 @@ const Events = () => {
                                             className={`animate-fade-in-up stagger-${(index % 5) + 1}`}
                                             style={{ opacity: 0 }}
                                         >
-                                            <EventCard event={event} />
+                                            <EventCard event={event} competitionId={event.competitionSlug} />
                                         </div>
                                     ))}
                                 </div>
