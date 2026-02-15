@@ -22,6 +22,7 @@ import LinksManager from './pages/admin/LinksManager';
 import RoundsManager from './pages/admin/RoundsManager';
 import GalleryManager from './pages/admin/GalleryManager';
 import UpdatePassword from './pages/admin/UpdatePassword';
+import ForgotPassword from './pages/ForgotPassword';
 
 function App() {
     return (
@@ -43,6 +44,7 @@ function App() {
                                 <Route path="/links" element={<UsefulLinks />} />
                                 <Route path="/competitions/:competitionId" element={<CompetitionDetails />} />
                                 <Route path="/login" element={<Login />} />
+                                <Route path="/forgot-password" element={<ForgotPassword />} />
 
                                 {/* Admin Routes */}
                                 <Route
