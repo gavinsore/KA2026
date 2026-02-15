@@ -21,11 +21,12 @@ import AnnouncementsManager from './pages/admin/AnnouncementsManager';
 import LinksManager from './pages/admin/LinksManager';
 import RoundsManager from './pages/admin/RoundsManager';
 import GalleryManager from './pages/admin/GalleryManager';
+import UpdatePassword from './pages/admin/UpdatePassword';
 
 function App() {
     return (
-        <AuthProvider>
-            <Router basename={import.meta.env.BASE_URL}>
+        <Router basename={import.meta.env.BASE_URL}>
+            <AuthProvider>
                 <div className="min-h-screen flex flex-col">
                     <Header />
                     <div className="pt-16 md:pt-20">
@@ -116,13 +117,21 @@ function App() {
                                         </ProtectedRoute>
                                     }
                                 />
+                                <Route
+                                    path="/admin/update-password"
+                                    element={
+                                        <ProtectedRoute>
+                                            <UpdatePassword />
+                                        </ProtectedRoute>
+                                    }
+                                />
                             </Routes>
                         </main>
                     </div>
                     <Footer />
                 </div>
-            </Router>
-        </AuthProvider>
+            </AuthProvider>
+        </Router>
     );
 }
 

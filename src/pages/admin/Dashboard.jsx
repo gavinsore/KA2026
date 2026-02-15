@@ -103,12 +103,20 @@ const Dashboard = () => {
                             Welcome back, <span className="font-semibold">{user?.email}</span>
                         </p>
                     </div>
-                    <button
-                        onClick={handleLogout}
-                        className="btn-secondary text-sm px-4 py-2"
-                    >
-                        Sign Out
-                    </button>
+                    <div className="flex gap-3">
+                        <Link
+                            to="/admin/update-password"
+                            className="btn-secondary text-sm px-4 py-2"
+                        >
+                            Update Password
+                        </Link>
+                        <button
+                            onClick={handleLogout}
+                            className="btn-secondary text-sm px-4 py-2"
+                        >
+                            Sign Out
+                        </button>
+                    </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
