@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-const EventCard = ({ event, competitionId }) => {
+const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return {
@@ -93,6 +93,21 @@ const EventCard = ({ event, competitionId }) => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                                 Enter Competition
+                            </Link>
+                        </div>
+                    )}
+
+                    {/* View Club Records Button — shown for non-competition events */}
+                    {!isCompetition && clubRecordsUrl && (
+                        <div className="mt-4">
+                            <Link
+                                to={clubRecordsUrl}
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-forest-600 text-white font-medium text-sm hover:bg-forest-700 transition-colors"
+                            >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                </svg>
+                                View Club Records
                             </Link>
                         </div>
                     )}

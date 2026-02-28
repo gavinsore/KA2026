@@ -295,7 +295,7 @@ const Events = () => {
                                             className={`animate-fade-in-up stagger-${(index % 5) + 1}`}
                                             style={{ opacity: 0 }}
                                         >
-                                            <EventCard event={event} competitionId={event.competitionSlug} />
+                                            <EventCard event={event} competitionId={event.competitionSlug} clubRecordsUrl={event.is_competition ? undefined : `/results?tab=records&round=${encodeURIComponent(event.title)}`} />
                                         </div>
                                     ))}
                                 </div>
