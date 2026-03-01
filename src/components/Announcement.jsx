@@ -18,9 +18,9 @@ const Announcement = () => {
                 .eq('is_active', true)
                 .order('date', { ascending: false })
                 .limit(1)
-                .single();
+                .maybeSingle();
 
-            if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+            if (error) {
                 console.error('Error fetching announcement:', error);
                 return;
             }

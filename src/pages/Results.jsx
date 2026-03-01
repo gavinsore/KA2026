@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { loadAllEventResults, loadClubRecords, loadPersonalBests, loadArchivesIndex, loadArchiveResults } from '../utils/csvLoader';
 import SEO from '../components/SEO';
@@ -131,19 +131,30 @@ const Results = () => {
 
     const getBowTypeStyle = (bowType) => {
         const type = bowType?.toLowerCase() || '';
-        if (type.includes('recurve')) return 'bg-forest-100 text-forest-600';
-        if (type.includes('compound')) return 'bg-gold-100 text-gold-600';
-        if (type.includes('longbow')) return 'bg-purple-600/20 text-purple-400';
-        if (type.includes('barebow')) return 'bg-blue-600/20 text-blue-400';
-        return 'bg-charcoal-100 text-charcoal-600';
+        if (type.includes('recurve')) return 'bg-emerald-100 text-emerald-800';
+        if (type.includes('compound')) return 'bg-gold-100 text-gold-800';
+        if (type.includes('longbow')) return 'bg-purple-100 text-purple-800';
+        if (type.includes('barebow')) return 'bg-orange-100 text-orange-800';
+        return 'bg-charcoal-100 text-charcoal-700';
     };
 
     const getCategoryStyle = (category) => {
         const cat = category?.toLowerCase() || '';
-        if (cat.includes('female')) return 'bg-pink-600/20 text-pink-400';
-        if (cat.includes('50+')) return 'bg-amber-600/20 text-amber-400';
-        if (cat.includes('u18') || cat.includes('u16') || cat.includes('u14') || cat.includes('u12')) return 'bg-cyan-600/20 text-cyan-400';
-        return 'bg-blue-600/20 text-blue-400';
+        // Female — rose/pink
+        if (cat.includes('ladies') || cat.includes('lady') || cat.includes('female') ||
+            cat.includes('woman') || cat.includes('women') || cat.includes('girl')) {
+            return 'bg-pink-100 text-pink-800';
+        }
+        // Junior (ungendered or explicit)
+        if (cat.includes('u18') || cat.includes('u16') || cat.includes('u14') || cat.includes('u12') || cat.includes('junior')) {
+            return 'bg-teal-100 text-teal-800';
+        }
+        // Senior / Masters
+        if (cat.includes('50+') || cat.includes('senior') || cat.includes('master') || cat.includes('veteran')) {
+            return 'bg-amber-100 text-amber-800';
+        }
+        // Male (mens, men, boys, gents, gentleman) — slate/blue
+        return 'bg-blue-100 text-blue-900';
     };
 
     const getPositionDisplay = (position) => {
@@ -281,7 +292,7 @@ const Results = () => {
                                     {sortedGroups.map(([bowTypeKey, results]) => {
                                         const { category, bowType } = parseBowType(bowTypeKey);
                                         return (
-                                            <>
+                                            <React.Fragment key={bowTypeKey}>
                                                 {/* Group header row */}
                                                 <tr key={`header-${bowTypeKey}`} className="bg-charcoal-50/60">
                                                     <td colSpan={7} className="py-1.5 px-2">
@@ -302,7 +313,7 @@ const Results = () => {
                                                         <td className="py-1.5 text-right text-gold-600 font-semibold">{result.score}</td>
                                                     </tr>
                                                 ))}
-                                            </>
+                                            </React.Fragment>
                                         );
                                     })}
                                 </tbody>
