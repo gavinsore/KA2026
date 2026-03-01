@@ -18,6 +18,7 @@ const Results = () => {
     const [personalBests, setPersonalBests] = useState([]);
     const [bowTypeFilter, setBowTypeFilter] = useState('all');
     const [expandedArchers, setExpandedArchers] = useState(new Set());
+    const [expandedRounds, setExpandedRounds] = useState(new Set());
 
     // Archive State
     const [archives, setArchives] = useState([]);
@@ -445,87 +446,109 @@ const Results = () => {
                                     </div>
                                 )}
 
-                                {/* Mobile Card Layout */}
-                                <div className="md:hidden space-y-3">
-                                    {clubRecords
-                                        .filter(record => {
-                                            if (bowTypeFilter !== 'all' && (record.bow_type || '').toLowerCase() !== bowTypeFilter.toLowerCase()) return false;
-                                            return matchesRoundFilter(record.round);
-                                        })
-                                        .map((record, index) => (
-                                            <div key={index} className="bg-white/60 rounded-lg p-4 border border-charcoal-100">
-                                                <div className="flex items-start justify-between mb-2">
-                                                    <div>
-                                                        <p className="text-forest-800 font-semibold">{record.round}</p>
-                                                        <p className="text-forest-900 text-sm">{record.archer_name}</p>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className="text-gold-600 font-bold text-lg">{record.score}</p>
-                                                        <p className="text-charcoal-500 text-xs">{formatDate(record.date)}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-2 flex-wrap">
-                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${getBowTypeStyle(record.bow_type)}`}>
-                                                        {record.bow_type}
-                                                    </span>
-                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryStyle(record.archer_category)}`}>
-                                                        {record.archer_category}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        ))}
-                                </div>
+                                {/* Grouped by round — collapsible */}
+                                {(() => {
+                                    const filteredRecords = clubRecords.filter(record => {
+                                        if (bowTypeFilter !== 'all' && (record.bow_type || '').toLowerCase() !== bowTypeFilter.toLowerCase()) return false;
+                                        return matchesRoundFilter(record.round);
+                                    });
 
-                                {/* Desktop Table Layout */}
-                                <div className="hidden md:block overflow-x-auto">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="text-left border-b border-charcoal-200">
-                                                <th className="pb-3 text-charcoal-600 font-medium">Round</th>
-                                                <th className="pb-3 text-charcoal-600 font-medium">Bow Type</th>
-                                                <th className="pb-3 text-charcoal-600 font-medium">Category</th>
-                                                <th className="pb-3 text-charcoal-600 font-medium">Holder</th>
-                                                <th className="pb-3 text-charcoal-600 font-medium text-right">Score</th>
-                                                <th className="pb-3 text-charcoal-600 font-medium text-right">Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {clubRecords
-                                                .filter(record => {
-                                                    if (bowTypeFilter !== 'all' && (record.bow_type || '').toLowerCase() !== bowTypeFilter.toLowerCase()) return false;
-                                                    return matchesRoundFilter(record.round);
-                                                })
-                                                .map((record, index) => (
-                                                    <tr key={index} className="border-b border-charcoal-100 hover:bg-white/50 transition-colors">
-                                                        <td className="py-3 text-forest-800">{record.round}</td>
-                                                        <td className="py-3">
-                                                            <span className={`px-2 py-1 rounded text-xs font-medium ${getBowTypeStyle(record.bow_type)}`}>
-                                                                {record.bow_type}
-                                                            </span>
-                                                        </td>
-                                                        <td className="py-3">
-                                                            <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryStyle(record.archer_category)}`}>
-                                                                {record.archer_category}
-                                                            </span>
-                                                        </td>
-                                                        <td className="py-3 text-forest-900 font-medium">{record.archer_name}</td>
-                                                        <td className="py-3 text-right text-gold-600 font-bold">{record.score}</td>
-                                                        <td className="py-3 text-right text-charcoal-600">{formatDate(record.date)}</td>
-                                                    </tr>
-                                                ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                {clubRecords.filter(record => {
-                                    if (bowTypeFilter !== 'all' && (record.bow_type || '').toLowerCase() !== bowTypeFilter.toLowerCase()) return false;
-                                    return matchesRoundFilter(record.round);
-                                }).length === 0 && (
-                                        <p className="text-center text-charcoal-500 py-8">
-                                            {roundFilter
-                                                ? `No records found matching "${roundFilter}".`
-                                                : bowTypeFilter === 'all' ? 'No records available yet.' : `No ${bowTypeFilter} records available.`}
-                                        </p>
-                                    )}
+                                    if (filteredRecords.length === 0) {
+                                        return (
+                                            <p className="text-center text-charcoal-500 py-8">
+                                                {roundFilter
+                                                    ? `No records found matching "${roundFilter}".`
+                                                    : bowTypeFilter === 'all' ? 'No records available yet.' : `No ${bowTypeFilter} records available.`}
+                                            </p>
+                                        );
+                                    }
+
+                                    // Group by round name
+                                    const byRound = filteredRecords.reduce((acc, r) => {
+                                        const key = r.round || 'Unknown';
+                                        if (!acc[key]) acc[key] = [];
+                                        acc[key].push(r);
+                                        return acc;
+                                    }, {});
+
+                                    return Object.entries(byRound).map(([roundName, records]) => {
+                                        const isOpen = expandedRounds.has(roundName);
+                                        const toggle = () => setExpandedRounds(prev => {
+                                            const next = new Set(prev);
+                                            next.has(roundName) ? next.delete(roundName) : next.add(roundName);
+                                            return next;
+                                        });
+
+                                        return (
+                                            <div key={roundName} className="border border-charcoal-100 rounded-lg overflow-hidden mb-1 last:mb-0">
+                                                {/* Round header */}
+                                                <button
+                                                    onClick={toggle}
+                                                    className="w-full flex items-center gap-3 px-4 py-2.5 bg-white/60 hover:bg-white/80 transition-colors text-left"
+                                                >
+                                                    <svg className="w-4 h-4 text-gold-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                                    </svg>
+                                                    <span className="flex-1 text-sm font-semibold text-forest-800">{roundName}</span>
+                                                    <span className="text-xs text-charcoal-400 mr-1">{records.length} record{records.length !== 1 ? 's' : ''}</span>
+                                                    <svg
+                                                        className={`w-4 h-4 text-charcoal-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                    >
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </button>
+
+                                                {/* Expanded content */}
+                                                {isOpen && (
+                                                    <div className="px-3 py-2 bg-white/30">
+                                                        {/* Mobile — compact rows */}
+                                                        <div className="md:hidden">
+                                                            {records.map((record, i) => (
+                                                                <div key={i} className="flex items-center gap-2 px-1 py-1 border-b border-charcoal-50 last:border-0">
+                                                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold shrink-0 ${getCategoryStyle(record.archer_category)}`}>{record.archer_category}</span>
+                                                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0 ${getBowTypeStyle(record.bow_type)}`}>{record.bow_type}</span>
+                                                                    <span className="flex-1 text-sm text-forest-900 truncate">{record.archer_name}</span>
+                                                                    <span className="text-gold-600 font-bold text-sm shrink-0 w-12 text-right">{record.score}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+
+                                                        {/* Desktop — compact table */}
+                                                        <div className="hidden md:block overflow-x-auto">
+                                                            <table className="w-full text-sm">
+                                                                <thead>
+                                                                    <tr className="text-left border-b border-charcoal-100">
+                                                                        <th className="pb-1.5 text-charcoal-600 font-medium">Category</th>
+                                                                        <th className="pb-1.5 text-charcoal-600 font-medium">Bow Type</th>
+                                                                        <th className="pb-1.5 text-charcoal-600 font-medium">Holder</th>
+                                                                        <th className="pb-1.5 text-charcoal-600 font-medium text-right">Score</th>
+                                                                        <th className="pb-1.5 text-charcoal-600 font-medium text-right">Date</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {records.map((record, i) => (
+                                                                        <tr key={i} className="border-b border-charcoal-50 hover:bg-white/50 transition-colors">
+                                                                            <td className="py-1.5">
+                                                                                <span className={`px-2 py-0.5 rounded text-xs font-medium ${getCategoryStyle(record.archer_category)}`}>{record.archer_category}</span>
+                                                                            </td>
+                                                                            <td className="py-1.5">
+                                                                                <span className={`px-2 py-0.5 rounded text-xs font-medium ${getBowTypeStyle(record.bow_type)}`}>{record.bow_type}</span>
+                                                                            </td>
+                                                                            <td className="py-1.5 text-forest-900 font-medium">{record.archer_name}</td>
+                                                                            <td className="py-1.5 text-right text-gold-600 font-bold">{record.score}</td>
+                                                                            <td className="py-1.5 text-right text-charcoal-600">{formatDate(record.date)}</td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    });
+                                })()}
                             </div>
                         )}
 
