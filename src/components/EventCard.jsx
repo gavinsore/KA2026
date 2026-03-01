@@ -16,6 +16,10 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
         switch (type?.toLowerCase()) {
             case 'competition':
                 return 'bg-gold-100 text-gold-700 border border-gold-300';
+            case 'away competition':
+                return 'bg-orange-100 text-orange-700 border border-orange-300';
+            case 'rove':
+                return 'bg-indigo-100 text-indigo-700 border border-indigo-300';
             case 'beginners':
                 return 'bg-blue-100 text-blue-700 border border-blue-300';
             case 'open day':
@@ -34,6 +38,8 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
     };
 
     const isCompetition = event.types?.some(type => type.toLowerCase() === 'competition');
+    const isAwayCompetition = event.types?.some(type => type.toLowerCase() === 'away competition');
+    const isRove = event.types?.some(type => type.toLowerCase() === 'rove');
 
     return (
         <div className="glass-card p-6 hover:border-forest-400 hover:shadow-lg transition-all duration-300 group">
@@ -80,9 +86,15 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
                                 {type}
                             </span>
                         ))}
+                        {/* Discipline badge for Away Competitions */}
+                        {isAwayCompetition && event.discipline && (
+                            <span className="px-2 py-1 rounded-full font-medium bg-orange-50 text-orange-600 border border-orange-200">
+                                {event.discipline === 'Clout' ? '🏹 Clout' : '🎯 Target'}
+                            </span>
+                        )}
                     </div>
 
-                    {/* Enter Competition Button */}
+                    {/* Enter Competition Button — our own club comps only */}
                     {isCompetition && competitionId && (
                         <div className="mt-4">
                             <Link
@@ -97,8 +109,25 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
                         </div>
                     )}
 
-                    {/* View Club Records Button — shown for non-competition events */}
-                    {!isCompetition && clubRecordsUrl && (
+                    {/* Visit Club Website — Away Competition only */}
+                    {isAwayCompetition && event.external_url && (
+                        <div className="mt-4">
+                            <a
+                                href={event.external_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white font-medium text-sm hover:bg-orange-600 transition-colors"
+                            >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                Visit Club Website
+                            </a>
+                        </div>
+                    )}
+
+                    {/* View Club Records Button — shown for regular non-competition events */}
+                    {!isCompetition && !isAwayCompetition && !isRove && clubRecordsUrl && (
                         <div className="mt-4">
                             <Link
                                 to={clubRecordsUrl}
@@ -118,4 +147,3 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
 };
 
 export default EventCard;
-

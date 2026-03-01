@@ -64,7 +64,9 @@ const Events = () => {
                     time: timeStr,
                     location: item.location || '',
                     description: item.description || '',
-                    types: [item.type]
+                    types: [item.type],
+                    external_url: item.external_url || null,
+                    discipline: item.discipline || null,
                 };
             });
 
@@ -210,18 +212,24 @@ const Events = () => {
 
                 {/* Event Type Legend */}
                 <div className="flex flex-wrap justify-center gap-3 mb-10">
-                    {['Practice', 'Target', 'Clout', 'Club Shoot', 'Competition', 'Beginners', 'Open Day'].map((type) => (
+                    {[
+                        'Practice', 'Target', 'Clout', 'Club Shoot',
+                        'Competition', 'Away Competition', 'Rove',
+                        'Beginners', 'Open Day'
+                    ].map((type) => (
                         <button
                             key={type}
                             onClick={() => setActiveFilter(activeFilter === type ? null : type)}
                             className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer hover:scale-105 ${type === 'Club Shoot' ? 'bg-forest-100 text-forest-700 border border-forest-300 hover:bg-forest-200' :
-                                type === 'Competition' ? 'bg-gold-100 text-gold-700 border border-gold-300 hover:bg-gold-200' :
-                                    type === 'Beginners' ? 'bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200' :
-                                        type === 'Open Day' ? 'bg-purple-100 text-purple-700 border border-purple-300 hover:bg-purple-200' :
-                                            type === 'Practice' ? 'bg-emerald-100 text-emerald-700 border border-emerald-300 hover:bg-emerald-200' :
-                                                type === 'Target' ? 'bg-teal-100 text-teal-700 border border-teal-300 hover:bg-teal-200' :
-                                                    type === 'Clout' ? 'bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-200' :
-                                                        'bg-pink-100 text-pink-700 border border-pink-300 hover:bg-pink-200'
+                                    type === 'Competition' ? 'bg-gold-100 text-gold-700 border border-gold-300 hover:bg-gold-200' :
+                                        type === 'Away Competition' ? 'bg-orange-100 text-orange-700 border border-orange-300 hover:bg-orange-200' :
+                                            type === 'Rove' ? 'bg-indigo-100 text-indigo-700 border border-indigo-300 hover:bg-indigo-200' :
+                                                type === 'Beginners' ? 'bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200' :
+                                                    type === 'Open Day' ? 'bg-purple-100 text-purple-700 border border-purple-300 hover:bg-purple-200' :
+                                                        type === 'Practice' ? 'bg-emerald-100 text-emerald-700 border border-emerald-300 hover:bg-emerald-200' :
+                                                            type === 'Target' ? 'bg-teal-100 text-teal-700 border border-teal-300 hover:bg-teal-200' :
+                                                                type === 'Clout' ? 'bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-200' :
+                                                                    'bg-pink-100 text-pink-700 border border-pink-300 hover:bg-pink-200'
                                 } ${activeFilter === type ? 'ring-2 ring-offset-2 ring-forest-500 scale-105' : 'opacity-90 hover:opacity-100'}`}
                         >
                             {type}

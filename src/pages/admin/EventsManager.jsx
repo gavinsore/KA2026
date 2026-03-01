@@ -16,10 +16,12 @@ const EventsManager = () => {
         location: 'Kettering Sports Ground',
         description: '',
         type: 'Club Shoot',
+        external_url: '',
+        discipline: '',
     });
 
     const eventTypes = [
-        'Club Shoot', 'Competition', 'Beginners', 'Open Day', 'Social', 'Practice', 'Target', 'Clout'
+        'Club Shoot', 'Competition', 'Away Competition', 'Rove', 'Beginners', 'Open Day', 'Social', 'Practice', 'Target', 'Clout'
     ];
 
     useEffect(() => {
@@ -63,6 +65,8 @@ const EventsManager = () => {
                 location: event.location || '',
                 description: event.description || '',
                 type: event.type || 'Club Shoot',
+                external_url: event.external_url || '',
+                discipline: event.discipline || '',
             });
         } else {
             setCurrentEvent(null);
@@ -74,6 +78,8 @@ const EventsManager = () => {
                 location: 'Kettering Sports Ground',
                 description: '',
                 type: 'Club Shoot',
+                external_url: '',
+                discipline: '',
             });
         }
         setIsModalOpen(true);
@@ -87,20 +93,29 @@ const EventsManager = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            // Only Away Competition uses these fields; send null for all other types
+            // (empty string '' violates the DB check constraint on discipline)
+            const payload = {
+                ...formData,
+                external_url: formData.type === 'Away Competition' && formData.external_url ? formData.external_url : null,
+                discipline: formData.type === 'Away Competition' && formData.discipline ? formData.discipline : null,
+            };
+
             if (currentEvent) {
                 // Update
                 const { error } = await supabase
                     .from('events')
-                    .update(formData)
+                    .update(payload)
                     .eq('id', currentEvent.id);
                 if (error) throw error;
             } else {
                 // Insert
                 const { error } = await supabase
                     .from('events')
-                    .insert([formData]);
+                    .insert([payload]);
                 if (error) throw error;
             }
+
             closeModal();
             fetchEvents();
         } catch (error) {
@@ -305,6 +320,37 @@ const EventsManager = () => {
                                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-forest-500 focus:border-forest-500 sm:text-sm"
                                             ></textarea>
                                         </div>
+
+                                        {/* Away Competition extra fields */}
+                                        {formData.type === 'Away Competition' && (
+                                            <>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Host Club Website URL</label>
+                                                    <input
+                                                        type="url"
+                                                        name="external_url"
+                                                        value={formData.external_url}
+                                                        onChange={handleInputChange}
+                                                        placeholder="https://www.otherclub.co.uk/enter"
+                                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-forest-500 focus:border-forest-500 sm:text-sm"
+                                                    />
+                                                    <p className="mt-1 text-xs text-gray-500">Members will be directed here to enter the competition.</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">Discipline</label>
+                                                    <select
+                                                        name="discipline"
+                                                        value={formData.discipline}
+                                                        onChange={handleInputChange}
+                                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-forest-500 focus:border-forest-500 sm:text-sm"
+                                                    >
+                                                        <option value="">-- Select --</option>
+                                                        <option value="Target">Target</option>
+                                                        <option value="Clout">Clout</option>
+                                                    </select>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
