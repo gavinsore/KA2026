@@ -9,6 +9,8 @@ const Home = () => {
     const [recentImages, setRecentImages] = useState([]);
     const [loadingGallery, setLoadingGallery] = useState(true);
     const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+    const [upcomingShoots, setUpcomingShoots] = useState([]);
+    const [loadingShoots, setLoadingShoots] = useState(true);
 
     useEffect(() => {
         const fetchRecentImages = async () => {
@@ -43,6 +45,82 @@ const Home = () => {
         fetchRecentImages();
     }, []);
 
+    // Fetch next 2 upcoming shoots (events or competitions)
+    useEffect(() => {
+        const fetchUpcomingShoots = async () => {
+            try {
+                setLoadingShoots(true);
+                const today = new Date().toISOString().split('T')[0];
+
+                // Fetch future events, excluding Away Competitions
+                const eventsPromise = supabase
+                    .from('events')
+                    .select('*')
+                    .gte('date', today)
+                    .neq('type', 'Away Competition')
+                    .order('date', { ascending: true })
+                    .limit(5);
+
+                // Fetch future competitions
+                const competitionsPromise = supabase
+                    .from('competitions')
+                    .select('*')
+                    .gte('date', today)
+                    .order('date', { ascending: true })
+                    .limit(5);
+
+                const [
+                    { data: eventsData, error: eventsError },
+                    { data: competitionsData, error: competitionsError }
+                ] = await Promise.all([eventsPromise, competitionsPromise]);
+
+                if (eventsError) throw eventsError;
+                if (competitionsError) throw competitionsError;
+
+                // Transform events
+                const transformedEvents = (eventsData || []).map((item) => {
+                    let timeStr = '';
+                    if (item.start_time) {
+                        timeStr = item.start_time.slice(0, 5);
+                    }
+                    return {
+                        id: `event_${item.id}`,
+                        title: item.title,
+                        date: item.date,
+                        time: timeStr,
+                        type: item.type,
+                        is_competition: false
+                    };
+                });
+
+                // Transform competitions
+                const transformedCompetitions = (competitionsData || []).map((comp) => ({
+                    id: `comp_${comp.id}`,
+                    title: comp.name,
+                    date: comp.date,
+                    time: comp.time ? comp.time.slice(0, 5) : '',
+                    type: 'Competition',
+                    is_competition: true
+                }));
+
+                // Merge, sort by date, and take top 2
+                const combined = [...transformedEvents, ...transformedCompetitions].sort((a, b) => {
+                    const dateA = new Date(a.date);
+                    const dateB = new Date(b.date);
+                    return dateA - dateB;
+                }).slice(0, 2);
+
+                setUpcomingShoots(combined);
+            } catch (error) {
+                console.error('Error fetching upcoming shoots:', error);
+            } finally {
+                setLoadingShoots(false);
+            }
+        };
+
+        fetchUpcomingShoots();
+    }, []);
+
     // Create a list of images to rotate in the hero section. Fallback to default images if none in DB.
     const heroImages = recentImages.length > 0 ? recentImages : [
         { id: 'default1', src: `${import.meta.env.BASE_URL}gallery/pexels-kampus-6540677.jpg`, alt: 'Archery' },
@@ -67,6 +145,51 @@ const Home = () => {
                 title="Kettering Archers - Archery Club in Kettering, Northamptonshire"
                 description="A friendly archery club in Kettering. Join us for beginners courses, competitions, and social shooting. Established 1977, all ages welcome from age 7+."
             />
+
+            {/* Upcoming Shoots Banner - Placed Above Hero */}
+            {!loadingShoots && upcomingShoots.length > 0 && (
+                <div className="bg-forest-50 border-b border-forest-100 text-forest-900 py-3 px-4 shadow-sm relative z-20">
+                    <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-6">
+                            <div className="flex items-center gap-2 text-forest-700 font-semibold shrink-0">
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span>Upcoming Shoots:</span>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 text-sm">
+                                {upcomingShoots.map((shoot) => {
+                                    const dateObj = new Date(shoot.date);
+                                    const formattedDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+
+                                    return (
+                                        <div key={shoot.id} className="flex items-center gap-2 bg-white rounded px-3 py-1.5 border border-forest-200 shadow-sm">
+                                            <span className="font-bold text-forest-700 min-w-12 text-center">{formattedDate}</span>
+                                            <span className="w-px h-4 bg-forest-200 hidden sm:block"></span>
+                                            <span className="font-medium truncate max-w-[200px]" title={shoot.title}>{shoot.title}</span>
+                                            {shoot.time && (
+                                                <>
+                                                    <span className="text-forest-400 text-xs hidden sm:inline">&bull;</span>
+                                                    <span className="text-forest-600 text-xs hidden sm:inline">{shoot.time}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <Link to="/events" className="shrink-0 text-sm bg-forest-700 hover:bg-forest-600 text-white px-4 py-1.5 rounded-full transition-colors flex items-center gap-1 shadow-sm">
+                            View Calendar
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </Link>
+                    </div>
+                </div>
+            )}
+
             {/* Hero Section */}
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
                 {/* Hero Background Image */}
