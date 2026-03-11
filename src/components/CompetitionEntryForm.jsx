@@ -18,9 +18,10 @@ import { supabase } from '../lib/supabase';
 //    - {{seated}} - Yes or No
 //    - {{club}} - Affiliated club name
 //    - {{emergency_contact}} - Emergency contact details
+//    - {{payment_details}} - Payment details
 // ============================================================
 const EMAILJS_SERVICE_ID = 'service_wf6l7qj';
-const EMAILJS_TEMPLATE_ID = 'template_competition'; // UPDATE: Create this template in EmailJS
+const EMAILJS_TEMPLATE_ID = 'template_w4raxbf'; // UPDATE: Create this template in EmailJS
 const EMAILJS_PUBLIC_KEY = '6TUz3DlyaDbDJIe5E';
 
 const CompetitionEntryForm = ({ competition }) => {
@@ -95,11 +96,14 @@ const CompetitionEntryForm = ({ competition }) => {
                 distance: formData.distance,
                 category: formData.category,
                 age_category: formData.ageCategory,
-                dob: formData.ageCategory === 'Junior' ? formData.dob : 'N/A',
+                dob: formData.ageCategory === 'Junior' && formData.dob
+                    ? new Date(formData.dob).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                    : 'N/A',
                 agb_number: formData.agbNumber,
                 seated: formData.seated ? 'Yes' : 'No',
                 club: formData.club,
-                emergency_contact: formData.emergencyContact
+                emergency_contact: formData.emergencyContact,
+                payment_details: competition.payment_details || 'N/A'
             };
 
             try {

@@ -21,7 +21,7 @@ const EventsManager = () => {
     });
 
     const eventTypes = [
-        'Club Shoot', 'Competition', 'Away Competition', 'Rove', 'Beginners', 'Open Day', 'Social', 'Practice', 'Target', 'Clout'
+        'Club Shoot', 'Competition', 'Away Competition', 'Beginners', 'Open Day', 'Social', 'Practice', 'Target', 'Clout'
     ];
 
     useEffect(() => {

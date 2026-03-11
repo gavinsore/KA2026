@@ -18,8 +18,6 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
                 return 'bg-gold-100 text-gold-700 border border-gold-300';
             case 'away competition':
                 return 'bg-orange-100 text-orange-700 border border-orange-300';
-            case 'rove':
-                return 'bg-indigo-100 text-indigo-700 border border-indigo-300';
             case 'beginners':
                 return 'bg-blue-100 text-blue-700 border border-blue-300';
             case 'open day':
@@ -39,7 +37,6 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
 
     const isCompetition = event.types?.some(type => type.toLowerCase() === 'competition');
     const isAwayCompetition = event.types?.some(type => type.toLowerCase() === 'away competition');
-    const isRove = event.types?.some(type => type.toLowerCase() === 'rove');
 
     return (
         <div className="glass-card p-6 hover:border-forest-400 hover:shadow-lg transition-all duration-300 group">
@@ -127,7 +124,7 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
                     )}
 
                     {/* View Club Records Button — shown for regular non-competition events */}
-                    {!isCompetition && !isAwayCompetition && !isRove && clubRecordsUrl && (
+                    {!isCompetition && !isAwayCompetition && clubRecordsUrl && (
                         <div className="mt-4">
                             <Link
                                 to={clubRecordsUrl}
