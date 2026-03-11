@@ -199,43 +199,54 @@ const ResultsManager = () => {
                         <form onSubmit={handleUpload} className="space-y-4">
 
                             {dataMode === 'event' && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-charcoal-700 mb-1">Event Name</label>
-                                        <input
-                                            type="text"
-                                            name="event_name"
-                                            value={formData.event_name}
-                                            onChange={handleInputChange}
-                                            className="w-full p-2 border border-charcoal-200 rounded-md focus:ring-forest-500 focus:border-forest-500"
-                                            placeholder="e.g. Spring Handicap"
-                                            required={dataMode === 'event'}
-                                        />
+                                <>
+                                    <div className="p-3 bg-blue-50 text-blue-800 rounded-md border border-blue-200 text-sm">
+                                        <p className="font-semibold flex items-center gap-2">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Uploading Archived Results
+                                        </p>
+                                        <p className="mt-1 ml-6 text-blue-700">Events with past dates are automatically sorted into the Historical Archive.</p>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-charcoal-700 mb-1">Date</label>
-                                        <input
-                                            type="date"
-                                            name="event_date"
-                                            value={formData.event_date}
-                                            onChange={handleInputChange}
-                                            className="w-full p-2 border border-charcoal-200 rounded-md focus:ring-forest-500 focus:border-forest-500"
-                                            required={dataMode === 'event'}
-                                        />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-charcoal-700 mb-1">Event Name</label>
+                                            <input
+                                                type="text"
+                                                name="event_name"
+                                                value={formData.event_name}
+                                                onChange={handleInputChange}
+                                                className="w-full p-2 border border-charcoal-200 rounded-md focus:ring-forest-500 focus:border-forest-500"
+                                                placeholder="e.g. Spring Handicap"
+                                                required={dataMode === 'event'}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-charcoal-700 mb-1">Date</label>
+                                            <input
+                                                type="date"
+                                                name="event_date"
+                                                value={formData.event_date}
+                                                onChange={handleInputChange}
+                                                className="w-full p-2 border border-charcoal-200 rounded-md focus:ring-forest-500 focus:border-forest-500"
+                                                required={dataMode === 'event'}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-charcoal-700 mb-1">Venue</label>
+                                            <select
+                                                name="venue"
+                                                value={formData.venue}
+                                                onChange={handleInputChange}
+                                                className="w-full p-2 border border-charcoal-200 rounded-md focus:ring-forest-500 focus:border-forest-500"
+                                            >
+                                                <option value="Outdoor">Outdoor</option>
+                                                <option value="Indoor">Indoor</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-charcoal-700 mb-1">Venue</label>
-                                        <select
-                                            name="venue"
-                                            value={formData.venue}
-                                            onChange={handleInputChange}
-                                            className="w-full p-2 border border-charcoal-200 rounded-md focus:ring-forest-500 focus:border-forest-500"
-                                        >
-                                            <option value="Outdoor">Outdoor</option>
-                                            <option value="Indoor">Indoor</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                </>
                             )}
 
                             {dataMode !== 'event' && (

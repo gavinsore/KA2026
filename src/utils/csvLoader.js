@@ -1,18 +1,77 @@
 import { supabase } from '../lib/supabase';
 
 /**
+ * Determine the season for an event based on its date and venue.
+ * Outdoor: strictly calendar year.
+ * Indoor: September (Y) to April (Y+1).
+ * @param {string|Date} dateStr 
+ * @param {string} venue 'Indoor' or 'Outdoor'
+ * @returns {Object} Season metadata { id, name, type, startYear }
+ */
+export function getSeasonFromDate(dateStr, venue = 'Outdoor') {
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = date.getMonth(); // 0 is Jan, 8 is Sep, 11 is Dec
+
+    if (venue && venue.toLowerCase() === 'indoor') {
+        // Indoor season starts in September
+        if (month >= 8) { // Sep-Dec
+            return {
+                id: `${year}_${year + 1}_indoor`,
+                name: `${year}/${year + 1} Indoor Season`,
+                type: 'indoor',
+                startYear: year
+            };
+        } else { // Jan-Aug
+            return {
+                id: `${year - 1}_${year}_indoor`,
+                name: `${year - 1}/${year} Indoor Season`,
+                type: 'indoor',
+                startYear: year - 1
+            };
+        }
+    } else {
+        // Outdoor season is based strictly on the calendar year
+        return {
+            id: `${year}_outdoor`,
+            name: `${year} Outdoor Season`,
+            type: 'outdoor',
+            startYear: year
+        };
+    }
+}
+
+/**
+ * Get the current seasons based on today's date.
+ */
+export function getCurrentSeasons() {
+    const today = new Date();
+    return {
+        outdoor: getSeasonFromDate(today, 'Outdoor'),
+        indoor: getSeasonFromDate(today, 'Indoor')
+    };
+}
+
+/**
  * Fetch text content from Supabase Storage
  * @param {string} path - Path in storage bucket
  * @returns {Promise<string>} File content
  */
 async function fetchSupabaseFile(path) {
     try {
-        const { data, error } = await supabase.storage
-            .from('results')
-            .download(path);
+        // Generate public URL with a cache buster to ensure we get the latest
+        // version immediately after an overwrite upload (especially for PBs and Records)
+        const { data } = supabase.storage.from('results').getPublicUrl(path);
+        const url = `${data.publicUrl}?t=${new Date().getTime()}`;
 
-        if (error) throw error;
-        return await data.text();
+        const response = await fetch(url);
+        // If 404 Not Found (e.g. file doesn't exist yet in Supabase), throw error
+        // so we can fallback to the local default file.
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status} when fetching ${url}`);
+        }
+
+        return await response.text();
     } catch (error) {
         console.error('Error downloading file from Supabase:', error);
         return null;
@@ -266,7 +325,8 @@ export async function loadAllEventResults() {
                     venue: file.venue, // 'Indoor' or 'Outdoor'
                     results: eventResults,
                     fileUrl: fileUrl,
-                    fileType: isCsv ? 'csv' : 'file'
+                    fileType: isCsv ? 'csv' : 'file',
+                    season: getSeasonFromDate(file.event_date, file.venue)
                 };
 
                 if (file.venue === 'Indoor') {
@@ -344,7 +404,10 @@ export async function loadClubRecords() {
     }
 
     if (!text) return [];
-    return parseClubRecordsCSV(text.split('\n'));
+
+    // Normalize line endings to ensure \r\n and \n are both handled
+    const normalizedText = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    return parseClubRecordsCSV(normalizedText.split('\n'));
 }
 
 /**
@@ -429,7 +492,10 @@ export async function loadPersonalBests() {
 
     if (!text) return [];
 
-    return parsePersonalBestsCSV(text.split('\n')).sort((a, b) => {
+    // Normalize line endings
+    const normalizedText = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+    return parsePersonalBestsCSV(normalizedText.split('\n')).sort((a, b) => {
         const nameCompare = (a.archer_name || '').localeCompare(b.archer_name || '');
         if (nameCompare !== 0) return nameCompare;
         return (a.round || '').localeCompare(b.round || '');

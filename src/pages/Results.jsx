@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { loadAllEventResults, loadClubRecords, loadPersonalBests, loadArchivesIndex, loadArchiveResults } from '../utils/csvLoader';
+import { loadAllEventResults, loadClubRecords, loadPersonalBests, loadArchivesIndex, loadArchiveResults, getCurrentSeasons } from '../utils/csvLoader';
 import SEO from '../components/SEO';
 
 const Results = () => {
@@ -58,10 +58,67 @@ const Results = () => {
                     loadArchivesIndex()
                 ]);
 
-                setOutdoorResults(eventResults.outdoor);
-                setIndoorResults(eventResults.indoor);
-                setClubRecords(records);
-                setArchives(archivesList);
+                const currentSeasons = getCurrentSeasons();
+
+                // Partition DB events into current vs archived
+                const currentOutdoor = [];
+                const currentIndoor = [];
+                const dynamicArchivesMap = {};
+
+                const routeEvent = (event) => {
+                    const season = event.season;
+                    if (!season) return;
+                    if (season.type === 'outdoor' && season.id === currentSeasons.outdoor.id) {
+                        currentOutdoor.push(event);
+                    } else if (season.type === 'indoor' && season.id === currentSeasons.indoor.id) {
+                        currentIndoor.push(event);
+                    } else {
+                        if (!dynamicArchivesMap[season.id]) {
+                            dynamicArchivesMap[season.id] = {
+                                id: season.id,
+                                name: season.name,
+                                type: season.type,
+                                startYear: season.startYear,
+                                isDynamic: true,
+                                events: []
+                            };
+                        }
+                        dynamicArchivesMap[season.id].events.push(event);
+                    }
+                };
+
+                eventResults.outdoor.forEach(routeEvent);
+                eventResults.indoor.forEach(routeEvent);
+
+                setOutdoorResults(currentOutdoor);
+                setIndoorResults(currentIndoor);
+
+                // Build merged archives list
+                const dynamicArchivesList = Object.values(dynamicArchivesMap);
+                const combinedArchivesMap = {};
+
+                dynamicArchivesList.forEach(a => {
+                    combinedArchivesMap[a.id] = a;
+                });
+
+                archivesList.forEach(a => {
+                    if (combinedArchivesMap[a.id]) {
+                        combinedArchivesMap[a.id].hasStaticConfig = true;
+                        combinedArchivesMap[a.id].staticPath = a.path;
+                    } else {
+                        combinedArchivesMap[a.id] = {
+                            id: a.id,
+                            name: a.name,
+                            isDynamic: false,
+                            hasStaticConfig: true,
+                            staticPath: a.path,
+                            startYear: parseInt(a.id.match(/\d{4}/)?.[0] || '0')
+                        };
+                    }
+                });
+
+                const finalArchives = Object.values(combinedArchivesMap).sort((a, b) => b.startYear - a.startYear);
+                setArchives(finalArchives);
 
                 // Build a set of club record identifiers for fast lookup
                 // Key: ArcherName|Round|BowType|Score
@@ -69,6 +126,7 @@ const Results = () => {
                     `${r.archer_name || ''}|${r.round || ''}|${r.bow_type || ''}|${r.score || ''}`.toLowerCase()
                 ));
                 setClubRecordSet(recordSet);
+                setClubRecords(records);
 
                 setPersonalBests(pbs);
             } catch (error) {
@@ -85,7 +143,19 @@ const Results = () => {
         setLoadingArchive(true);
         setSelectedArchive(archive);
         try {
-            const results = await loadArchiveResults(archive.path);
+            let results = [];
+            // Load static results if they exist (legacy JSON method)
+            if (archive.hasStaticConfig) {
+                const staticRes = await loadArchiveResults(archive.staticPath);
+                results = [...results, ...staticRes];
+            }
+            // Add dynamic results (already fetched from DB in loadAllEventResults)
+            if (archive.isDynamic) {
+                results = [...results, ...archive.events];
+            }
+
+            // Sort all by date desc
+            results.sort((a, b) => new Date(b.date) - new Date(a.date));
             setArchiveResults(results);
         } catch (error) {
             console.error("Failed to load archive", error);
@@ -409,7 +479,7 @@ const Results = () => {
                                     <svg className="w-6 h-6 text-forest-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                                     </svg>
-                                    Current Outdoor Season 2026
+                                    Current {getCurrentSeasons().outdoor.name}
                                 </h2>
                                 {renderEventsList(outdoorResults)}
                             </div>
@@ -422,7 +492,7 @@ const Results = () => {
                                     <svg className="w-6 h-6 text-gold-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                     </svg>
-                                    Current Indoor Season 2025-2026
+                                    Current {getCurrentSeasons().indoor.name}
                                 </h2>
                                 {renderEventsList(indoorResults)}
                             </div>

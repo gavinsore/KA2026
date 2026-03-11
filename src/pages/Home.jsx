@@ -8,6 +8,7 @@ import SEO from '../components/SEO';
 const Home = () => {
     const [recentImages, setRecentImages] = useState([]);
     const [loadingGallery, setLoadingGallery] = useState(true);
+    const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
 
     useEffect(() => {
         const fetchRecentImages = async () => {
@@ -15,6 +16,7 @@ const Home = () => {
                 const { data, error } = await supabase
                     .from('gallery_images')
                     .select('*')
+                    .eq('is_hero', true)
                     .order('created_at', { ascending: false })
                     .limit(4);
 
@@ -41,6 +43,24 @@ const Home = () => {
         fetchRecentImages();
     }, []);
 
+    // Create a list of images to rotate in the hero section. Fallback to default images if none in DB.
+    const heroImages = recentImages.length > 0 ? recentImages : [
+        { id: 'default1', src: `${import.meta.env.BASE_URL}gallery/pexels-kampus-6540677.jpg`, alt: 'Archery' },
+        { id: 'default2', src: `${import.meta.env.BASE_URL}gallery/pexels-kampus-6540679.jpg`, alt: 'Archery' },
+        { id: 'default3', src: `${import.meta.env.BASE_URL}gallery/pexels-kampus-6540714.jpg`, alt: 'Archery' }
+    ];
+
+    // Rotate hero image every 6 seconds
+    useEffect(() => {
+        if (heroImages.length <= 1) return;
+
+        const interval = setInterval(() => {
+            setCurrentHeroIndex(prev => (prev + 1) % heroImages.length);
+        }, 6000);
+
+        return () => clearInterval(interval);
+    }, [heroImages.length]);
+
     return (
         <div className="min-h-screen">
             <SEO
@@ -50,12 +70,15 @@ const Home = () => {
             {/* Hero Section */}
             <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
                 {/* Hero Background Image */}
-                <div className="absolute inset-0">
-                    <img
-                        src={`${import.meta.env.BASE_URL}gallery/pexels-kampus-6540677.jpg`}
-                        alt="Archery at Kettering Archers"
-                        className="w-full h-full object-cover"
-                    />
+                <div className="absolute inset-0 bg-forest-900">
+                    {heroImages.map((img, index) => (
+                        <img
+                            key={img.id}
+                            src={img.src}
+                            alt={img.alt || "Archery at Kettering Archers"}
+                            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${index === currentHeroIndex ? 'opacity-100' : 'opacity-0'}`}
+                        />
+                    ))}
                     <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/70 to-white/90" />
                 </div>
 
