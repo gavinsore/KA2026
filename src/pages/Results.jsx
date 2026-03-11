@@ -583,42 +583,30 @@ const Results = () => {
                                                 {/* Expanded content */}
                                                 {isOpen && (
                                                     <div className="px-3 py-2 bg-white/30">
-                                                        {/* Mobile — compact rows */}
-                                                        <div className="md:hidden">
-                                                            {records.map((record, i) => (
-                                                                <div key={i} className="flex items-center gap-2 px-1 py-1 border-b border-charcoal-50 last:border-0">
-                                                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold shrink-0 ${getCategoryStyle(record.archer_category)}`}>{record.archer_category}</span>
-                                                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0 ${getBowTypeStyle(record.bow_type)}`}>{record.bow_type}</span>
-                                                                    <span className="flex-1 text-sm text-forest-900 truncate">{record.archer_name}</span>
-                                                                    <span className="text-gold-600 font-bold text-sm shrink-0 w-12 text-right">{record.score}</span>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-
-                                                        {/* Desktop — compact table */}
-                                                        <div className="hidden md:block overflow-x-auto">
-                                                            <table className="w-full text-sm">
+                                                        {/* Scrollable table for all devices */}
+                                                        <div className="overflow-x-auto">
+                                                            <table className="w-full text-sm min-w-[600px]">
                                                                 <thead>
                                                                     <tr className="text-left border-b border-charcoal-100">
-                                                                        <th className="pb-1.5 text-charcoal-600 font-medium">Category</th>
-                                                                        <th className="pb-1.5 text-charcoal-600 font-medium">Bow Type</th>
-                                                                        <th className="pb-1.5 text-charcoal-600 font-medium">Holder</th>
-                                                                        <th className="pb-1.5 text-charcoal-600 font-medium text-right">Score</th>
-                                                                        <th className="pb-1.5 text-charcoal-600 font-medium text-right">Date</th>
+                                                                        <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Archer Name</th>
+                                                                        <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Score</th>
+                                                                        <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Bow Type</th>
+                                                                        <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Date</th>
+                                                                        <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap">Category</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
                                                                     {records.map((record, i) => (
                                                                         <tr key={i} className="border-b border-charcoal-50 hover:bg-white/50 transition-colors">
-                                                                            <td className="py-1.5">
-                                                                                <span className={`px-2 py-0.5 rounded text-xs font-medium ${getCategoryStyle(record.archer_category)}`}>{record.archer_category}</span>
-                                                                            </td>
-                                                                            <td className="py-1.5">
+                                                                            <td className="py-1.5 text-forest-900 font-medium whitespace-nowrap pr-4">{record.archer_name}</td>
+                                                                            <td className="py-1.5 text-gold-600 font-bold pr-4">{record.score}</td>
+                                                                            <td className="py-1.5 whitespace-nowrap pr-4">
                                                                                 <span className={`px-2 py-0.5 rounded text-xs font-medium ${getBowTypeStyle(record.bow_type)}`}>{record.bow_type}</span>
                                                                             </td>
-                                                                            <td className="py-1.5 text-forest-900 font-medium">{record.archer_name}</td>
-                                                                            <td className="py-1.5 text-right text-gold-600 font-bold">{record.score}</td>
-                                                                            <td className="py-1.5 text-right text-charcoal-600">{formatDate(record.date)}</td>
+                                                                            <td className="py-1.5 text-charcoal-600 whitespace-nowrap pr-4">{formatDate(record.date)}</td>
+                                                                            <td className="py-1.5 whitespace-nowrap">
+                                                                                <span className={`px-2 py-0.5 rounded text-xs font-medium ${getCategoryStyle(record.archer_category)}`}>{record.archer_category}</span>
+                                                                            </td>
                                                                         </tr>
                                                                     ))}
                                                                 </tbody>
@@ -685,69 +673,37 @@ const Results = () => {
                                             {/* Expandable content */}
                                             {expandedArchers.has(archerName) && (
                                                 <div className="px-3 py-2 bg-white/30">
-                                                    {/* Mobile — compact grouped by bow type */}
-                                                    <div className="md:hidden">
-                                                        {Object.entries(
-                                                            pbs.reduce((acc, pb) => {
-                                                                const key = pb.bow_type || 'Unknown';
-                                                                if (!acc[key]) acc[key] = [];
-                                                                acc[key].push(pb);
-                                                                return acc;
-                                                            }, {})
-                                                        ).sort(([a], [b]) => a.localeCompare(b)).map(([bowType, bowPbs]) => (
-                                                            <div key={bowType} className="mb-3 last:mb-0">
-                                                                {/* Bow type header */}
-                                                                <div className={`px-2 py-1 rounded text-xs font-semibold mb-1 ${getBowTypeStyle(bowType)}`}>
-                                                                    {bowType}
-                                                                </div>
-                                                                {/* PB rows */}
-                                                                {bowPbs.sort((a, b) => (a.round || '').localeCompare(b.round || '')).map((pb, i) => (
-                                                                    <div key={i} className="flex items-center gap-2 px-2 py-1 border-b border-charcoal-50 last:border-0">
-                                                                        <span className="flex-1 text-sm text-forest-900 truncate">{pb.round}</span>
-                                                                        {isClubRecord(pb) && (
-                                                                            <span className="bg-gold-400 text-white text-[10px] uppercase font-bold px-1.5 py-0.5 rounded shrink-0">CR</span>
-                                                                        )}
-                                                                        <span className="text-xs text-charcoal-400 shrink-0">H:{pb.hits} G:{pb.golds}</span>
-                                                                        <span className="text-gold-600 font-bold text-sm shrink-0 w-12 text-right">{pb.score}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-
-                                                    {/* Desktop Table Layout */}
-                                                    <div className="hidden md:block overflow-x-auto">
-                                                        <table className="w-full text-sm">
+                                                    {/* Scrollable Table Layout for all devices */}
+                                                    <div className="overflow-x-auto">
+                                                        <table className="w-full text-sm min-w-[600px]">
                                                             <thead>
                                                                 <tr className="text-left border-b border-charcoal-100">
-                                                                    <th className="pb-2 text-charcoal-600 font-medium">Round</th>
-                                                                    <th className="pb-2 text-charcoal-600 font-medium">Bow Type</th>
-                                                                    <th className="pb-2 text-charcoal-600 font-medium">Date</th>
+                                                                    <th className="pb-2 text-charcoal-600 font-medium whitespace-nowrap">Round</th>
+                                                                    <th className="pb-2 text-charcoal-600 font-medium whitespace-nowrap">Bow Type</th>
+                                                                    <th className="pb-2 text-charcoal-600 font-medium whitespace-nowrap">Date</th>
                                                                     <th className="pb-2 text-charcoal-600 font-medium text-right">Score</th>
                                                                     <th className="pb-2 text-charcoal-600 font-medium text-right">Hits</th>
                                                                     <th className="pb-2 text-charcoal-600 font-medium text-right">Golds</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                {pbs.sort((a, b) => (a.round || '').localeCompare(b.round || '')).map((pb, index) => (
-                                                                    <tr key={index} className="border-b border-charcoal-50 hover:bg-white/50 transition-colors">
-                                                                        <td className="py-2 text-forest-800">{pb.round}</td>
-                                                                        <td className="py-2">
-                                                                            <span className={`px-2 py-1 rounded text-xs font-medium ${getBowTypeStyle(pb.bow_type)}`}>
-                                                                                {pb.bow_type}
-                                                                            </span>
-                                                                        </td>
-                                                                        <td className="py-2 text-charcoal-600">{formatDate(pb.date)}</td>
-                                                                        <td className="py-2 text-right">
-                                                                            <div className="flex items-center justify-end gap-2">
+                                                                {pbs.sort((a, b) => new Date(b.date) - new Date(a.date)).map((pb, i) => (
+                                                                    <tr key={i} className="border-b border-charcoal-50 hover:bg-white/50 transition-colors">
+                                                                        <td className="py-2 text-forest-900 font-medium whitespace-nowrap pr-4">
+                                                                            <div className="flex items-center gap-2">
+                                                                                {pb.round}
                                                                                 {isClubRecord(pb) && (
-                                                                                    <span className="bg-gold-400 text-white text-[10px] uppercase font-bold px-1.5 py-0.5 rounded cursor-help" title="Current Club Record">CR</span>
+                                                                                    <span className="bg-gold-400 text-white text-[10px] uppercase font-bold px-1.5 py-0.5 rounded" title="Current Club Record">CR</span>
                                                                                 )}
-                                                                                <span className="text-gold-600 font-bold">{pb.score}</span>
                                                                             </div>
                                                                         </td>
-                                                                        <td className="py-2 text-right text-charcoal-600">{pb.hits}</td>
-                                                                        <td className="py-2 text-right text-charcoal-600">{pb.golds}</td>
+                                                                        <td className="py-2 whitespace-nowrap">
+                                                                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${getBowTypeStyle(pb.bow_type)}`}>{pb.bow_type}</span>
+                                                                        </td>
+                                                                        <td className="py-2 text-charcoal-600 whitespace-nowrap pr-4">{formatDate(pb.date)}</td>
+                                                                        <td className="py-2 text-right text-gold-600 font-bold">{pb.score || '-'}</td>
+                                                                        <td className="py-2 text-right text-charcoal-600">{pb.hits || '-'}</td>
+                                                                        <td className="py-2 text-right text-charcoal-600">{pb.golds || '-'}</td>
                                                                     </tr>
                                                                 ))}
                                                             </tbody>
