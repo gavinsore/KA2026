@@ -318,6 +318,8 @@ export async function loadAllEventResults() {
                     }
                 }
 
+                const pdfUrl = file.pdf_path ? getSupabaseFileUrl(file.pdf_path) : null;
+
                 const eventData = {
                     id: file.id,
                     date: file.event_date,
@@ -325,6 +327,7 @@ export async function loadAllEventResults() {
                     venue: file.venue, // 'Indoor' or 'Outdoor'
                     results: eventResults,
                     fileUrl: fileUrl,
+                    pdfUrl: pdfUrl,
                     fileType: isCsv ? 'csv' : 'file',
                     season: getSeasonFromDate(file.event_date, file.venue)
                 };

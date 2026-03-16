@@ -314,20 +314,36 @@ const Results = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                 </div>
-                {isExpanded && event.fileUrl && (
-                    <div className="px-4 py-2 border-t border-charcoal-100/50 bg-white/40 flex justify-end">
-                        <a
-                            href={event.fileUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-forest-600 hover:text-forest-800 flex items-center gap-1 bg-white px-2.5 py-1.5 rounded border border-forest-200 shadow-sm"
-                            title="Download Result File"
-                        >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Download
-                        </a>
+                {isExpanded && (event.fileUrl || event.pdfUrl) && (
+                    <div className="px-4 py-2 border-t border-charcoal-100/50 bg-white/40 flex justify-end gap-2">
+                        {event.fileUrl && (
+                            <a
+                                href={event.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-forest-600 hover:text-forest-800 flex items-center gap-1 bg-white px-2.5 py-1.5 rounded border border-forest-200 shadow-sm"
+                                title="Download Result File"
+                            >
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Download
+                            </a>
+                        )}
+                        {event.pdfUrl && (
+                            <a
+                                href={event.pdfUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1 bg-white px-2.5 py-1.5 rounded border border-red-200 shadow-sm"
+                                title="View Results PDF"
+                            >
+                                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                                </svg>
+                                View PDF
+                            </a>
+                        )}
                     </div>
                 )}
 

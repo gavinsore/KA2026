@@ -1,25 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
-import { format } from 'date-fns';
 import AdminBreadcrumbs from '../../components/admin/AdminBreadcrumbs';
 
 const ResultsManager = () => {
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [message, setMessage] = useState(null); // For success/error messages
+    const [message, setMessage] = useState(null);
     const [dataMode, setDataMode] = useState('event'); // 'event', 'records', 'pbs'
 
-    // Form State
+    // PDF upload state: which row is showing the inline upload form
+    const [pdfUploadingFor, setPdfUploadingFor] = useState(null); // file.id
+    const [pdfFile, setPdfFile] = useState(null);
+    const [pdfUploading, setPdfUploading] = useState(false);
+    const pdfInputRef = useRef(null);
+
+    // Form State (for CSV event upload)
     const [formData, setFormData] = useState({
         event_name: '',
-        event_date: new Date().toISOString().split('T')[0], // Default to today
+        event_date: new Date().toISOString().split('T')[0],
         venue: 'Outdoor',
         file: null
     });
 
-    // List files on load
     useEffect(() => {
         fetchFiles();
     }, []);
@@ -60,10 +63,9 @@ const ResultsManager = () => {
             if (!formData.file) throw new Error('Please select a file.');
 
             let filePath = '';
-            let dbInsert = true; // Whether to insert into results_files table
+            let dbInsert = true;
 
             if (dataMode === 'event') {
-                // Standard Event Result Upload
                 if (!formData.event_name || !formData.event_date) {
                     throw new Error('Event Name and Date are required.');
                 }
@@ -71,23 +73,20 @@ const ResultsManager = () => {
                 const fileName = `${formData.event_date}_${formData.event_name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${fileExt}`;
                 filePath = `${formData.venue.toLowerCase()}/${fileName}`;
             } else {
-                // Special Record File Upload (Overwrite)
                 if (dataMode === 'records') {
                     filePath = 'special/club-records.csv';
                 } else if (dataMode === 'pbs') {
                     filePath = 'special/personal-bests.csv';
                 }
-                dbInsert = false; // We don't track these in the events table
+                dbInsert = false;
             }
 
-            // Upload to Supabase Storage (Upsert = true to overwrite)
             const { error: uploadError } = await supabase.storage
                 .from('results')
                 .upload(filePath, formData.file, { upsert: true });
 
             if (uploadError) throw uploadError;
 
-            // Only insert metadata for Events
             if (dbInsert) {
                 const { error: dbError } = await supabase
                     .from('results_files')
@@ -101,18 +100,16 @@ const ResultsManager = () => {
                     }]);
 
                 if (dbError) throw dbError;
-                fetchFiles(); // Refresh list
+                fetchFiles();
             }
 
             setMessage({ type: 'success', text: 'File uploaded successfully!' });
-            // Reset form
             setFormData({
                 file: null,
                 event_name: '',
                 event_date: new Date().toISOString().split('T')[0],
                 venue: 'Outdoor'
             });
-            // Reset file input manually
             document.getElementById('file-upload').value = '';
 
         } catch (error) {
@@ -124,11 +121,10 @@ const ResultsManager = () => {
     };
 
     const handleDelete = async (id, filePath) => {
-        if (!window.confirm('Are you sure you want to delete this result?')) return;
+        if (!window.confirm('Are you sure you want to delete this result? The associated PDF (if any) will NOT be automatically deleted from storage.')) return;
 
         setLoading(true);
         try {
-            // Delete from Storage
             const { error: storageError } = await supabase.storage
                 .from('results')
                 .remove([filePath]);
@@ -137,7 +133,6 @@ const ResultsManager = () => {
                 console.warn('Storage delete warning:', storageError);
             }
 
-            // Delete from DB
             const { error: dbError } = await supabase
                 .from('results_files')
                 .delete()
@@ -154,6 +149,85 @@ const ResultsManager = () => {
             setLoading(false);
         }
     };
+
+    // ── PDF Upload ──────────────────────────────────────────────────────────
+
+    const buildPdfPath = (file) => {
+        const baseName = file.file_path
+            .split('/')
+            .pop()
+            .replace(/\.[^.]+$/, ''); // strip extension
+        const folder = file.file_path.substring(0, file.file_path.lastIndexOf('/'));
+        return `${folder}/${baseName}_programme.pdf`;
+    };
+
+    const handlePdfUpload = async (file) => {
+        if (!pdfFile) return;
+        setPdfUploading(true);
+        setMessage(null);
+
+        try {
+            const pdfPath = buildPdfPath(file);
+
+            const { error: uploadError } = await supabase.storage
+                .from('results')
+                .upload(pdfPath, pdfFile, { upsert: true, contentType: 'application/pdf' });
+
+            if (uploadError) throw uploadError;
+
+            const { error: dbError } = await supabase
+                .from('results_files')
+                .update({ pdf_path: pdfPath })
+                .eq('id', file.id);
+
+            if (dbError) throw dbError;
+
+            setMessage({ type: 'success', text: 'PDF uploaded successfully!' });
+            setPdfUploadingFor(null);
+            setPdfFile(null);
+            fetchFiles();
+        } catch (error) {
+            console.error('PDF upload error:', error);
+            setMessage({ type: 'error', text: error.message || 'Error uploading PDF.' });
+        } finally {
+            setPdfUploading(false);
+        }
+    };
+
+    const handlePdfRemove = async (file) => {
+        if (!window.confirm('Remove the PDF for this event?')) return;
+        setPdfUploading(true);
+        setMessage(null);
+
+        try {
+            if (file.pdf_path) {
+                await supabase.storage.from('results').remove([file.pdf_path]);
+            }
+
+            const { error: dbError } = await supabase
+                .from('results_files')
+                .update({ pdf_path: null })
+                .eq('id', file.id);
+
+            if (dbError) throw dbError;
+
+            setMessage({ type: 'success', text: 'PDF removed.' });
+            fetchFiles();
+        } catch (error) {
+            console.error('PDF remove error:', error);
+            setMessage({ type: 'error', text: 'Failed to remove PDF.' });
+        } finally {
+            setPdfUploading(false);
+        }
+    };
+
+    const cancelPdfUpload = () => {
+        setPdfUploadingFor(null);
+        setPdfFile(null);
+        if (pdfInputRef.current) pdfInputRef.current.value = '';
+    };
+
+    // ────────────────────────────────────────────────────────────────────────
 
     return (
         <div className="min-h-screen py-10 bg-gray-50">
@@ -263,7 +337,7 @@ const ResultsManager = () => {
                                     id="file-upload"
                                     type="file"
                                     onChange={handleFileChange}
-                                    accept=".csv,.pdf,.xls,.xlsx" // Accept common formats
+                                    accept=".csv,.pdf,.xls,.xlsx"
                                     className="w-full p-2 border border-charcoal-200 rounded-md focus:ring-forest-500 focus:border-forest-500"
                                     required
                                 />
@@ -279,7 +353,7 @@ const ResultsManager = () => {
                         </form>
                     </div>
 
-                    {/* List Events only */}
+                    {/* List Events */}
                     <div className="bg-white p-6 rounded-lg shadow-md border border-charcoal-100">
                         <h2 className="text-xl font-semibold text-forest-800 mb-4">Uploaded Event Results</h2>
                         <div className="overflow-x-auto">
@@ -290,18 +364,19 @@ const ResultsManager = () => {
                                         <th className="p-3 text-sm font-semibold text-charcoal-700">Event</th>
                                         <th className="p-3 text-sm font-semibold text-charcoal-700">Venue</th>
                                         <th className="p-3 text-sm font-semibold text-charcoal-700">Filename</th>
+                                        <th className="p-3 text-sm font-semibold text-charcoal-700">PDF</th>
                                         <th className="p-3 text-sm font-semibold text-charcoal-700 text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {files.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="p-4 text-center text-charcoal-500">No result files uploaded yet.</td>
+                                            <td colSpan="6" className="p-4 text-center text-charcoal-500">No result files uploaded yet.</td>
                                         </tr>
                                     ) : (
                                         files.map((file) => (
-                                            <tr key={file.id} className="border-b border-charcoal-100 hover:bg-charcoal-50">
-                                                <td className="p-3 text-charcoal-700">{new Date(file.event_date).toLocaleDateString()}</td>
+                                            <tr key={file.id} className="border-b border-charcoal-100 hover:bg-charcoal-50 align-top">
+                                                <td className="p-3 text-charcoal-700 whitespace-nowrap">{new Date(file.event_date).toLocaleDateString()}</td>
                                                 <td className="p-3 text-forest-800 font-medium">{file.event_name}</td>
                                                 <td className="p-3 text-charcoal-600">
                                                     <span className={`px-2 py-1 rounded text-xs ${file.venue === 'Indoor' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
@@ -309,7 +384,72 @@ const ResultsManager = () => {
                                                     </span>
                                                 </td>
                                                 <td className="p-3 text-charcoal-500 text-sm">{file.filename}</td>
-                                                <td className="p-3 text-right">
+
+                                                {/* PDF Column */}
+                                                <td className="p-3">
+                                                    {file.pdf_path ? (
+                                                        /* PDF exists — show badge + remove */
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-red-100 text-red-700 text-xs font-semibold">
+                                                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                                                                </svg>
+                                                                PDF
+                                                            </span>
+                                                            <button
+                                                                onClick={() => handlePdfRemove(file)}
+                                                                disabled={pdfUploading}
+                                                                className="text-xs text-charcoal-400 hover:text-red-600 transition-colors"
+                                                                title="Remove PDF"
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                        </div>
+                                                    ) : pdfUploadingFor === file.id ? (
+                                                        /* Inline upload form */
+                                                        <div className="flex flex-col gap-2">
+                                                            <input
+                                                                ref={pdfInputRef}
+                                                                type="file"
+                                                                accept=".pdf"
+                                                                onChange={(e) => setPdfFile(e.target.files[0])}
+                                                                className="text-xs border border-charcoal-200 rounded p-1 w-44"
+                                                            />
+                                                            <div className="flex gap-2">
+                                                                <button
+                                                                    onClick={() => handlePdfUpload(file)}
+                                                                    disabled={!pdfFile || pdfUploading}
+                                                                    className="text-xs px-2 py-1 bg-forest-600 text-white rounded hover:bg-forest-700 disabled:opacity-50 transition-colors"
+                                                                >
+                                                                    {pdfUploading ? 'Uploading…' : 'Upload'}
+                                                                </button>
+                                                                <button
+                                                                    onClick={cancelPdfUpload}
+                                                                    className="text-xs px-2 py-1 bg-charcoal-100 text-charcoal-700 rounded hover:bg-charcoal-200 transition-colors"
+                                                                >
+                                                                    Cancel
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        /* No PDF yet — prompt to upload */
+                                                        <button
+                                                            onClick={() => {
+                                                                setPdfUploadingFor(file.id);
+                                                                setPdfFile(null);
+                                                            }}
+                                                            className="inline-flex items-center gap-1 text-xs text-charcoal-400 hover:text-forest-600 transition-colors"
+                                                            title="Upload PDF for this event"
+                                                        >
+                                                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                            </svg>
+                                                            Add PDF
+                                                        </button>
+                                                    )}
+                                                </td>
+
+                                                <td className="p-3 text-right whitespace-nowrap">
                                                     <button
                                                         onClick={() => handleDelete(file.id, file.file_path)}
                                                         className="text-red-600 hover:text-red-800 text-sm font-medium"
