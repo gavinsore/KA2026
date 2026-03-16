@@ -594,6 +594,38 @@ function parseUKDate(dateStr) {
 }
 
 /**
+ * Load county records from the county_records Supabase table.
+ * Populated and refreshed weekly by the scrape-county-records Edge Function.
+ * @returns {Promise<{records: Array<Object>, lastUpdated: string|null}>}
+ */
+export async function loadCountyRecords() {
+    try {
+        const { data, error } = await supabase
+            .from('county_records')
+            .select('*')
+            .order('bow_type', { ascending: true })
+            .order('category', { ascending: true })
+            .order('round', { ascending: true });
+
+        if (error) {
+            console.error('Error loading county records:', error);
+            return { records: [], lastUpdated: null };
+        }
+
+        // Find the most recent updated_at for display purposes
+        const latestUpdate = data?.reduce((latest, r) => {
+            if (!latest) return r.updated_at;
+            return r.updated_at > latest ? r.updated_at : latest;
+        }, null) || null;
+
+        return { records: data || [], lastUpdated: latestUpdate };
+    } catch (error) {
+        console.error('Error in loadCountyRecords:', error);
+        return { records: [], lastUpdated: null };
+    }
+}
+
+/**
  * Export data to CSV
  * @param {Array<Object>} data - Array of objects to export
  * @param {string} filename - Filename for the downloaded file

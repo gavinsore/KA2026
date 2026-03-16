@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { loadAllEventResults, loadClubRecords, loadPersonalBests, loadArchivesIndex, loadArchiveResults, getCurrentSeasons } from '../utils/csvLoader';
+import { loadAllEventResults, loadClubRecords, loadPersonalBests, loadArchivesIndex, loadArchiveResults, getCurrentSeasons, loadCountyRecords } from '../utils/csvLoader';
 import SEO from '../components/SEO';
 
 const Results = () => {
     const [searchParams] = useSearchParams();
-    const validTabs = ['outdoor', 'indoor', 'records', 'pbs', 'archive'];
+    const validTabs = ['outdoor', 'indoor', 'records', 'pbs', 'countyrecords', 'archive'];
     const tabParam = searchParams.get('tab');
     const roundParam = searchParams.get('round') || '';
     const [activeTab, setActiveTab] = useState(validTabs.includes(tabParam) ? tabParam : 'outdoor');
@@ -16,6 +16,9 @@ const Results = () => {
     const [clubRecords, setClubRecords] = useState([]);
     const [clubRecordSet, setClubRecordSet] = useState(new Set());
     const [personalBests, setPersonalBests] = useState([]);
+    const [countyRecords, setCountyRecords] = useState([]);
+    const [countyRecordSet, setCountyRecordSet] = useState(new Set());
+    const [countyRecordsLastUpdated, setCountyRecordsLastUpdated] = useState(null);
     const [bowTypeFilter, setBowTypeFilter] = useState('all');
     const [expandedArchers, setExpandedArchers] = useState(new Set());
     const [expandedRounds, setExpandedRounds] = useState(new Set());
@@ -45,6 +48,7 @@ const Results = () => {
         { id: 'indoor', label: 'Indoor Season' },
         { id: 'records', label: 'Club Records' },
         { id: 'pbs', label: 'Personal Bests' },
+        { id: 'countyrecords', label: 'County Records' },
         { id: 'archive', label: 'Archive' },
     ];
 
@@ -52,11 +56,12 @@ const Results = () => {
         const loadData = async () => {
             setLoading(true);
             try {
-                const [eventResults, records, pbs, archivesList] = await Promise.all([
+                const [eventResults, records, pbs, archivesList, countyResult] = await Promise.all([
                     loadAllEventResults(),
                     loadClubRecords(),
                     loadPersonalBests(),
-                    loadArchivesIndex()
+                    loadArchivesIndex(),
+                    loadCountyRecords()
                 ]);
 
                 const currentSeasons = getCurrentSeasons();
@@ -135,6 +140,18 @@ const Results = () => {
                 setClubRecords(records);
 
                 setPersonalBests(pbs);
+
+                // County records
+                const crRecords = countyResult?.records || [];
+                setCountyRecords(crRecords);
+                setCountyRecordsLastUpdated(countyResult?.lastUpdated || null);
+                // Build fast lookup set: round|bow_type|archer_name (lowercase)
+                const crSet = new Set(
+                    crRecords.map(r =>
+                        `${r.round || ''}|${r.bow_type || ''}|${r.archer_name || ''}`.toLowerCase()
+                    )
+                );
+                setCountyRecordSet(crSet);
             } catch (error) {
                 console.error('Error loading results:', error);
             } finally {
@@ -180,25 +197,41 @@ const Results = () => {
         setArchiveResults([]);
     };
 
+    // Decode HTML entities stored in DB (e.g. &#8211; → –, &ndash; → –)
+    const decodeEntities = (str) => {
+        if (!str || typeof str !== 'string') return str;
+        const el = document.createElement('textarea');
+        el.innerHTML = str;
+        return el.value;
+    };
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     };
 
+
     const isClubRecord = (pb) => {
-        // Construct the key to check against the set
-        // Note: personal-bests.csv usually has bow_type as just "Recurve" whereas club-records might have "Mens Recurve"
-        // But based on analysis, club records.csv has 'Bow Type' column like 'Barebow', 'Recurve'.
-        // However, let's normalize to be safe.
-        // Wait, looking at club-records.csv lines:
-        // Line 8: ,,Mark Allison,,151,,Barebow,,06/06/2021,Men,,,
-        // Bow Type is 'Barebow'.
-        // Personal Bests Key: Archer|Round|Bow|Score
-
-        // Club Records might have slightly different spacing or casing, so we used toLowerCase() in the Set.
-
         const key = `${pb.archer_name || ''}|${pb.round || ''}|${pb.bow_type || ''}|${pb.score || ''}`.toLowerCase();
         return clubRecordSet.has(key);
+    };
+
+    // Check if a personal best entry is also a county record.
+    // Matches on round + bow_type + archer_name (case-insensitive substring on name
+    // to accommodate club name variations between NCAS and our CSV data).
+    const isCountyRecord = (pb) => {
+        const pbRound = (pb.round || '').toLowerCase();
+        const pbBow = (pb.bow_type || '').toLowerCase();
+        const pbName = (pb.archer_name || '').toLowerCase();
+        // Direct key match first (fastest)
+        const directKey = `${pbRound}|${pbBow}|${pbName}`;
+        if (countyRecordSet.has(directKey)) return true;
+        // Fallback: iterate county records for this round+bow and check name substring
+        return countyRecords.some(cr =>
+            (cr.round || '').toLowerCase() === pbRound &&
+            (cr.bow_type || '').toLowerCase() === pbBow &&
+            (cr.archer_name || '').toLowerCase().includes(pbName)
+        );
     };
 
     // Returns true if the record's round matches the active roundFilter (bidirectional partial match)
@@ -708,11 +741,20 @@ const Results = () => {
                                                 </div>
                                                 <h3 className="flex-1 text-base font-semibold text-forest-800">{archerName}</h3>
                                                 {(() => {
-                                                    const crCount = pbs.filter(pb => isClubRecord(pb)).length; return crCount > 0 ? (
-                                                        <span className="hidden md:inline-flex items-center gap-1 bg-gold-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-1">
-                                                            {crCount} CR{crCount !== 1 ? 's' : ''}
-                                                        </span>
-                                                    ) : null;
+                                                    const crCount = pbs.filter(pb => isClubRecord(pb)).length;
+                                                    const ctyCount = pbs.filter(pb => isCountyRecord(pb)).length;
+                                                    return (<>
+                                                        {crCount > 0 && (
+                                                            <span className="hidden md:inline-flex items-center gap-1 bg-gold-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-1">
+                                                                {crCount} CR{crCount !== 1 ? 's' : ''}
+                                                            </span>
+                                                        )}
+                                                        {ctyCount > 0 && (
+                                                            <span className="hidden md:inline-flex items-center gap-1 bg-purple-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-1">
+                                                                {ctyCount} CtyR{ctyCount !== 1 ? 's' : ''}
+                                                            </span>
+                                                        )}
+                                                    </>);
                                                 })()}
                                                 <span className="text-xs text-charcoal-400 mr-1">{pbs.length} PB{pbs.length !== 1 ? 's' : ''}</span>
                                                 <svg
@@ -745,6 +787,9 @@ const Results = () => {
                                                                         <td className="py-2 text-forest-900 font-medium whitespace-nowrap pr-4">
                                                                             <div className="flex items-center gap-2">
                                                                                 {pb.round}
+                                                                                {isCountyRecord(pb) && (
+                                                                                    <span className="bg-purple-500 text-white text-[10px] uppercase font-bold px-1.5 py-0.5 rounded" title="Northamptonshire County Record">CtyR</span>
+                                                                                )}
                                                                                 {isClubRecord(pb) && (
                                                                                     <span className="bg-gold-400 text-white text-[10px] uppercase font-bold px-1.5 py-0.5 rounded" title="Current Club Record">CR</span>
                                                                                 )}
@@ -770,6 +815,123 @@ const Results = () => {
                                         <p className="text-center text-charcoal-500 py-8">No personal bests available yet.</p>
                                     )}
                                 </div>
+                            </div>
+                        )}
+
+                        {/* County Records */}
+                        {activeTab === 'countyrecords' && (
+                            <div>
+                                <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                                    <h2 className="text-xl font-semibold text-forest-900 flex items-center gap-3">
+                                        <svg className="w-6 h-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                                        </svg>
+                                        Northamptonshire County Records
+                                    </h2>
+                                    {countyRecordsLastUpdated && (
+                                        <span className="text-xs text-charcoal-400">
+                                            Updated {new Date(countyRecordsLastUpdated).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {countyRecords.length === 0 ? (
+                                    <div className="text-center py-12">
+                                        <svg className="w-12 h-12 text-charcoal-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                                        </svg>
+                                        <p className="text-charcoal-500 mb-1">County records not yet loaded.</p>
+                                        <p className="text-charcoal-400 text-sm">Records are automatically refreshed weekly from the NCAS website.</p>
+                                    </div>
+                                ) : (() => {
+                                    // Filter by bow type
+                                    const filtered = countyRecords.filter(r => {
+                                        if (bowTypeFilter === 'all') return true;
+                                        return (r.bow_type || '').toLowerCase() === bowTypeFilter.toLowerCase();
+                                    });
+
+                                    if (filtered.length === 0) {
+                                        return <p className="text-center text-charcoal-500 py-8">No county records for {bowTypeFilter}.</p>;
+                                    }
+
+                                    // Group: bow_type -> category -> records
+                                    const byBowType = filtered.reduce((acc, r) => {
+                                        const bt = r.bow_type || 'Other';
+                                        if (!acc[bt]) acc[bt] = {};
+                                        const cat = r.category || 'All';
+                                        if (!acc[bt][cat]) acc[bt][cat] = [];
+                                        acc[bt][cat].push(r);
+                                        return acc;
+                                    }, {});
+
+                                    return (
+                                        <div className="space-y-4">
+                                            {Object.entries(byBowType).map(([bowTypeName, categories]) => (
+                                                <div key={bowTypeName}>
+                                                    {/* Bow Type Header */}
+                                                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg mb-2 ${getBowTypeStyle(bowTypeName)}`}>
+                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                                        </svg>
+                                                        <span className="font-semibold text-sm">{bowTypeName}</span>
+                                                    </div>
+
+                                                    {Object.entries(categories).map(([catName, records]) => (
+                                                        <div key={catName} className="border border-charcoal-100 rounded-lg overflow-hidden mb-1 last:mb-0">
+                                                            {/* Category header */}
+                                                            <div className={`flex items-center gap-2 px-4 py-2 ${getCategoryStyle(catName)} bg-opacity-60`}>
+                                                                <span className="text-xs font-semibold">{bowTypeName} — {catName}</span>
+                                                                <span className="ml-auto text-xs opacity-70">{records.length} round{records.length !== 1 ? 's' : ''}</span>
+                                                            </div>
+
+                                                            {/* Records table */}
+                                                            <div className="px-3 py-2 bg-white/30 overflow-x-auto">
+                                                                <table className="w-full text-sm min-w-[520px]">
+                                                                    <thead>
+                                                                        <tr className="text-left border-b border-charcoal-100">
+                                                                            <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Round</th>
+                                                                            <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Score</th>
+                                                                            <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Archer</th>
+                                                                            <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Club</th>
+                                                                            <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap">Date</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {records.map((r, i) => (
+                                                                            <tr key={i} className="border-b border-charcoal-50 hover:bg-white/50 transition-colors">
+                                                                                <td className="py-1.5 text-forest-900 font-medium whitespace-nowrap pr-4">{decodeEntities(r.round)}</td>
+                                                                                <td className="py-1.5 pr-4">
+                                                                                    <div className="flex items-center gap-1.5">
+                                                                                        <span className="text-gold-600 font-bold">{r.score}</span>
+                                                                                        {r.is_national_record && (
+                                                                                            <span className="bg-red-500 text-white text-[9px] uppercase font-bold px-1 py-0.5 rounded" title="National Record">NR</span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td className="py-1.5 text-forest-900 whitespace-nowrap pr-4">{r.archer_name}</td>
+                                                                                <td className="py-1.5 text-charcoal-500 whitespace-nowrap pr-4">{r.club}</td>
+                                                                                <td className="py-1.5 text-charcoal-500 whitespace-nowrap">{r.date_text}</td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ))}
+
+                                            {/* Attribution */}
+                                            <p className="text-center text-xs text-charcoal-400 pt-2">
+                                                Records sourced from{' '}
+                                                <a href="https://www.ncasarchery.org.uk/all-ncas-county-records/" target="_blank" rel="noopener noreferrer" className="text-forest-600 hover:underline">
+                                                    ncasarchery.org.uk
+                                                </a>
+                                                {' '}and refreshed automatically each week.
+                                            </p>
+                                        </div>
+                                    );
+                                })()}
                             </div>
                         )}
 
