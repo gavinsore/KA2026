@@ -2,10 +2,11 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
-    const { user, isAdmin, loading } = useAuth();
+    const { user, isAdmin, loading, adminLoading } = useAuth();
     const location = useLocation();
 
-    if (loading) {
+    // If basic auth is loading, OR if this route needs admin and the admin check is still loading
+    if (loading || (requireAdmin && adminLoading)) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="w-12 h-12 rounded-full border-4 border-forest-600 border-t-transparent animate-spin"></div>

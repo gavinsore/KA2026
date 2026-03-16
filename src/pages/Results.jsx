@@ -19,6 +19,7 @@ const Results = () => {
     const [bowTypeFilter, setBowTypeFilter] = useState('all');
     const [expandedArchers, setExpandedArchers] = useState(new Set());
     const [expandedRounds, setExpandedRounds] = useState(new Set());
+    const [expandedEvents, setExpandedEvents] = useState(new Set());
 
     // Archive State
     const [archives, setArchives] = useState([]);
@@ -93,6 +94,11 @@ const Results = () => {
                 setOutdoorResults(currentOutdoor);
                 setIndoorResults(currentIndoor);
 
+                const initialExpanded = new Set();
+                if (currentOutdoor.length > 0) initialExpanded.add(currentOutdoor[0].id);
+                if (currentIndoor.length > 0) initialExpanded.add(currentIndoor[0].id);
+                setExpandedEvents(initialExpanded);
+
                 // Build merged archives list
                 const dynamicArchivesList = Object.values(dynamicArchivesMap);
                 const combinedArchivesMap = {};
@@ -157,6 +163,10 @@ const Results = () => {
             // Sort all by date desc
             results.sort((a, b) => new Date(b.date) - new Date(a.date));
             setArchiveResults(results);
+
+            if (results.length > 0) {
+                setExpandedEvents(prev => new Set(prev).add(results[0].id));
+            }
         } catch (error) {
             console.error("Failed to load archive", error);
             setArchiveResults([]);
@@ -276,120 +286,147 @@ const Results = () => {
         // Sort groups alphabetically by bow_type key
         const sortedGroups = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
 
-        return (
-            <div key={event.id} className="mb-8 last:mb-0">
-                <div className="flex items-center justify-between mb-3 pb-2 border-b border-charcoal-200">
-                    <h3 className="text-base font-semibold text-forest-800">{event.eventName}</h3>
-                    <div className="flex items-center gap-3">
-                        <span className="text-charcoal-500 text-xs">{formatDate(event.date)}</span>
-                        {event.fileUrl && (
-                            <a
-                                href={event.fileUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-sm text-forest-600 hover:text-forest-800 flex items-center gap-1"
-                                title="Download Result File"
-                            >
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                </svg>
-                                Download
-                            </a>
-                        )}
-                    </div>
-                </div>
+        const isExpanded = expandedEvents.has(event.id);
+        const toggleExpanded = () => {
+            setExpandedEvents(prev => {
+                const next = new Set(prev);
+                if (next.has(event.id)) next.delete(event.id);
+                else next.add(event.id);
+                return next;
+            });
+        };
 
-                {/* Show Download Button if no parsed results (e.g. PDF) */}
-                {filteredResults.length === 0 && event.fileUrl ? (
-                    <div className="bg-white/60 rounded-lg p-6 border border-charcoal-100 text-center">
-                        <p className="text-charcoal-600 mb-4">Detailed breakdown not available for this format.</p>
+        return (
+            <div key={event.id} className="mb-1 last:mb-0 border border-charcoal-100 rounded-lg overflow-hidden shadow-sm">
+                <div
+                    onClick={toggleExpanded}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 bg-white/60 hover:bg-white/80 transition-colors cursor-pointer"
+                >
+                    <svg className="w-4 h-4 text-forest-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="flex-1 text-sm font-semibold text-forest-800 truncate">{event.eventName}</span>
+                    <span className="text-xs text-charcoal-400 mr-1 shrink-0">{formatDate(event.date)}</span>
+                    <svg
+                        className={`w-4 h-4 text-charcoal-400 transition-transform duration-200 shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+                {isExpanded && event.fileUrl && (
+                    <div className="px-4 py-2 border-t border-charcoal-100/50 bg-white/40 flex justify-end">
                         <a
                             href={event.fileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn-primary inline-flex items-center gap-2"
+                            className="text-xs text-forest-600 hover:text-forest-800 flex items-center gap-1 bg-white px-2.5 py-1.5 rounded border border-forest-200 shadow-sm"
+                            title="Download Result File"
                         >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
-                            Download Results File
+                            Download
                         </a>
                     </div>
-                ) : filteredResults.length === 0 ? (
-                    <p className="text-charcoal-500 italic text-sm">No results found.</p>
-                ) : (
-                    <>
-                        {/* ── Mobile: compact grouped list ── */}
-                        <div className="md:hidden">
-                            {sortedGroups.map(([bowTypeKey, results]) => {
-                                const { category, bowType } = parseBowType(bowTypeKey);
-                                return (
-                                    <div key={bowTypeKey} className="mb-3 last:mb-0">
-                                        {/* Category header */}
-                                        <div className={`flex items-center gap-2 px-2 py-1 rounded text-xs font-semibold mb-1 ${getBowTypeStyle(bowType)}`}>
-                                            {category && <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${getCategoryStyle(category)}`}>{category}</span>}
-                                            {bowType}
-                                        </div>
-                                        {/* Result rows */}
-                                        {results.map((result, i) => (
-                                            <div key={i} className="flex items-center gap-2 px-2 py-1 border-b border-charcoal-50 last:border-0">
-                                                <div className="shrink-0 w-6 flex justify-center">{getPositionDisplay(result.position)}</div>
-                                                <span className="flex-1 text-sm text-forest-900 font-medium truncate">{result.archer_name}</span>
-                                                <span className="text-xs text-charcoal-400 shrink-0">H:{result.hits} G:{result.golds}</span>
-                                                <span className="text-gold-600 font-bold text-sm shrink-0 w-12 text-right">{result.score}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                );
-                            })}
-                        </div>
+                )}
 
-                        {/* ── Desktop: grouped table ── */}
-                        <div className="hidden md:block overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="text-left border-b border-charcoal-100">
-                                        <th className="pb-2 text-charcoal-600 font-medium w-10">Pos</th>
-                                        <th className="pb-2 text-charcoal-600 font-medium">Archer</th>
-                                        <th className="pb-2 text-charcoal-600 font-medium">Club</th>
-                                        <th className="pb-2 text-charcoal-600 font-medium">Round</th>
-                                        <th className="pb-2 text-charcoal-600 font-medium text-right">Hits</th>
-                                        <th className="pb-2 text-charcoal-600 font-medium text-right">Golds</th>
-                                        <th className="pb-2 text-charcoal-600 font-medium text-right">Score</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                {isExpanded && (
+                    <div className="px-3 py-2 bg-white/30 border-t border-charcoal-100/50">
+
+                        {/* Show Download Button if no parsed results (e.g. PDF) */}
+                        {filteredResults.length === 0 && event.fileUrl ? (
+                            <div className="bg-white/60 rounded-lg p-6 border border-charcoal-100 text-center">
+                                <p className="text-charcoal-600 mb-4">Detailed breakdown not available for this format.</p>
+                                <a
+                                    href={event.fileUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-primary inline-flex items-center gap-2"
+                                >
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    Download Results File
+                                </a>
+                            </div>
+                        ) : filteredResults.length === 0 ? (
+                            <p className="text-charcoal-500 italic text-sm">No results found.</p>
+                        ) : (
+                            <>
+                                {/* ── Mobile: compact grouped list ── */}
+                                <div className="md:hidden">
                                     {sortedGroups.map(([bowTypeKey, results]) => {
                                         const { category, bowType } = parseBowType(bowTypeKey);
                                         return (
-                                            <React.Fragment key={bowTypeKey}>
-                                                {/* Group header row */}
-                                                <tr key={`header-${bowTypeKey}`} className="bg-charcoal-50/60">
-                                                    <td colSpan={7} className="py-1.5 px-2">
-                                                        <div className="flex items-center gap-2">
-                                                            {category && <span className={`px-2 py-0.5 rounded text-xs font-semibold ${getCategoryStyle(category)}`}>{category}</span>}
-                                                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${getBowTypeStyle(bowType)}`}>{bowType}</span>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                            <div key={bowTypeKey} className="mb-3 last:mb-0">
+                                                {/* Category header */}
+                                                <div className={`flex items-center gap-2 px-2 py-1 rounded text-xs font-semibold mb-1 ${getBowTypeStyle(bowType)}`}>
+                                                    {category && <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${getCategoryStyle(category)}`}>{category}</span>}
+                                                    {bowType}
+                                                </div>
+                                                {/* Result rows */}
                                                 {results.map((result, i) => (
-                                                    <tr key={`${bowTypeKey}-${i}`} className="border-b border-charcoal-50 hover:bg-white/50 transition-colors">
-                                                        <td className="py-1.5 pl-2">{getPositionDisplay(result.position)}</td>
-                                                        <td className="py-1.5 text-forest-900 font-medium">{result.archer_name}</td>
-                                                        <td className="py-1.5 text-charcoal-600">{result.club}</td>
-                                                        <td className="py-1.5 text-charcoal-600">{result.round}</td>
-                                                        <td className="py-1.5 text-right text-charcoal-600">{result.hits}</td>
-                                                        <td className="py-1.5 text-right text-charcoal-600">{result.golds}</td>
-                                                        <td className="py-1.5 text-right text-gold-600 font-semibold">{result.score}</td>
-                                                    </tr>
+                                                    <div key={i} className="flex items-center gap-2 px-2 py-1 border-b border-charcoal-50 last:border-0">
+                                                        <div className="shrink-0 w-6 flex justify-center">{getPositionDisplay(result.position)}</div>
+                                                        <span className="flex-1 text-sm text-forest-900 font-medium truncate">{result.archer_name}</span>
+                                                        <span className="text-xs text-charcoal-400 shrink-0">H:{result.hits} G:{result.golds}</span>
+                                                        <span className="text-gold-600 font-bold text-sm shrink-0 w-12 text-right">{result.score}</span>
+                                                    </div>
                                                 ))}
-                                            </React.Fragment>
+                                            </div>
                                         );
                                     })}
-                                </tbody>
-                            </table>
-                        </div>
-                    </>
+                                </div>
+
+                                {/* ── Desktop: grouped table ── */}
+                                <div className="hidden md:block overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="text-left border-b border-charcoal-100">
+                                                <th className="pb-2 text-charcoal-600 font-medium w-10">Pos</th>
+                                                <th className="pb-2 text-charcoal-600 font-medium">Archer</th>
+                                                <th className="pb-2 text-charcoal-600 font-medium">Club</th>
+                                                <th className="pb-2 text-charcoal-600 font-medium">Round</th>
+                                                <th className="pb-2 text-charcoal-600 font-medium text-right">Hits</th>
+                                                <th className="pb-2 text-charcoal-600 font-medium text-right">Golds</th>
+                                                <th className="pb-2 text-charcoal-600 font-medium text-right">Score</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {sortedGroups.map(([bowTypeKey, results]) => {
+                                                const { category, bowType } = parseBowType(bowTypeKey);
+                                                return (
+                                                    <React.Fragment key={bowTypeKey}>
+                                                        {/* Group header row */}
+                                                        <tr key={`header-${bowTypeKey}`} className="bg-charcoal-50/60">
+                                                            <td colSpan={7} className="py-1.5 px-2">
+                                                                <div className="flex items-center gap-2">
+                                                                    {category && <span className={`px-2 py-0.5 rounded text-xs font-semibold ${getCategoryStyle(category)}`}>{category}</span>}
+                                                                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${getBowTypeStyle(bowType)}`}>{bowType}</span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        {results.map((result, i) => (
+                                                            <tr key={`${bowTypeKey}-${i}`} className="border-b border-charcoal-50 hover:bg-white/50 transition-colors">
+                                                                <td className="py-1.5 pl-2">{getPositionDisplay(result.position)}</td>
+                                                                <td className="py-1.5 text-forest-900 font-medium">{result.archer_name}</td>
+                                                                <td className="py-1.5 text-charcoal-600">{result.club}</td>
+                                                                <td className="py-1.5 text-charcoal-600">{result.round}</td>
+                                                                <td className="py-1.5 text-right text-charcoal-600">{result.hits}</td>
+                                                                <td className="py-1.5 text-right text-charcoal-600">{result.golds}</td>
+                                                                <td className="py-1.5 text-right text-gold-600 font-semibold">{result.score}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </React.Fragment>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 )}
             </div>
         );
@@ -687,7 +724,7 @@ const Results = () => {
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                {pbs.sort((a, b) => new Date(b.date) - new Date(a.date)).map((pb, i) => (
+                                                                {pbs.sort((a, b) => a.round.localeCompare(b.round)).map((pb, i) => (
                                                                     <tr key={i} className="border-b border-charcoal-50 hover:bg-white/50 transition-colors">
                                                                         <td className="py-2 text-forest-900 font-medium whitespace-nowrap pr-4">
                                                                             <div className="flex items-center gap-2">

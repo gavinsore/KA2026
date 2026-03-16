@@ -9,6 +9,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [adminLoading, setAdminLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
 
@@ -45,6 +46,7 @@ export const AuthProvider = ({ children }) => {
     const checkAdminRole = async (userId) => {
         if (!userId) {
             setIsAdmin(false);
+            setAdminLoading(false);
             return;
         }
 
@@ -63,6 +65,8 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Error checking admin role:', error);
             setIsAdmin(false);
+        } finally {
+            setAdminLoading(false);
         }
     };
 
@@ -72,7 +76,8 @@ export const AuthProvider = ({ children }) => {
         signOut: () => supabase.auth.signOut(),
         user,
         isAdmin,
-        loading
+        loading,
+        adminLoading
     };
 
     return (
