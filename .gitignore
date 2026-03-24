@@ -29,3 +29,4 @@ Thumbs.db
 
 # gh-pages cache (prevents ENAMETOOLONG errors on Windows)
 node_modules/.cache/gh-pages/
+supabase/migrations/20260317000001_schedule_county_records_cron.sql

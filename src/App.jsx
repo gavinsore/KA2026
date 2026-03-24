@@ -22,6 +22,8 @@ import LinksManager from './pages/admin/LinksManager';
 import RoundsManager from './pages/admin/RoundsManager';
 import GalleryManager from './pages/admin/GalleryManager';
 import UpdatePassword from './pages/admin/UpdatePassword';
+import CountyRecordsManager from './pages/admin/CountyRecordsManager';
+import BeginnersCourseManager from './pages/admin/BeginnersCourseManager';
 import ForgotPassword from './pages/ForgotPassword';
 
 function App() {
@@ -116,6 +118,22 @@ function App() {
                                     element={
                                         <ProtectedRoute requireAdmin={true}>
                                             <GalleryManager />
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/admin/county-records"
+                                    element={
+                                        <ProtectedRoute requireAdmin={true}>
+                                            <CountyRecordsManager />
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/admin/beginners-course"
+                                    element={
+                                        <ProtectedRoute requireAdmin={true}>
+                                            <BeginnersCourseManager />
                                         </ProtectedRoute>
                                     }
                                 />

@@ -2,11 +2,10 @@
 -- Requires the pg_cron and pg_net extensions to be enabled on your Supabase project.
 -- Enable them via: Supabase Dashboard > Database > Extensions > pg_cron and pg_net
 
--- NOTE: The Edge Function URL and service role key are stored as database settings.
--- Set these in the Supabase Dashboard > Database > Extensions > pg_cron or via:
---   alter database postgres set app.edge_fn_url = 'https://<your-project-ref>.supabase.co/functions/v1';
---   alter database postgres set app.service_role_key = '<your-service-role-key>';
--- Or hard-code the values below if preferred.
+-- !! FILL IN YOUR VALUES BEFORE RUNNING !!
+-- Replace <YOUR-PROJECT-REF> with your Supabase project ref (e.g. abcdefghijklmnop)
+-- Replace <YOUR-SERVICE-ROLE-KEY> with the service_role secret from Project Settings > API
+-- NOTE: Supabase does not allow ALTER DATABASE SET for custom params, so values are inlined here.
 
 -- Remove any existing schedule with this name (idempotent)
 select cron.unschedule('weekly-county-records-refresh')
@@ -21,10 +20,10 @@ select cron.schedule(
     $$
     select
         net.http_post(
-            url := current_setting('app.edge_fn_url', true) || '/scrape-county-records',
+            url := 'https://https://cyylmnxlzfbexyeufkhg.supabase.co/functions/v1/scrape-county-records',
             headers := jsonb_build_object(
                 'Content-Type',  'application/json',
-                'Authorization', 'Bearer ' || current_setting('app.service_role_key', true)
+                'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5eWxtbnhsemZiZXh5ZXVma2hnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDc0NTgyNCwiZXhwIjoyMDg2MzIxODI0fQ.q2oiHuYxTHOcCrkdKm2yaaCg_HvfBfx_zzFG8lMBeDQ'
             ),
             body := '{}'::jsonb
         );

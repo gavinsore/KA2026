@@ -24,6 +24,12 @@ const Results = () => {
     const [expandedRounds, setExpandedRounds] = useState(new Set());
     const [expandedEvents, setExpandedEvents] = useState(new Set());
 
+    // County records collapse state (expanded keys; empty = all collapsed)
+    const [crExpandedBowTypes, setCrExpandedBowTypes] = useState(new Set());
+    const [crExpandedCategories, setCrExpandedCategories] = useState(new Set());
+    const toggleCrBowType = (key) => setCrExpandedBowTypes(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n; });
+    const toggleCrCategory = (key) => setCrExpandedCategories(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n; });
+
     // Archive State
     const [archives, setArchives] = useState([]);
     const [selectedArchive, setSelectedArchive] = useState(null);
@@ -145,10 +151,11 @@ const Results = () => {
                 const crRecords = countyResult?.records || [];
                 setCountyRecords(crRecords);
                 setCountyRecordsLastUpdated(countyResult?.lastUpdated || null);
-                // Build fast lookup set: round|bow_type|archer_name (lowercase)
+                // Build fast lookup set: display_round|bow_type|archer_name (lowercase)
+                // Uses display_round so PB matching respects any admin round overrides.
                 const crSet = new Set(
                     crRecords.map(r =>
-                        `${r.round || ''}|${r.bow_type || ''}|${r.archer_name || ''}`.toLowerCase()
+                        `${r.display_round || r.round || ''}|${r.bow_type || ''}|${r.archer_name || ''}`.toLowerCase()
                     )
                 );
                 setCountyRecordSet(crSet);
@@ -205,6 +212,20 @@ const Results = () => {
         return el.value;
     };
 
+    // ── GDPR: name display helpers ──────────────────────────────────────────
+    // Archers from other clubs are displayed as First-initial. Surname
+    // e.g. "John Smith" → "J. Smith". KA archers retain their full name.
+    const KA_CLUB_NAMES = ['kettering', 'kettering archers', 'kettering a'];
+    const isKAArcher = (club) => KA_CLUB_NAMES.some(k => (club || '').toLowerCase().includes(k));
+    const formatArcherName = (name, club) => {
+        if (!name) return '';
+        if (isKAArcher(club)) return name;
+        const parts = name.trim().split(/\s+/);
+        if (parts.length === 1) return name;
+        return `${parts[0][0]}. ${parts.slice(1).join(' ')}`;
+    };
+    // ───────────────────────────────────────────────────────────────────────
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -223,12 +244,12 @@ const Results = () => {
         const pbRound = (pb.round || '').toLowerCase();
         const pbBow = (pb.bow_type || '').toLowerCase();
         const pbName = (pb.archer_name || '').toLowerCase();
-        // Direct key match first (fastest)
+        // Direct key match first (fastest) — uses display_round so overrides are respected
         const directKey = `${pbRound}|${pbBow}|${pbName}`;
         if (countyRecordSet.has(directKey)) return true;
         // Fallback: iterate county records for this round+bow and check name substring
         return countyRecords.some(cr =>
-            (cr.round || '').toLowerCase() === pbRound &&
+            (cr.display_round || cr.round || '').toLowerCase() === pbRound &&
             (cr.bow_type || '').toLowerCase() === pbBow &&
             (cr.archer_name || '').toLowerCase().includes(pbName)
         );
@@ -869,29 +890,43 @@ const Results = () => {
                                             {Object.entries(byBowType).map(([bowTypeName, categories]) => (
                                                 <div key={bowTypeName}>
                                                     {/* Bow Type Header */}
-                                                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg mb-2 ${getBowTypeStyle(bowTypeName)}`}>
-                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <button
+                                                        onClick={() => toggleCrBowType(bowTypeName)}
+                                                        className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg mb-2 ${getBowTypeStyle(bowTypeName)} hover:opacity-80 transition-opacity text-left`}
+                                                    >
+                                                        <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                                                         </svg>
-                                                        <span className="font-semibold text-sm">{bowTypeName}</span>
-                                                    </div>
+                                                        <span className="font-semibold text-sm flex-1">{bowTypeName}</span>
+                                                        <svg className={`w-4 h-4 shrink-0 transition-transform duration-200 ${crExpandedBowTypes.has(bowTypeName) ? '' : '-rotate-90'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </button>
 
-                                                    {Object.entries(categories).map(([catName, records]) => (
+                                                    {crExpandedBowTypes.has(bowTypeName) && Object.entries(categories).map(([catName, records]) => {
+                                                        const crCatKey = `${bowTypeName}__${catName}`;
+                                                        return (
                                                         <div key={catName} className="border border-charcoal-100 rounded-lg overflow-hidden mb-1 last:mb-0">
                                                             {/* Category header */}
-                                                            <div className={`flex items-center gap-2 px-4 py-2 ${getCategoryStyle(catName)} bg-opacity-60`}>
-                                                                <span className="text-xs font-semibold">{bowTypeName} — {catName}</span>
-                                                                <span className="ml-auto text-xs opacity-70">{records.length} round{records.length !== 1 ? 's' : ''}</span>
-                                                            </div>
+                                                            <button
+                                                                onClick={() => toggleCrCategory(crCatKey)}
+                                                                className={`w-full flex items-center gap-2 px-4 py-2 ${getCategoryStyle(catName)} bg-opacity-60 hover:opacity-80 transition-opacity text-left`}
+                                                            >
+                                                                <span className="text-xs font-semibold flex-1">{bowTypeName} — {catName}</span>
+                                                                <span className="text-xs opacity-70 mr-1">{records.length} round{records.length !== 1 ? 's' : ''}</span>
+                                                                <svg className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${crExpandedCategories.has(crCatKey) ? '' : '-rotate-90'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                                </svg>
+                                                            </button>
 
                                                             {/* Records table */}
-                                                            <div className="px-3 py-2 bg-white/30 overflow-x-auto">
+                                                            {crExpandedCategories.has(crCatKey) && <div className="px-3 py-2 bg-white/30 overflow-x-auto">
                                                                 <table className="w-full text-sm min-w-[520px]">
                                                                     <thead>
                                                                         <tr className="text-left border-b border-charcoal-100">
                                                                             <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Round</th>
                                                                             <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Score</th>
-                                                                            <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Archer</th>
+                                                                            <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4"><span className="flex items-center gap-1">Archer <span title="Names of archers from other clubs are shown as initials only for privacy." className="text-charcoal-400 cursor-help">ⓘ</span></span></th>
                                                                             <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap pr-4">Club</th>
                                                                             <th className="pb-1.5 text-charcoal-600 font-medium whitespace-nowrap">Date</th>
                                                                         </tr>
@@ -899,7 +934,7 @@ const Results = () => {
                                                                     <tbody>
                                                                         {records.map((r, i) => (
                                                                             <tr key={i} className="border-b border-charcoal-50 hover:bg-white/50 transition-colors">
-                                                                                <td className="py-1.5 text-forest-900 font-medium whitespace-nowrap pr-4">{decodeEntities(r.round)}</td>
+                                                                                <td className="py-1.5 text-forest-900 font-medium whitespace-nowrap pr-4">{decodeEntities(r.display_round)}</td>
                                                                                 <td className="py-1.5 pr-4">
                                                                                     <div className="flex items-center gap-1.5">
                                                                                         <span className="text-gold-600 font-bold">{r.score}</span>
@@ -908,16 +943,17 @@ const Results = () => {
                                                                                         )}
                                                                                     </div>
                                                                                 </td>
-                                                                                <td className="py-1.5 text-forest-900 whitespace-nowrap pr-4">{r.archer_name}</td>
+                                                                                <td className="py-1.5 text-forest-900 whitespace-nowrap pr-4">{formatArcherName(r.archer_name, r.club)}</td>
                                                                                 <td className="py-1.5 text-charcoal-500 whitespace-nowrap pr-4">{r.club}</td>
                                                                                 <td className="py-1.5 text-charcoal-500 whitespace-nowrap">{r.date_text}</td>
                                                                             </tr>
                                                                         ))}
                                                                     </tbody>
                                                                 </table>
-                                                            </div>
+                                                            </div>}
                                                         </div>
-                                                    ))}
+                                                        );
+                                                    })}
                                                 </div>
                                             ))}
 

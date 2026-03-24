@@ -24,6 +24,17 @@ const Dashboard = () => {
             color: 'bg-forest-50 border-forest-200'
         },
         {
+            title: 'Beginners Course',
+            description: 'Update the adult and junior fees shown on the beginners enrollment page.',
+            icon: (
+                <svg className="w-8 h-8 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            ),
+            link: '/admin/beginners-course',
+            color: 'bg-teal-50 border-teal-200'
+        },
+        {
             title: 'Competitions',
             description: 'Create and edit open competitions and download entry lists.',
             icon: (
@@ -77,6 +88,17 @@ const Dashboard = () => {
             description: 'Upload and manage photo gallery.',
             link: '/admin/gallery',
             color: 'bg-purple-100 text-purple-800'
+        },
+        {
+            title: 'County Records',
+            description: 'Review and correct scraped NCAS county records. Fix round name mismatches and trigger manual data refreshes.',
+            icon: (
+                <svg className="w-8 h-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                </svg>
+            ),
+            link: '/admin/county-records',
+            color: 'bg-purple-50 border-purple-200'
         },
         {
             title: 'Archery Rounds',

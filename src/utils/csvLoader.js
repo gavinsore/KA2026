@@ -618,7 +618,13 @@ export async function loadCountyRecords() {
             return r.updated_at > latest ? r.updated_at : latest;
         }, null) || null;
 
-        return { records: data || [], lastUpdated: latestUpdate };
+        return {
+            records: (data || []).map(r => ({
+                ...r,
+                display_round: r.round_override || r.round,
+            })),
+            lastUpdated: latestUpdate,
+        };
     } catch (error) {
         console.error('Error in loadCountyRecords:', error);
         return { records: [], lastUpdated: null };

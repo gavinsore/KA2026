@@ -10,7 +10,8 @@ const AdminBreadcrumbs = () => {
         '/admin/results': 'Results Upload',
         '/admin/announcements': 'Announcements',
         '/admin/links': 'Useful Links',
-        '/admin/rounds': 'Archery Rounds'
+        '/admin/rounds': 'Archery Rounds',
+        '/admin/beginners-course': 'Beginners Course'
     };
 
     // Also handle dynamic sub-paths if necessary, but for now exact match or fallback

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import SEO from '../components/SEO';
+import { supabase } from '../lib/supabase';
 
 // ============================================================
 // EMAILJS CONFIGURATION
@@ -40,6 +41,25 @@ const BeginnerEnrollment = () => {
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
+    const [prices, setPrices] = useState({ adult: null, junior: null });
+
+    useEffect(() => {
+        const fetchPrices = async () => {
+            const { data } = await supabase
+                .from('site_settings')
+                .select('key, value')
+                .in('key', ['beginners_price_adult', 'beginners_price_junior']);
+            if (data) {
+                const adult = data.find(r => r.key === 'beginners_price_adult');
+                const junior = data.find(r => r.key === 'beginners_price_junior');
+                setPrices({
+                    adult: adult ? Number(adult.value) : 40,
+                    junior: junior ? Number(junior.value) : 30,
+                });
+            }
+        };
+        fetchPrices();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -202,13 +222,22 @@ const BeginnerEnrollment = () => {
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-charcoal-600">Ages 10+ welcome</span>
+                            <span className="text-charcoal-600">Ages 8+ welcome </span>
                         </div>
                         <div className="flex items-start gap-3">
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-charcoal-600">Course fee: £40 for adults, £30 for juniors</span>
+                            <span className="text-charcoal-600">
+                                    {prices.adult !== null && prices.junior !== null
+                                        ? `Course fee: £${prices.adult} for adults, £${prices.junior} for juniors`
+                                        : 'Course fee: loading…'}
+                                </span>
+                        </div>                        <div className="flex items-start gap-3">
+                            <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="text-charcoal-600">Under 16's must be accompanied by an adult</span>
                         </div>
                     </div>
 
@@ -330,10 +359,9 @@ const BeginnerEnrollment = () => {
                                 className={`input-field ${errors.ageGroup ? 'border-red-500' : ''}`}
                             >
                                 <option value="">Select age group</option>
-                                <option value="10-15">10-15 years</option>
-                                <option value="16-17">16-17 years</option>
-                                <option value="18-30">18-30 years</option>
-                                <option value="31-50">31-50 years</option>
+                                <option value="10-15">8-12 years</option>
+                                <option value="16-17">13-17 years</option>
+                                <option value="18-30">18-50 years</option>
                                 <option value="51-65">51-65 years</option>
                                 <option value="65+">65+ years</option>
                             </select>
@@ -361,47 +389,6 @@ const BeginnerEnrollment = () => {
                                 <p className="text-red-400 text-sm mt-1">{errors.experience}</p>
                             )}
                         </div>
-                    </div>
-
-                    {/* Preferred Sessions */}
-                    <div className="mb-8">
-                        <label className="block text-sm font-medium text-charcoal-600 mb-3">
-                            Preferred Session Times * (select all that apply)
-                        </label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {['Friday Evening', 'Saturday Morning', 'Saturday Afternoon'].map((session) => (
-                                <label
-                                    key={session}
-                                    className={`flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-all ${formData.preferredSessions.includes(session)
-                                        ? 'bg-forest-600/30 border border-forest-500'
-                                        : 'bg-white/50 border border-charcoal-200 hover:border-charcoal-600'
-                                        }`}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        name="preferredSessions"
-                                        value={session}
-                                        checked={formData.preferredSessions.includes(session)}
-                                        onChange={handleChange}
-                                        className="sr-only"
-                                    />
-                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${formData.preferredSessions.includes(session)
-                                        ? 'bg-forest-600 border-forest-600'
-                                        : 'border-charcoal-500'
-                                        }`}>
-                                        {formData.preferredSessions.includes(session) && (
-                                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        )}
-                                    </div>
-                                    <span className="text-sm text-charcoal-700">{session}</span>
-                                </label>
-                            ))}
-                        </div>
-                        {errors.preferredSessions && (
-                            <p className="text-red-400 text-sm mt-2">{errors.preferredSessions}</p>
-                        )}
                     </div>
 
                     {/* How Heard */}
