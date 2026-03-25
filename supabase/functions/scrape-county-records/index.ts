@@ -81,7 +81,14 @@ function parseCategoryPage(html, bow_type, category, source_url) {
     // Process data rows (skip header row)
     for (let i = 1; i < rowMatches.length; i++) {
       const rowHtml = rowMatches[i][0];
-      const cells = [...rowHtml.matchAll(/<t[dh][\s\S]*?<\/t[dh]>/gi)].map(m => m[0]);
+
+      // Split on opening <td or <th tags — handles malformed HTML where NCAS pages
+      // omit the closing </span></td> on the archer cell (so a closing-tag regex drops the row).
+      // Each element after splitting is the raw content that came after that opening tag.
+      const cellParts = rowHtml.split(/<t[dh](?:\s[^>]*)?\s*>/i).slice(1);
+      // Strip any trailing </td>, </th>, </tr> etc. from each part
+      const cells = cellParts.map((p: string) => p.replace(/<\/t[dhr][^>]*>/gi, '').trim());
+
       if (cells.length < 3) continue;
 
       const roundName = stripHtml(cells[0]).trim();

@@ -32,7 +32,7 @@ const BeginnerEnrollment = () => {
         phone: '',
         ageGroup: '',
         experience: '',
-        preferredSessions: [],
+        //preferredSessions: [],
         howHeard: '',
         message: ''
     });
@@ -93,9 +93,9 @@ const BeginnerEnrollment = () => {
         if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
         if (!formData.ageGroup) newErrors.ageGroup = 'Please select an age group';
         if (!formData.experience) newErrors.experience = 'Please select your experience level';
-        if (formData.preferredSessions.length === 0) {
+        /*if (formData.preferredSessions.length === 0) {
             newErrors.preferredSessions = 'Please select at least one preferred session';
-        }
+        }*/
         return newErrors;
     };
 
@@ -114,7 +114,7 @@ const BeginnerEnrollment = () => {
                 phone: formData.phone,
                 age_group: formData.ageGroup,
                 experience: formData.experience,
-                preferred_sessions: formData.preferredSessions.join(', '),
+                /*preferred_sessions: formData.preferredSessions.join(', '),*/
                 how_heard: formData.howHeard || 'Not specified',
                 message: formData.message || 'No additional message'
             };
@@ -229,10 +229,10 @@ const BeginnerEnrollment = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                             <span className="text-charcoal-600">
-                                    {prices.adult !== null && prices.junior !== null
-                                        ? `Course fee: £${prices.adult} for adults, £${prices.junior} for juniors`
-                                        : 'Course fee: loading…'}
-                                </span>
+                                {prices.adult !== null && prices.junior !== null
+                                    ? `Course fee: £${prices.adult} for adults, £${prices.junior} for juniors`
+                                    : 'Course fee: loading…'}
+                            </span>
                         </div>                        <div className="flex items-start gap-3">
                             <svg className="w-5 h-5 text-forest-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
