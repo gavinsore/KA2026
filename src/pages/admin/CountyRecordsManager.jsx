@@ -116,21 +116,45 @@ const CountyRecordsManager = () => {
 
     const triggerRescrape = async () => {
         setScrapeStatus('running');
-        setScrapeMessage('');
+        setScrapeMessage('Scrape triggered — this takes about 60 seconds. Records will reload automatically…');
+
         try {
-            const { data, error } = await supabase.functions.invoke('scrape-county-records');
-            if (error) throw error;
-            const result = data || {};
-            setScrapeStatus('done');
-            setScrapeMessage(
-                `Rescrape complete: ${result.upserted ?? '?'} records updated.` +
-                (result.errors?.length ? ` ${result.errors.length} error(s): ${result.errors.slice(0, 2).join('; ')}` : '')
-            );
-            // Reload table to reflect any fresh data
-            await fetchRecords();
+            // Get the current session token so the Edge Function accepts the request
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+
+            const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/scrape-county-records`;
+
+            // Fire-and-forget: we don't await the response body because the function
+            // takes ~60s which exceeds browser timeout. The function runs server-side;
+            // we poll the DB after a delay to pick up the fresh data.
+            fetch(fnUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                },
+                body: '{}',
+            }).catch(() => { /* intentionally ignore — function may already be done */ });
+
+            // Countdown and auto-reload after 75s
+            let elapsed = 0;
+            const interval = setInterval(async () => {
+                elapsed += 5;
+                if (elapsed < 75) {
+                    setScrapeMessage(`Scraping in progress… (~${75 - elapsed}s remaining). Records will reload automatically.`);
+                } else {
+                    clearInterval(interval);
+                    setScrapeMessage('Scrape complete (or still running). Reloading records…');
+                    await fetchRecords();
+                    setScrapeStatus('done');
+                    setScrapeMessage('Records reloaded. If new data is missing, wait a moment and click Trigger Rescrape again.');
+                }
+            }, 5000);
+
         } catch (err) {
             setScrapeStatus('error');
-            setScrapeMessage('Rescrape failed: ' + (err.message || String(err)));
+            setScrapeMessage('Failed to trigger rescrape: ' + (err.message || String(err)));
         }
     };
 

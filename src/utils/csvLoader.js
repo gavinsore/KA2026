@@ -600,26 +600,47 @@ function parseUKDate(dateStr) {
  */
 export async function loadCountyRecords() {
     try {
-        const { data, error } = await supabase
-            .from('county_records')
-            .select('*')
-            .order('bow_type', { ascending: true })
-            .order('category', { ascending: true })
-            .order('round', { ascending: true });
+        // Supabase projects have a server-side max_rows cap (often 1000) that
+        // overrides client-side .limit(). Paginate to guarantee all rows are fetched.
+        const PAGE_SIZE = 1000;
+        let allData = [];
+        let page = 0;
+        let keepGoing = true;
 
-        if (error) {
-            console.error('Error loading county records:', error);
-            return { records: [], lastUpdated: null };
+        while (keepGoing) {
+            const from = page * PAGE_SIZE;
+            const to = from + PAGE_SIZE - 1;
+            const { data, error } = await supabase
+                .from('county_records')
+                .select('*')
+                .order('bow_type', { ascending: true })
+                .order('category', { ascending: true })
+                .order('round', { ascending: true })
+                .range(from, to);
+
+            if (error) {
+                console.error('Error loading county records:', error);
+                return { records: [], lastUpdated: null };
+            }
+
+            if (data && data.length > 0) {
+                allData = allData.concat(data);
+            }
+
+            // If we got fewer rows than PAGE_SIZE, we've reached the last page
+            keepGoing = data && data.length === PAGE_SIZE;
+            page++;
         }
 
+
         // Find the most recent updated_at for display purposes
-        const latestUpdate = data?.reduce((latest, r) => {
+        const latestUpdate = allData.reduce((latest, r) => {
             if (!latest) return r.updated_at;
             return r.updated_at > latest ? r.updated_at : latest;
         }, null) || null;
 
         return {
-            records: (data || []).map(r => ({
+            records: allData.map(r => ({
                 ...r,
                 display_round: r.round_override || r.round,
             })),
