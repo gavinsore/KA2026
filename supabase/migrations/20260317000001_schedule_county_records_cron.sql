@@ -23,7 +23,7 @@ select cron.schedule(
             url := 'https://https://cyylmnxlzfbexyeufkhg.supabase.co/functions/v1/scrape-county-records',
             headers := jsonb_build_object(
                 'Content-Type',  'application/json',
-                'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5eWxtbnhsemZiZXh5ZXVma2hnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDc0NTgyNCwiZXhwIjoyMDg2MzIxODI0fQ.q2oiHuYxTHOcCrkdKm2yaaCg_HvfBfx_zzFG8lMBeDQ'
+                'Authorization', 'Bearer <YOUR-SERVICE-ROLE-KEY>'  -- !! DO NOT COMMIT - paste key here only when running manually in Supabase SQL Editor !!
             ),
             body := '{}'::jsonb
         );
