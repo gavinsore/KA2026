@@ -1,6 +1,36 @@
 import { Link } from 'react-router-dom';
 
-const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
+const EventCard = ({ event, competitionId, clubRecordsUrl, roundDetails }) => {
+
+    // Derive total arrows and primary distance from a matched round
+    const getRoundSummary = (round) => {
+        if (!round) return null;
+
+        // Total arrow count
+        let totalArrows = round.arrows;
+        if (!totalArrows && round.distance_breakdown?.length) {
+            totalArrows = round.distance_breakdown.reduce((sum, d) => sum + (d.arrows || 0), 0);
+        }
+
+        // Primary distance label
+        let primaryDistance = null;
+        if (round.distance_breakdown?.length) {
+            // If all distances are the same, show once; otherwise show the first
+            const unique = [...new Set(round.distance_breakdown.map(d => d.distance))];
+            primaryDistance = unique.length === 1 ? unique[0] : unique.join(' / ');
+        } else if (round.distances) {
+            primaryDistance = round.distances;
+        }
+
+        return {
+            arrows: totalArrows,
+            distance: primaryDistance,
+            measurement: round.measurement,
+            maxScore: round.max_score,
+        };
+    };
+
+    const roundSummary = getRoundSummary(roundDetails);
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return {
@@ -60,6 +90,7 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
                             </span>
                         ))}
                     </p>
+
                     <div className="flex flex-wrap items-center gap-3 text-xs">
                         {event.time && (
                             <span className="flex items-center gap-1.5 text-charcoal-600">
@@ -79,9 +110,12 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
                             </span>
                         )}
                         {event.types?.map((type) => (
-                            <span key={type} className={`px-2 py-1 rounded-full font-medium ${getTypeColor(type)}`}>
-                                {type}
-                            </span>
+                            // Only show type badge here when there's no round detail strip
+                            !roundSummary && (
+                                <span key={type} className={`px-2 py-1 rounded-full font-medium ${getTypeColor(type)}`}>
+                                    {type}
+                                </span>
+                            )
                         ))}
                         {/* Discipline badge for Away Competitions */}
                         {isAwayCompetition && event.discipline && (
@@ -90,6 +124,42 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
                             </span>
                         )}
                     </div>
+
+                    {/* Round Detail Pills */}
+                    {roundSummary && (
+                        <div className="flex flex-wrap items-center gap-2 mt-3 p-2.5 rounded-lg bg-forest-50/70 border border-forest-200/60">
+                            {/* Type badge lives here when round details are shown */}
+                            {event.types?.map((type) => (
+                                <span key={type} className={`px-2 py-1 rounded-full font-medium text-xs ${getTypeColor(type)}`}>
+                                    {type}
+                                </span>
+                            ))}
+                            {roundSummary.arrows && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border border-forest-200 text-xs text-forest-800 font-medium">
+                                    🏹 {roundSummary.arrows} arrows
+                                </span>
+                            )}
+                            {roundSummary.distance && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border border-forest-200 text-xs text-forest-800 font-medium">
+                                    📏 {roundSummary.distance}
+                                </span>
+                            )}
+                            {roundSummary.measurement && (
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
+                                    roundSummary.measurement === 'imperial'
+                                        ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                        : 'bg-sky-50 text-sky-700 border-sky-200'
+                                }`}>
+                                    {roundSummary.measurement === 'imperial' ? 'Imperial' : 'Metric'}
+                                </span>
+                            )}
+                            {roundSummary.maxScore && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border border-forest-200 text-xs text-forest-800 font-medium">
+                                    🏆 Max {roundSummary.maxScore}
+                                </span>
+                            )}
+                        </div>
+                    )}
 
                     {/* Enter Competition Button — our own club comps only */}
                     {isCompetition && competitionId && (
@@ -123,18 +193,31 @@ const EventCard = ({ event, competitionId, clubRecordsUrl }) => {
                         </div>
                     )}
 
-                    {/* View Club Records Button — shown for regular non-competition events */}
-                    {!isCompetition && !isAwayCompetition && clubRecordsUrl && (
-                        <div className="mt-4">
-                            <Link
-                                to={clubRecordsUrl}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-forest-600 text-white font-medium text-sm hover:bg-forest-700 transition-colors"
-                            >
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                                </svg>
-                                View Club Records
-                            </Link>
+                    {/* View Club Records + Round Details Buttons — shown for regular non-competition events */}
+                    {!isCompetition && !isAwayCompetition && (clubRecordsUrl || roundSummary) && (
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            {clubRecordsUrl && (
+                                <Link
+                                    to={clubRecordsUrl}
+                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-forest-600 text-white font-medium text-sm hover:bg-forest-700 transition-colors"
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                    </svg>
+                                    View Club Records
+                                </Link>
+                            )}
+                            {roundSummary && (
+                                <Link
+                                    to="/rounds"
+                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-charcoal-100 text-charcoal-700 font-medium text-sm hover:bg-charcoal-200 transition-colors border border-charcoal-200"
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Round Details
+                                </Link>
+                            )}
                         </div>
                     )}
                 </div>

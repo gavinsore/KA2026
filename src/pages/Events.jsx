@@ -36,13 +36,36 @@ const Events = () => {
                 .gte('date', today)
                 .order('date', { ascending: true });
 
+            // 3. Fetch Archery Rounds for inline detail display
+            const roundsPromise = supabase
+                .from('archery_rounds')
+                .select('*');
+
             const [
                 { data: eventsData, error: eventsError },
-                { data: competitionsData, error: competitionsError }
-            ] = await Promise.all([eventsPromise, competitionsPromise]);
+                { data: competitionsData, error: competitionsError },
+                { data: roundsData, error: roundsError }
+            ] = await Promise.all([eventsPromise, competitionsPromise, roundsPromise]);
 
             if (eventsError) throw eventsError;
             if (competitionsError) throw competitionsError;
+            if (roundsError) throw roundsError;
+
+            // Build a lowercase name → round lookup map
+            const roundsByName = {};
+            (roundsData || []).forEach(r => {
+                roundsByName[r.name.toLowerCase()] = r;
+            });
+
+            // Try to match an event title to a round name
+            const findRoundForTitle = (title) => {
+                const lower = title.toLowerCase();
+                // Exact match first
+                if (roundsByName[lower]) return roundsByName[lower];
+                // Then check if any round name appears within the title
+                const match = Object.keys(roundsByName).find(name => lower.includes(name));
+                return match ? roundsByName[match] : null;
+            };
 
             // Set Open Competitions for the top section
             setCompetitions(competitionsData.filter(c => c.is_open));
@@ -57,6 +80,8 @@ const Events = () => {
                     }
                 }
 
+                const matchedRound = findRoundForTitle(item.title);
+
                 return {
                     id: item.id,
                     title: item.title,
@@ -67,6 +92,7 @@ const Events = () => {
                     types: [item.type],
                     external_url: item.external_url || null,
                     discipline: item.discipline || null,
+                    roundDetails: matchedRound || null,
                 };
             });
 
@@ -302,7 +328,7 @@ const Events = () => {
                                             className={`animate-fade-in-up stagger-${(index % 5) + 1}`}
                                             style={{ opacity: 0 }}
                                         >
-                                            <EventCard event={event} competitionId={event.competitionSlug} clubRecordsUrl={event.is_competition ? undefined : `/results?tab=records&round=${encodeURIComponent(event.title)}`} />
+                                            <EventCard event={event} competitionId={event.competitionSlug} roundDetails={event.roundDetails} clubRecordsUrl={event.is_competition ? undefined : `/results?tab=records&round=${encodeURIComponent(event.title)}`} />
                                         </div>
                                     ))}
                                 </div>
