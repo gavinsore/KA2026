@@ -419,7 +419,7 @@ const Home = () => {
                             </div>
                             <h3 className="text-xl font-semibold text-forest-900 mb-3">All Ages & Abilities</h3>
                             <p className="text-charcoal-600">
-                                We welcome everyone from age 7 upwards, complete beginners to seasoned competition archers. There's always someone on hand to help.
+                                We welcome everyone from age 8 upwards, complete beginners to seasoned competition archers. There's always someone on hand to help.
                             </p>
                         </div>
 

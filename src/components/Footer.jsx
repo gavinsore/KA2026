@@ -130,9 +130,14 @@ const Footer = () => {
 
                 {/* Bottom Bar */}
                 <div className="mt-10 pt-6 border-t border-forest-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-forest-300 text-sm">
-                        © {currentYear} Kettering Archers. All rights reserved.
-                    </p>
+                    <div className="flex items-center gap-4">
+                        <p className="text-forest-300 text-sm">
+                            © {currentYear} Kettering Archers. All rights reserved.
+                        </p>
+                        <Link to="/privacy" className="text-forest-400 hover:text-gold-400 transition-colors text-sm">
+                            Privacy Policy
+                        </Link>
+                    </div>
                     <p className="text-forest-300 text-sm">
                         Affiliated to <a href="https://archerygb.org" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">Archery GB</a>,{' '}
                         <a href="https://ncasarchery.org.uk" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">NCAS</a> &amp;{' '}

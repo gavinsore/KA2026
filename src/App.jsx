@@ -25,6 +25,7 @@ import UpdatePassword from './pages/admin/UpdatePassword';
 import CountyRecordsManager from './pages/admin/CountyRecordsManager';
 import BeginnersCourseManager from './pages/admin/BeginnersCourseManager';
 import ForgotPassword from './pages/ForgotPassword';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 function App() {
     return (
@@ -47,6 +48,7 @@ function App() {
                                 <Route path="/competitions/:competitionId" element={<CompetitionDetails />} />
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                                <Route path="/privacy" element={<PrivacyPolicy />} />
 
                                 {/* Admin Routes */}
                                 <Route
