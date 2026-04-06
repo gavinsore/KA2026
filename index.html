@@ -5,18 +5,24 @@
   <!-- Google Consent Mode v2 defaults - must be before Cookiebot and gtag -->
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('consent', 'default', {
-      'ad_storage':          'denied',
-      'ad_user_data':        'denied',
-      'ad_personalization':  'denied',
-      'analytics_storage':   'denied',
-      'wait_for_update':     500
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'analytics_storage': 'denied',
+      'functionality_storage': 'denied',
+      'personalization_storage': 'denied',
+      'security_storage': 'granted',
+      'wait_for_update': 500
     });
+    gtag("set", "ads_data_redaction", true);
+    gtag("set", "url_passthrough", false);
   </script>
 
   <!-- Cookiebot - updates consent state when user accepts/declines -->
-  <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="4b0e76e3-75d4-421e-ab37-0982bcd952d9" data-blockingmode="auto" data-consentmode="auto" type="text/javascript"></script>
+  <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="4b0e76e3-75d4-421e-ab37-0982bcd952d9"
+    data-blockingmode="auto" type="text/javascript"></script>
 
   <meta charset="UTF-8" />
   <link rel="icon" type="image/jpeg" href="/logo.jpg" />
@@ -65,7 +71,7 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJQ78M8P1P"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-QJQ78M8P1P');
