@@ -85,7 +85,7 @@ const CookieBanner = () => {
                                 <p className="text-white font-semibold text-sm mb-1">Cookie Preferences</p>
                                 <p className="text-forest-300 text-sm leading-relaxed">
                                     We use <strong className="text-forest-200">Google Analytics</strong> to understand how visitors use this site — no advertising or social media tracking.
-                                    Essential cookies (Supabase session) are always active.{' '}
+                                    {' '}
                                     <Link to="/privacy" className="text-gold-400 hover:text-gold-300 underline underline-offset-2 transition-colors">
                                         Privacy Policy
                                     </Link>
