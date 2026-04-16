@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { loadAllEventResults, loadClubRecords, loadPersonalBests, loadArchivesIndex, loadArchiveResults, getCurrentSeasons, loadCountyRecords } from '../utils/csvLoader';
 import SEO from '../components/SEO';
@@ -36,6 +36,12 @@ const Results = () => {
     const [archiveResults, setArchiveResults] = useState([]);
     const [loadingArchive, setLoadingArchive] = useState(false);
 
+    // Track whether lazy-loaded tabs have been fetched yet
+    const countyRecordsLoaded = useRef(false);
+    const archivesLoaded = useRef(false);
+    const [loadingCountyRecords, setLoadingCountyRecords] = useState(false);
+    const [loadingArchives, setLoadingArchives] = useState(false);
+
     // Available bow types for filtering
     const bowTypes = ['all', 'Recurve', 'Compound', 'Longbow', 'Barebow', 'Traditional', 'Horsebow'];
 
@@ -62,12 +68,12 @@ const Results = () => {
         const loadData = async () => {
             setLoading(true);
             try {
-                const [eventResults, records, pbs, archivesList, countyResult] = await Promise.all([
+                // Only fetch critical data upfront: events, club records, and PBs.
+                // County records and archives are lazy-loaded when those tabs are opened.
+                const [eventResults, records, pbs] = await Promise.all([
                     loadAllEventResults(),
                     loadClubRecords(),
                     loadPersonalBests(),
-                    loadArchivesIndex(),
-                    loadCountyRecords()
                 ]);
 
                 const currentSeasons = getCurrentSeasons();
@@ -110,11 +116,73 @@ const Results = () => {
                 if (currentIndoor.length > 0) initialExpanded.add(currentIndoor[0].id);
                 setExpandedEvents(initialExpanded);
 
-                // Build merged archives list
-                const dynamicArchivesList = Object.values(dynamicArchivesMap);
+                // Store dynamic archive entries so the Archive tab can use them later
+                // without a re-fetch. We cache them on the ref so the archive lazy-loader
+                // can merge them with any static archives from archives.json.
+                archivesLoaded._dynamicMap = dynamicArchivesMap;
+
+                // Build a set of club record identifiers for fast lookup
+                const recordSet = new Set(records.map(r =>
+                    `${r.archer_name || ''}|${r.round || ''}|${r.bow_type || ''}|${r.score || ''}`.toLowerCase()
+                ));
+                setClubRecordSet(recordSet);
+                setClubRecords(records);
+
+                setPersonalBests(pbs);
+
+            } catch (error) {
+                console.error('Error loading results:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadData();
+    }, []);
+
+    // Lazy-load County Records only when that tab is first activated
+    useEffect(() => {
+        if (activeTab !== 'countyrecords') return;
+        if (countyRecordsLoaded.current) return;
+        countyRecordsLoaded.current = true;
+
+        const fetchCountyRecords = async () => {
+            setLoadingCountyRecords(true);
+            try {
+                const countyResult = await loadCountyRecords();
+                const crRecords = countyResult?.records || [];
+                setCountyRecords(crRecords);
+                setCountyRecordsLastUpdated(countyResult?.lastUpdated || null);
+                const crSet = new Set(
+                    crRecords.map(r =>
+                        `${r.display_round || r.round || ''}|${r.bow_type || ''}|${r.archer_name || ''}`.toLowerCase()
+                    )
+                );
+                setCountyRecordSet(crSet);
+            } catch (error) {
+                console.error('Error loading county records:', error);
+            } finally {
+                setLoadingCountyRecords(false);
+            }
+        };
+
+        fetchCountyRecords();
+    }, [activeTab]);
+
+    // Lazy-load Archives Index only when that tab is first activated
+    useEffect(() => {
+        if (activeTab !== 'archive') return;
+        if (archivesLoaded.current) return;
+        archivesLoaded.current = true;
+
+        const fetchArchives = async () => {
+            setLoadingArchives(true);
+            try {
+                const archivesList = await loadArchivesIndex();
+                const dynamicArchivesMap = archivesLoaded._dynamicMap || {};
                 const combinedArchivesMap = {};
 
-                dynamicArchivesList.forEach(a => {
+                Object.values(dynamicArchivesMap).forEach(a => {
                     combinedArchivesMap[a.id] = a;
                 });
 
@@ -136,38 +204,15 @@ const Results = () => {
 
                 const finalArchives = Object.values(combinedArchivesMap).sort((a, b) => b.startYear - a.startYear);
                 setArchives(finalArchives);
-
-                // Build a set of club record identifiers for fast lookup
-                // Key: ArcherName|Round|BowType|Score
-                const recordSet = new Set(records.map(r =>
-                    `${r.archer_name || ''}|${r.round || ''}|${r.bow_type || ''}|${r.score || ''}`.toLowerCase()
-                ));
-                setClubRecordSet(recordSet);
-                setClubRecords(records);
-
-                setPersonalBests(pbs);
-
-                // County records
-                const crRecords = countyResult?.records || [];
-                setCountyRecords(crRecords);
-                setCountyRecordsLastUpdated(countyResult?.lastUpdated || null);
-                // Build fast lookup set: display_round|bow_type|archer_name (lowercase)
-                // Uses display_round so PB matching respects any admin round overrides.
-                const crSet = new Set(
-                    crRecords.map(r =>
-                        `${r.display_round || r.round || ''}|${r.bow_type || ''}|${r.archer_name || ''}`.toLowerCase()
-                    )
-                );
-                setCountyRecordSet(crSet);
             } catch (error) {
-                console.error('Error loading results:', error);
+                console.error('Error loading archives:', error);
             } finally {
-                setLoading(false);
+                setLoadingArchives(false);
             }
         };
 
-        loadData();
-    }, []);
+        fetchArchives();
+    }, [activeTab]);
 
     const handleArchiveSelect = async (archive) => {
         setLoadingArchive(true);
@@ -856,7 +901,12 @@ const Results = () => {
                                     )}
                                 </div>
 
-                                {countyRecords.length === 0 ? (
+                                {loadingCountyRecords ? (
+                                    <div className="text-center py-12">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-forest-600 mx-auto mb-4"></div>
+                                        <p className="text-charcoal-600">Loading county records...</p>
+                                    </div>
+                                ) : countyRecords.length === 0 ? (
                                     <div className="text-center py-12">
                                         <svg className="w-12 h-12 text-charcoal-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
@@ -982,7 +1032,12 @@ const Results = () => {
                                             </svg>
                                             Historical Archive
                                         </h2>
-                                        {archives.length === 0 ? (
+                                        {loadingArchives ? (
+                                            <div className="text-center py-12">
+                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-forest-600 mx-auto mb-4"></div>
+                                                <p className="text-charcoal-600">Loading archive list...</p>
+                                            </div>
+                                        ) : archives.length === 0 ? (
                                             <p className="text-center text-charcoal-500 py-8">No archived results available.</p>
                                         ) : (
                                             <div className="grid gap-4">

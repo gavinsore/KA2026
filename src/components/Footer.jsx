@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { showCookiePreferences } from '../utils/cookieConsent';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
@@ -137,6 +138,12 @@ const Footer = () => {
                         <Link to="/privacy" className="text-forest-400 hover:text-gold-400 transition-colors text-sm">
                             Privacy Policy
                         </Link>
+                        <button
+                            onClick={showCookiePreferences}
+                            className="text-forest-400 hover:text-gold-400 transition-colors text-sm cursor-pointer"
+                        >
+                            Cookie Preferences
+                        </button>
                     </div>
                     <p className="text-forest-300 text-sm">
                         Affiliated to <a href="https://archerygb.org" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">Archery GB</a>,{' '}

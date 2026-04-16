@@ -57,12 +57,12 @@ export function getCurrentSeasons() {
  * @param {string} path - Path in storage bucket
  * @returns {Promise<string>} File content
  */
-async function fetchSupabaseFile(path) {
+async function fetchSupabaseFile(path, { bustCache = false } = {}) {
     try {
-        // Generate public URL with a cache buster to ensure we get the latest
-        // version immediately after an overwrite upload (especially for PBs and Records)
         const { data } = supabase.storage.from('results').getPublicUrl(path);
-        const url = `${data.publicUrl}?t=${new Date().getTime()}`;
+        // Only append a cache-buster when explicitly requested (e.g. right after
+        // an admin upload). For regular reads we let the browser / CDN cache the file.
+        const url = bustCache ? `${data.publicUrl}?t=${Date.now()}` : data.publicUrl;
 
         const response = await fetch(url);
         // If 404 Not Found (e.g. file doesn't exist yet in Supabase), throw error
@@ -306,33 +306,38 @@ export async function loadAllEventResults() {
             .order('event_date', { ascending: false });
 
         if (!error && files) {
-            for (const file of files) {
-                let eventResults = [];
-                const isCsv = file.filename.toLowerCase().endsWith('.csv');
-                const fileUrl = getSupabaseFileUrl(file.file_path);
+            // Fetch all event CSVs in parallel rather than one-by-one
+            const eventDataList = await Promise.all(
+                files.map(async (file) => {
+                    let eventResults = [];
+                    const isCsv = file.filename.toLowerCase().endsWith('.csv');
+                    const fileUrl = getSupabaseFileUrl(file.file_path);
 
-                if (isCsv) {
-                    const csvText = await fetchSupabaseFile(file.file_path);
-                    if (csvText) {
-                        eventResults = parseCSV(csvText);
+                    if (isCsv) {
+                        const csvText = await fetchSupabaseFile(file.file_path);
+                        if (csvText) {
+                            eventResults = parseCSV(csvText);
+                        }
                     }
-                }
 
-                const pdfUrl = file.pdf_path ? getSupabaseFileUrl(file.pdf_path) : null;
+                    const pdfUrl = file.pdf_path ? getSupabaseFileUrl(file.pdf_path) : null;
 
-                const eventData = {
-                    id: file.id,
-                    date: file.event_date,
-                    eventName: file.event_name,
-                    venue: file.venue, // 'Indoor' or 'Outdoor'
-                    results: eventResults,
-                    fileUrl: fileUrl,
-                    pdfUrl: pdfUrl,
-                    fileType: isCsv ? 'csv' : 'file',
-                    season: getSeasonFromDate(file.event_date, file.venue)
-                };
+                    return {
+                        id: file.id,
+                        date: file.event_date,
+                        eventName: file.event_name,
+                        venue: file.venue, // 'Indoor' or 'Outdoor'
+                        results: eventResults,
+                        fileUrl: fileUrl,
+                        pdfUrl: pdfUrl,
+                        fileType: isCsv ? 'csv' : 'file',
+                        season: getSeasonFromDate(file.event_date, file.venue)
+                    };
+                })
+            );
 
-                if (file.venue === 'Indoor') {
+            for (const eventData of eventDataList) {
+                if (eventData.venue === 'Indoor') {
                     results.indoor.push(eventData);
                 } else {
                     results.outdoor.push(eventData);

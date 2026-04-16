@@ -26,6 +26,7 @@ import CountyRecordsManager from './pages/admin/CountyRecordsManager';
 import BeginnersCourseManager from './pages/admin/BeginnersCourseManager';
 import ForgotPassword from './pages/ForgotPassword';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import CookieBanner from './components/CookieBanner';
 
 function App() {
     return (
@@ -151,6 +152,7 @@ function App() {
                         </main>
                     </div>
                     <Footer />
+                    <CookieBanner />
                 </div>
             </AuthProvider>
         </Router>
