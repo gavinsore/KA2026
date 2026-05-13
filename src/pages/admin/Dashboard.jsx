@@ -1,6 +1,267 @@
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import SEO from '../../components/SEO';
+import { supabase } from '../../lib/supabase';
+
+// ─── Site Analytics Panel ────────────────────────────────────────────────────
+
+function SiteAnalytics() {
+    const [dailyData, setDailyData]     = useState([]);   // { date, count }[]
+    const [topPages, setTopPages]       = useState([]);   // { page, count }[]
+    const [loading, setLoading]         = useState(true);
+    const [error, setError]             = useState(null);
+
+    useEffect(() => {
+        async function load() {
+            setLoading(true);
+            setError(null);
+            try {
+                // Format a Date as YYYY-MM-DD in the browser's LOCAL timezone.
+                // Using toISOString() would give UTC, which is 1 hour behind BST
+                // and causes today's visits to fall outside the dayMap.
+                const toLocalDateStr = (d) => {
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${y}-${m}-${day}`;
+                };
+
+                // Start of the 30-day window at local midnight
+                const since = new Date();
+                since.setDate(since.getDate() - 29);
+                since.setHours(0, 0, 0, 0);
+
+                const { data, error: dbErr } = await supabase
+                    .from('page_visits')
+                    .select('visited_at, page, session_id, daily_hash')
+                    .gte('visited_at', since.toISOString())
+                    .order('visited_at', { ascending: true });
+
+                if (dbErr) throw dbErr;
+
+                // Build dayMap keys using LOCAL dates so today is always included
+                const dayMap = {};
+                const sessionMap = {}; // date → Set of unique session IDs
+                const pageMap = {};
+                for (let i = 0; i < 30; i++) {
+                    const d = new Date(since);
+                    d.setDate(d.getDate() + i);
+                    const key = toLocalDateStr(d);
+                    dayMap[key] = 0;
+                    sessionMap[key] = new Set();
+                }
+
+                // visited_at arrives as a UTC ISO string — convert to local date
+                (data || []).forEach(({ visited_at, page, session_id, daily_hash }) => {
+                    const day = toLocalDateStr(new Date(visited_at));
+                    if (day in dayMap) {
+                        dayMap[day]++;
+                        // Prefer daily_hash (IP-based, accurate across tabs/days)
+                        // Fall back to session_id if hash not yet populated
+                        const uniqueKey = daily_hash ?? session_id;
+                        if (uniqueKey) sessionMap[day].add(uniqueKey);
+                    }
+                    pageMap[page] = (pageMap[page] || 0) + 1;
+                });
+
+                setDailyData(
+                    Object.entries(dayMap).map(([date, count]) => ({
+                        date,
+                        count,
+                        sessions: sessionMap[date]?.size ?? 0,
+                    }))
+                );
+                setTopPages(
+                    Object.entries(pageMap)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 8)
+                        .map(([page, count]) => ({ page, count }))
+                );
+            } catch (e) {
+                console.error('[SiteAnalytics]', e);
+                setError('Could not load analytics data.');
+            } finally {
+                setLoading(false);
+            }
+        }
+        load();
+    }, []);
+
+    // Derived stats — use local date strings to match the dayMap keys
+    const toLocalDateStr = (d) => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    };
+    const totalMonth        = dailyData.reduce((s, d) => s + d.count, 0);
+    const totalMonthSess    = dailyData.reduce((s, d) => s + d.sessions, 0);
+    const today             = toLocalDateStr(new Date());
+    const todayEntry        = dailyData.find(d => d.date === today);
+    const todayCount        = todayEntry?.count    ?? 0;
+    const todaySessions     = todayEntry?.sessions ?? 0;
+    const weekStart         = new Date(); weekStart.setDate(weekStart.getDate() - 6);
+    const weekStr           = toLocalDateStr(weekStart);
+    const weekData          = dailyData.filter(d => d.date >= weekStr);
+    const weekCount         = weekData.reduce((s, d) => s + d.count, 0);
+    const weekSessions      = weekData.reduce((s, d) => s + d.sessions, 0);
+    const maxCount          = Math.max(...dailyData.map(d => d.count), 1);
+
+    const fmtDate = (iso) => {
+        const d = new Date(iso + 'T00:00:00');
+        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    };
+
+    const pageName = (path) => path === '/' ? 'Home' : path.replace(/^\//, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    return (
+        <div className="mt-10 pt-10 border-t border-forest-200">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-forest-50 rounded-lg border border-forest-200">
+                    <svg className="w-5 h-5 text-forest-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 className="text-xl font-bold text-forest-900">Site Analytics</h2>
+                    <p className="text-xs text-charcoal-400 mt-0.5">Cookie-free · Last 30 days · Public pages only</p>
+                </div>
+            </div>
+
+            {loading && (
+                <div className="flex items-center justify-center h-40 text-charcoal-400">
+                    <svg className="animate-spin w-6 h-6 mr-2" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                    Loading analytics…
+                </div>
+            )}
+
+            {error && (
+                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>
+            )}
+
+            {!loading && !error && (
+                <>
+                    {/* ── Stat Cards ─────────────────────────────────────── */}
+                    <div className="grid grid-cols-3 gap-4 mb-8">
+                        {[
+                            { label: 'Today',      views: todayCount,  sessions: todaySessions,  icon: '📅', color: 'from-forest-500 to-forest-600' },
+                            { label: 'This Week',  views: weekCount,   sessions: weekSessions,   icon: '📆', color: 'from-teal-500 to-teal-600'   },
+                            { label: 'This Month', views: totalMonth,  sessions: totalMonthSess, icon: '📊', color: 'from-gold-500 to-gold-600'   },
+                        ].map(({ label, views, sessions, icon, color }) => (
+                            <div key={label} className="glass-card p-5 flex flex-col gap-1">
+                                <span className="text-2xl">{icon}</span>
+                                <span className={`text-3xl font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
+                                    {views.toLocaleString()}
+                                </span>
+                                <span className="text-xs text-charcoal-400 font-medium uppercase tracking-wide">{label}</span>
+                                <div className="mt-1 pt-1 border-t border-charcoal-100 flex items-center gap-1">
+                                    <svg className="w-3 h-3 text-charcoal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    <span className="text-xs text-charcoal-500">
+                                        <strong>{sessions.toLocaleString()}</strong> unique visitor{sessions !== 1 ? 's' : ''}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* ── Bar Chart ──────────────────────────────────────── */}
+                    <div className="glass-card p-6 mb-6">
+                        <h3 className="text-sm font-semibold text-charcoal-500 uppercase tracking-wide mb-4">
+                            Daily Visits — Last 30 Days
+                        </h3>
+                        {totalMonth === 0 ? (
+                            <p className="text-center text-charcoal-400 text-sm py-8">No visits recorded yet.</p>
+                        ) : (
+                            <div className="flex items-end gap-1 h-32" aria-label="Daily visits bar chart">
+                                {dailyData.map(({ date, count }) => {
+                                    const heightPct = Math.max((count / maxCount) * 100, count > 0 ? 4 : 0);
+                                    const isToday   = date === today;
+                                    return (
+                                        <div
+                                            key={date}
+                                            className="flex-1 flex flex-col items-center justify-end gap-0.5 group relative"
+                                            title={`${fmtDate(date)}: ${count} visit${count !== 1 ? 's' : ''}`}
+                                        >
+                                            {/* Tooltip */}
+                                            <div className="absolute bottom-full mb-1 hidden group-hover:flex flex-col items-center z-10 pointer-events-none">
+                                                <div className="bg-charcoal-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap shadow-lg">
+                                                    {fmtDate(date)}: <strong>{count}</strong>
+                                                </div>
+                                                <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-charcoal-800" />
+                                            </div>
+                                            {/* Bar */}
+                                            <div
+                                                style={{ height: `${heightPct}%` }}
+                                                className={`w-full rounded-t transition-all duration-300 ${
+                                                    isToday
+                                                        ? 'bg-gradient-to-t from-gold-500 to-gold-400'
+                                                        : 'bg-gradient-to-t from-forest-500 to-forest-400 group-hover:from-forest-600 group-hover:to-forest-500'
+                                                }`}
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                        {/* X-axis labels — show only a few to avoid crowding */}
+                        <div className="flex justify-between mt-2 text-xs text-charcoal-400">
+                            {[0, 7, 14, 21, 29].map(i => (
+                                <span key={i}>{dailyData[i] ? fmtDate(dailyData[i].date) : ''}</span>
+                            ))}
+                        </div>
+                        <div className="flex items-center gap-4 mt-3 text-xs text-charcoal-400">
+                            <span className="flex items-center gap-1">
+                                <span className="w-3 h-3 rounded-sm bg-gradient-to-t from-forest-500 to-forest-400 inline-block" /> Past days
+                            </span>
+                            <span className="flex items-center gap-1">
+                                <span className="w-3 h-3 rounded-sm bg-gradient-to-t from-gold-500 to-gold-400 inline-block" /> Today
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* ── Top Pages ──────────────────────────────────────── */}
+                    {topPages.length > 0 && (
+                        <div className="glass-card p-6">
+                            <h3 className="text-sm font-semibold text-charcoal-500 uppercase tracking-wide mb-4">
+                                Top Pages — Last 30 Days
+                            </h3>
+                            <div className="space-y-2">
+                                {topPages.map(({ page, count }, idx) => {
+                                    const barPct = Math.round((count / topPages[0].count) * 100);
+                                    return (
+                                        <div key={page} className="flex items-center gap-3">
+                                            <span className="text-xs text-charcoal-400 w-4 text-right shrink-0">{idx + 1}</span>
+                                            <span className="text-sm font-medium text-charcoal-700 w-28 shrink-0 truncate" title={page}>
+                                                {pageName(page)}
+                                            </span>
+                                            <div className="flex-1 bg-charcoal-100 rounded-full h-2 overflow-hidden">
+                                                <div
+                                                    className="h-full bg-gradient-to-r from-forest-400 to-forest-600 rounded-full transition-all duration-500"
+                                                    style={{ width: `${barPct}%` }}
+                                                />
+                                            </div>
+                                            <span className="text-sm font-semibold text-charcoal-600 w-10 text-right shrink-0">
+                                                {count.toLocaleString()}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+                </>
+            )}
+        </div>
+    );
+}
+
+// ─── Dashboard ───────────────────────────────────────────────────────────────
 
 const Dashboard = () => {
     const { user, signOut } = useAuth();
@@ -141,6 +402,7 @@ const Dashboard = () => {
                     </div>
                 </div>
 
+                {/* Module cards */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {modules.map((module) => (
                         <Link
@@ -160,6 +422,9 @@ const Dashboard = () => {
                         </Link>
                     ))}
                 </div>
+
+                {/* Analytics panel — below the module grid */}
+                <SiteAnalytics />
             </div>
         </div>
     );

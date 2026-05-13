@@ -24,7 +24,7 @@ const PrivacyPolicy = () => {
                         Privacy <span className="gradient-text">Policy</span>
                     </h1>
                     <p className="text-charcoal-600 text-lg">
-                        Last updated: April 2025
+                        Last updated: May 2026
                     </p>
                 </div>
 
@@ -49,18 +49,19 @@ const PrivacyPolicy = () => {
                             payment details) unless you contact us via email.
                         </p>
                         <p>
-                            With your consent, we use <strong>Google Analytics (GA4)</strong> to collect anonymised
-                            usage data about how visitors interact with our website. This may include:
+                            We collect two categories of usage data:
                         </p>
                         <ul className="list-disc list-inside space-y-1 pl-2">
-                            <li>Pages visited and time spent on each page</li>
-                            <li>Approximate geographic location (country / region level only)</li>
-                            <li>Browser type and device type</li>
-                            <li>How you arrived at the site (e.g. search engine, direct link)</li>
+                            <li>
+                                <strong>Server-side visit counts</strong> — recorded automatically for every page visit,
+                                without any cookies or personal identifiers. See the section below for full details.
+                            </li>
+                            <li>
+                                <strong>Google Analytics (GA4)</strong> — collected only <strong>if you consent</strong> via
+                                the cookie banner. This may include pages visited, approximate location (country/region),
+                                browser type, and how you arrived at the site.
+                            </li>
                         </ul>
-                        <p>
-                            This data is <strong>anonymised</strong> — we cannot identify you personally from it.
-                        </p>
                     </Section>
 
                     <Section title="Cookies">
@@ -98,10 +99,50 @@ const PrivacyPolicy = () => {
                         </p>
                     </Section>
 
-                    <Section title="How Long Data Is Retained">
+                    <Section title="Server-Side Analytics (No Consent Required)">
                         <p>
-                            Google Analytics data is retained for <strong>14 months</strong> by default, after which
-                            it is automatically deleted. We do not store any analytics data on our own servers.
+                            In addition to Google Analytics, we operate our own <strong>privacy-first visit counter</strong>.
+                            When you visit any page on this website, our server records:
+                        </p>
+                        <ul className="list-disc list-inside space-y-1 pl-2">
+                            <li>The page URL path visited (e.g. <code className="font-mono text-forest-700">/events</code>)</li>
+                            <li>The referring website (e.g. a search engine), if any</li>
+                            <li>Your browser type (user-agent string)</li>
+                        </ul>
+                        <p>
+                            <strong>Your IP address is never stored.</strong> It is used solely for automatic bot
+                            filtering (to exclude web crawlers from the count) and is immediately discarded.
+                            No cookies are set by this system and no persistent identifier of any kind is stored
+                            on your device.
+                        </p>
+                        <p>
+                            The lawful basis for this processing is <strong>Legitimate Interest</strong> (UK GDPR
+                            Article 6(1)(f)). We have a legitimate interest in understanding how our website is used
+                            so that we can improve it for members and visitors. As no personal data is retained and
+                            no individual profiling takes place, this processing does not override your privacy rights.
+                        </p>
+                        <p>
+                            This processing does <strong>not</strong> require your consent under UK PECR because
+                            nothing is stored on your device.
+                        </p>
+                    </Section>
+
+                    <Section title="How Long Data Is Retained">
+                        <p>We apply a two-tier retention policy to our server-side visit data:</p>
+                        <ul className="list-disc list-inside space-y-1 pl-2">
+                            <li>
+                                <strong>Daily visit records</strong> — kept for <strong>12 months</strong>, then
+                                automatically deleted.
+                            </li>
+                            <li>
+                                <strong>Monthly summary totals</strong> — aggregated counts (page name + visit count
+                                per month, no individual records) are retained for <strong>5 years</strong> to allow
+                                long-term trend analysis.
+                            </li>
+                        </ul>
+                        <p>
+                            Google Analytics data is retained for <strong>14 months</strong> by default within
+                            Google's systems. We do not store Google Analytics data on our own servers.
                         </p>
                     </Section>
 

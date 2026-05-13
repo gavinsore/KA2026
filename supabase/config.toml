@@ -1,0 +1,5 @@
+# track-visit is a public endpoint — it receives only { page, referrer } from
+# the browser and uses the service_role key internally to write. There is no
+# sensitive data returned to the caller, so JWT verification is disabled.
+[functions.track-visit]
+verify_jwt = false

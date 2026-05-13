@@ -1,6 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import { trackVisit } from './utils/trackVisit';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Announcement from './components/Announcement';
@@ -28,6 +30,18 @@ import ForgotPassword from './pages/ForgotPassword';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import CookieBanner from './components/CookieBanner';
 
+// Fires once per page per session — no cookies, no personal data stored
+function PageTracker() {
+    const location = useLocation();
+    useEffect(() => {
+        // Skip admin pages — no value in tracking internal admin navigation
+        if (!location.pathname.startsWith('/admin')) {
+            trackVisit(location.pathname);
+        }
+    }, [location.pathname]);
+    return null;
+}
+
 function App() {
     return (
         <Router basename={import.meta.env.BASE_URL}>
@@ -37,6 +51,7 @@ function App() {
                     <div className="pt-16 md:pt-20">
                         <Announcement />
                         <main className="flex-1">
+                            <PageTracker />
                             <Routes>
                                 {/* Public Routes */}
                                 <Route path="/" element={<Home />} />
