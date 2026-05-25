@@ -57,8 +57,6 @@ function SiteAnalytics() {
                     const day = toLocalDateStr(new Date(visited_at));
                     if (day in dayMap) {
                         dayMap[day]++;
-                        // Prefer daily_hash (IP-based, accurate across tabs/days)
-                        // Fall back to session_id if hash not yet populated
                         const uniqueKey = daily_hash ?? session_id;
                         if (uniqueKey) sessionMap[day].add(uniqueKey);
                     }
@@ -178,26 +176,30 @@ function SiteAnalytics() {
                         {totalMonth === 0 ? (
                             <p className="text-center text-charcoal-400 text-sm py-8">No visits recorded yet.</p>
                         ) : (
-                            <div className="flex items-end gap-1 h-32" aria-label="Daily visits bar chart">
+                            // Bar heights use px (not %) — % heights fail when parent is auto-height in a flex row
+                            <div className="flex gap-1 h-32" aria-label="Daily visits bar chart">
                                 {dailyData.map(({ date, count }) => {
-                                    const heightPct = Math.max((count / maxCount) * 100, count > 0 ? 4 : 0);
-                                    const isToday   = date === today;
+                                    const BAR_MAX_PX = 128; // matches h-32
+                                    const barPx = count > 0
+                                        ? Math.max(Math.round((count / maxCount) * BAR_MAX_PX), 5)
+                                        : 0;
+                                    const isToday = date === today;
                                     return (
                                         <div
                                             key={date}
-                                            className="flex-1 flex flex-col items-center justify-end gap-0.5 group relative"
+                                            className="flex-1 h-full flex flex-col justify-end group relative"
                                             title={`${fmtDate(date)}: ${count} visit${count !== 1 ? 's' : ''}`}
                                         >
                                             {/* Tooltip */}
-                                            <div className="absolute bottom-full mb-1 hidden group-hover:flex flex-col items-center z-10 pointer-events-none">
+                                            <div className="absolute bottom-full mb-1 hidden group-hover:flex flex-col items-center z-10 pointer-events-none" style={{ left: '50%', transform: 'translateX(-50%)' }}>
                                                 <div className="bg-charcoal-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap shadow-lg">
                                                     {fmtDate(date)}: <strong>{count}</strong>
                                                 </div>
                                                 <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-charcoal-800" />
                                             </div>
-                                            {/* Bar */}
+                                            {/* Bar — fixed px height so rendering is independent of parent height resolution */}
                                             <div
-                                                style={{ height: `${heightPct}%` }}
+                                                style={{ height: `${barPx}px` }}
                                                 className={`w-full rounded-t transition-all duration-300 ${
                                                     isToday
                                                         ? 'bg-gradient-to-t from-gold-500 to-gold-400'
