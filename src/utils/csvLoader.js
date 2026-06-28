@@ -415,7 +415,15 @@ export async function loadClubRecords() {
 
     // Normalize line endings to ensure \r\n and \n are both handled
     const normalizedText = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    return parseClubRecordsCSV(normalizedText.split('\n'));
+    const lines = normalizedText.split('\n');
+
+    // Detect format by checking if the first non-empty line is the new named-header format.
+    // Strip both the Unicode BOM (﻿) and its Latin-1 decoded equivalent (ï»¿) before checking.
+    const firstLine = lines[0].replace(/^﻿/, '').replace(/^ï»¿/, '').trim();
+    if (firstLine.startsWith('Date Shot')) {
+        return parseNewClubRecordsCSV(lines);
+    }
+    return parseClubRecordsCSV(lines);
 }
 
 /**
@@ -479,6 +487,50 @@ function parseClubRecordsCSV(lines) {
                 archer_category: values[9]?.trim() || ''
             });
         }
+    }
+
+    return records.sort((a, b) => (a.round || '').localeCompare(b.round || ''));
+}
+
+/**
+ * Parse the newer flat club-records CSV format.
+ * Header: Date Shot,Round,Score,Golds,Hits,Tens,Class,Age Group,Name,Place Shot,User1,User2
+ * @param {Array<string>} lines
+ * @returns {Array<Object>}
+ */
+function parseNewClubRecordsCSV(lines) {
+    // Strip BOM from the raw header line before splitting — handles both the
+    // Unicode BOM (﻿) and the same bytes decoded as Latin-1 (ï»¿).
+    const rawHeader = lines[0].replace(/^﻿/, '').replace(/^ï»¿/, '');
+    const headers = parseCSVLine(rawHeader).map(h => h.trim().toLowerCase().replace(/\s+/g, '_'));
+
+    // Build a column-index lookup so we can fetch values by position,
+    // which is immune to any key-naming issues that slipped through the BOM strip.
+    const col = {};
+    headers.forEach((h, i) => { col[h] = i; });
+
+    const records = [];
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        if (isEmptyLine(line)) continue;
+
+        const values = parseCSVLine(line);
+        const get = (key) => values[col[key]]?.trim() || '';
+
+        const name = get('name');
+        if (!name) continue;
+
+        records.push({
+            round: get('round'),
+            archer_name: name,
+            score: get('score') || '0',
+            golds: get('golds') || '0',
+            hits: get('hits') || '0',
+            bow_type: get('class'),
+            date: parseUKDate(get('date_shot')),
+            archer_category: get('age_group'),
+            place_shot: get('place_shot')
+        });
     }
 
     return records.sort((a, b) => (a.round || '').localeCompare(b.round || ''));
@@ -578,18 +630,19 @@ function parsePersonalBestsCSV(lines) {
 }
 
 /**
- * Parse date string in dd/mm/yyyy format to ISO YYYY-MM-DD
- * @param {string} dateStr 
+ * Parse date string in dd/mm/yyyy or dd/mm/yyyy HH:MM format to ISO YYYY-MM-DD
+ * @param {string} dateStr
  * @returns {string} ISO date string or original if parse fails
  */
 function parseUKDate(dateStr) {
     if (!dateStr) return '';
 
-    // Check if matched dd/mm/yyyy format
-    const parts = dateStr.split('/');
+    // Strip any trailing time component (e.g. "13/01/2013 21:29")
+    const datePart = dateStr.split(' ')[0];
+
+    const parts = datePart.split('/');
     if (parts.length === 3) {
         const [day, month, year] = parts;
-        // Basic validation: ensure parts are numbers and year is 4 digits
         if (!isNaN(day) && !isNaN(month) && !isNaN(year) && year.length === 4) {
             return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
         }
