@@ -554,12 +554,119 @@ export async function loadPersonalBests() {
 
     // Normalize line endings
     const normalizedText = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = normalizedText.split('\n');
 
-    return parsePersonalBestsCSV(normalizedText.split('\n')).sort((a, b) => {
+    // Detect format: in the new (2026+) export the header row starts with "Round"
+    // in the first column; the old export had the header at column index 2.
+    const parsed = isNewPersonalBestsFormat(lines)
+        ? parseNewPersonalBestsCSV(lines)
+        : parsePersonalBestsCSV(lines);
+
+    return parsed.sort((a, b) => {
         const nameCompare = (a.archer_name || '').localeCompare(b.archer_name || '');
         if (nameCompare !== 0) return nameCompare;
         return (a.round || '').localeCompare(b.round || '');
     });
+}
+
+/**
+ * Detect the new (2026+) Personal Bests export format.
+ * The new export puts the section header row ("Round","Age Group","Date Shot",...)
+ * in the FIRST column, whereas the old print-ready export had "Round" at column index 2.
+ * @param {Array<string>} lines
+ * @returns {boolean}
+ */
+function isNewPersonalBestsFormat(lines) {
+    for (const line of lines) {
+        if (isEmptyLine(line)) continue;
+        const values = parseCSVLine(line.trim());
+        const roundIdx = values.findIndex(v => v.trim() === 'Round');
+        if (roundIdx !== -1) {
+            return roundIdx === 0;
+        }
+    }
+    return false;
+}
+
+/**
+ * Parse the new (2026+) Personal Bests CSV export format.
+ * Structure (all data starts in the first column):
+ * - Page metadata: "Kettering Archers", "Personal Bests in period ending ...",
+ *   and page footers like "29/06/2026",,,"Page 2" -> ignored
+ * - Archer name line: single populated cell (e.g. "Alan Haynes")
+ * - Bow type line: single populated cell (e.g. "Barebow"), always followed by a header row
+ * - Header row: "Round","Age Group","Date Shot","Score","Hits",,"Golds","Xs"
+ * - Record row: values at [0]=round, [1]=age group, [2]=date, [3]=score,
+ *   [4]=hits, [5]=(blank), [6]=golds, [7]=Xs
+ * Sections continue across page breaks, so archer/bow state persists until
+ * a new entity line appears.
+ * @param {Array<string>} lines
+ * @returns {Array<Object>}
+ */
+function parseNewPersonalBestsCSV(lines) {
+    const records = [];
+    let currentArcher = null;
+    let currentBow = null;
+    let potentialEntity = null;
+    const DATE_RE = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (isEmptyLine(line)) continue;
+
+        const values = parseCSVLine(line).map(v => v.trim());
+        const nonEmpty = values.filter(v => v !== '');
+        if (nonEmpty.length === 0) continue;
+
+        const first = values[0];
+
+        // Page metadata -> ignore
+        if (first.includes('Kettering Archers')) continue;
+        if (first.startsWith('Personal Bests')) continue;
+        // Page footer, e.g. "29/06/2026",,,"Page 2"
+        if (DATE_RE.test(first) && values.some(v => /^Page\s+\d+/i.test(v))) continue;
+
+        // Header row: the entity line directly above it was the bow type;
+        // if another entity preceded that one, it was the archer name.
+        if (first === 'Round') {
+            if (potentialEntity) {
+                currentBow = potentialEntity;
+                potentialEntity = null;
+            }
+            continue;
+        }
+
+        // Entity line (only the first column populated): archer name or bow type
+        if (nonEmpty.length === 1) {
+            if (potentialEntity) {
+                currentArcher = potentialEntity;
+            }
+            potentialEntity = first;
+            continue;
+        }
+
+        // Record rows
+        if (!currentArcher || !currentBow) continue;
+
+        if (DATE_RE.test(values[2] || '')) {
+            records.push({
+                archer_name: currentArcher,
+                bow_type: currentBow,
+                round: values[0],
+                archer_category: values[1] || '',
+                date: parseUKDate(values[2]),
+                score: values[3] || '0',
+                hits: values[4] || '0',
+                golds: values[6] || '0'
+            });
+        } else if (DATE_RE.test(values[1] || '')) {
+            // Occasionally the export drops the round name from a row, shifting
+            // every column left by one. Without a round the record is unusable.
+            console.warn(`Personal Bests parser: skipping record with missing round name for ${currentArcher} (${currentBow})`);
+        }
+    }
+
+    return records;
 }
 
 /**
